@@ -1,0 +1,82 @@
+package com.sparta.quokkatravel.domain.accommodation.controller;
+
+import com.sparta.quokkatravel.domain.accommodation.dto.AccommodationRequestDto;
+import com.sparta.quokkatravel.domain.accommodation.dto.AccommodationOfHostResponseDto;
+import com.sparta.quokkatravel.domain.accommodation.service.AccommodationOfHostService;
+import com.sparta.quokkatravel.domain.accommodation.service.AccommodationOfHostServiceImpl;
+import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
+import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.user.entity.UserRole;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v1/host")
+@PreAuthorize("hasRole('ROLE_HOST')")
+@RequiredArgsConstructor
+@Tag(name = "Accommodation", description = "Host 숙소 관련 컨트롤러")
+public class AccommodationOfHostController {
+
+    private final AccommodationOfHostService accommodationOfHostService;
+
+    // 숙소 생성
+    @PostMapping("/accommodations")
+    @Operation(summary = "숙소 생성", description = "HOST 유저가 숙소를 생성하는 API")
+    public ResponseEntity<?> createAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                 @RequestBody AccommodationRequestDto accommodationRequestDto) {
+
+        AccommodationOfHostResponseDto accommodationOfHostResponseDto = accommodationOfHostService.createAccommodation(customUserDetails, accommodationRequestDto);
+        return ResponseEntity.ok(ApiResponse.created("숙소 생성 성공", accommodationOfHostResponseDto));
+    }
+
+    // 숙소 전체 조회
+    @GetMapping("/accommodations")
+    @Operation(summary = "숙소 전체 조회", description = "HOST 유저의 숙소들을 조회하는 API")
+    public ResponseEntity<?> getAllAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                 @RequestParam(required = false) Pageable pageable) {
+        if(customUserDetails.getUserRole() == UserRole.GUEST) {
+
+        }
+        Page<AccommodationOfHostResponseDto> accommodations = accommodationOfHostService.getAllAccommodation(customUserDetails, pageable);
+        return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", accommodations));
+    }
+
+    // 숙소 단일 조회
+    @GetMapping("/accommodations/{accommodationId}")
+    @Operation(summary = "숙소 전체 조회", description = "HOST 유저의 특정 숙소 하나만 조회하는 API")
+    public ResponseEntity<?> getAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                              @PathVariable(name = "accommodationId") Long accommodationId) {
+
+        AccommodationOfHostResponseDto accommodationOfHostResponseDto = accommodationOfHostService.getAccommodation(customUserDetails, accommodationId);
+        return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", accommodationOfHostResponseDto));
+    }
+
+    // 숙소 수정
+    @PutMapping("/accommodations/{accommodationId}")
+    @Operation(summary = "숙소 수정", description = "HOST 유저의 특정 숙소를 수정하는 API")
+    public ResponseEntity<?> updateAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                 @PathVariable(name = "accommodationId") Long accommodationId,
+                                                 @RequestBody AccommodationRequestDto accommodationRequestDto) {
+
+        AccommodationOfHostResponseDto accommodationOfHostResponseDto = accommodationOfHostService.updateAccommodation(customUserDetails, accommodationId, accommodationRequestDto);
+        return ResponseEntity.ok(ApiResponse.success("숙소 수정 성공", accommodationOfHostResponseDto));
+    }
+
+    // 숙소 삭제
+    @DeleteMapping("/accommodations/{accommodationId}")
+    @Operation(summary = "숙소 삭제", description = "HOST 유저의 특정 숙소를 삭제하는 API")
+    public ResponseEntity<?> updateAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                 @PathVariable(name = "accommodationId") Long accommodationId) {
+
+        AccommodationOfHostResponseDto accommodationOfHostResponseDto = accommodationOfHostService.deleteAccommodation(customUserDetails, accommodationId);
+        return ResponseEntity.ok(ApiResponse.success("숙소 수정 성공", accommodationOfHostResponseDto));
+    }
+
+}
