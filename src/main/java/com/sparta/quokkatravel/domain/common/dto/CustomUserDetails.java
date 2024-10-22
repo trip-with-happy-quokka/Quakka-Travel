@@ -1,6 +1,7 @@
 package com.sparta.quokkatravel.domain.common.dto;
 
 import com.sparta.quokkatravel.domain.user.entity.User;
+import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,15 +15,17 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
 
     private final String email;
+    private final UserRole userRole;
 
     public CustomUserDetails(User user) {
         this.email = user.getEmail();
+        this.userRole = user.getUserRole();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_"));
+        authorities.add(new SimpleGrantedAuthority("ROLE_"+ userRole.name()));
         return authorities;
     }
 
