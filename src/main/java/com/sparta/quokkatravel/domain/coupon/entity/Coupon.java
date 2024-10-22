@@ -17,7 +17,6 @@ import java.util.Set;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "coupon")
 public class Coupon extends Timestamped {
 
     @Id

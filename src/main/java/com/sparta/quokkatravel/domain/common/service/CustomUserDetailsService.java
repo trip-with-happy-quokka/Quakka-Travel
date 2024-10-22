@@ -2,7 +2,7 @@ package com.sparta.quokkatravel.domain.common.service;
 
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.user.entity.User;
-import com.sparta.quokkatravel.domain.user.UserRepository;
+import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

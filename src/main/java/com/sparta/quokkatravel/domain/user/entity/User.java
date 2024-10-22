@@ -1,15 +1,12 @@
 package com.sparta.quokkatravel.domain.user.entity;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
-import com.sparta.quokkatravel.domain.admin.loginhistory.entity.LoginHistory;
 import com.sparta.quokkatravel.domain.chat.entity.ChatParticipant;
 import com.sparta.quokkatravel.domain.chat.entity.Chatting;
 import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
-import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponUser;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.review.entity.Review;
-import com.sparta.quokkatravel.domain.user.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +18,6 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "user")
 public class User extends Timestamped {
 
     @Id

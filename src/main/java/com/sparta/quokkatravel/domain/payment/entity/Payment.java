@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Table(name = "payment")
 public class Payment extends Timestamped {
 
     @Id

@@ -6,7 +6,6 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "room")
 public class Room extends Timestamped {
 
     @Id

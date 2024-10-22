@@ -1,4 +1,4 @@
-package com.sparta.quokkatravel.domain.user;
+package com.sparta.quokkatravel.domain.user.entity;
 
 import lombok.Getter;
 

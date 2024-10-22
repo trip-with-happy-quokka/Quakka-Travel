@@ -14,7 +14,6 @@ import java.time.temporal.ChronoUnit;
 
 @Entity
 @Getter
-@Table(name = "reservation")
 public class Reservation extends Timestamped {
 
     @Id
