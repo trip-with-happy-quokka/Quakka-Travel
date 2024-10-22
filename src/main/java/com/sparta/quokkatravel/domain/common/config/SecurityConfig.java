@@ -25,7 +25,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api-docs/**").permitAll()
-                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/v3/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/api/v1/users","/api/v1/users/login").permitAll() // 인증 관련 엔드포인트는 모두 접근 가능
                         .requestMatchers("/api/v1/notify/").hasRole("ADMIN")
                         .requestMatchers("/topic/notifications/").permitAll()
