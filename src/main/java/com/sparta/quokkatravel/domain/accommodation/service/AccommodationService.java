@@ -9,7 +9,7 @@ public interface AccommodationService {
     // 생성
     AccommodationResponseDto createAccommodation(CustomUserDetails customUserDetails, AccommodationRequestDto accommodationRequestDto);
     // 조회
-    AccommodationResponseDto getAllAccommodations(CustomUserDetails customUserDetails);
+    AccommodationResponseDto getAllAccommodation(CustomUserDetails customUserDetails);
     AccommodationResponseDto getAccommodation(CustomUserDetails customUserDetails, Long accommodationId);
     // 수정
     AccommodationResponseDto updateAccommodation(CustomUserDetails customUserDetails, Long accommodationId, AccommodationRequestDto accommodationRequestDto);

@@ -33,7 +33,7 @@ public class AccommodationController {
     @Operation(summary = "숙소 전체 조회", description = "HOST 유저의 숙소들을 조회하는 API")
     public ResponseEntity<?> getAllAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        AccommodationResponseDto accommodationResponseDto = accommodationSerivceImpl.getAllAccommodation();
+        AccommodationResponseDto accommodationResponseDto = accommodationSerivceImpl.getAllAccommodation(customUserDetails);
         return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", accommodationResponseDto));
     }
 
@@ -41,7 +41,7 @@ public class AccommodationController {
     @Operation(summary = "숙소 전체 조회", description = "HOST 유저의 특정 숙소 하나만 조회하는 API")
     public ResponseEntity<?> getAccommodation(@PathVariable(name = "accommodationId") Long accommodationId) {
 
-        AccommodationResponseDto accommodationResponseDto = accommodationSerivceImpl.createAccommodation(accommodationRequestDto);
+        AccommodationResponseDto accommodationResponseDto = accommodationSerivceImpl.updateAccommodation(accommodationRequestDto);
         return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", accommodationResponseDto));
     }
 
