@@ -26,6 +26,7 @@ public class ChatParticipant extends Timestamped {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // 생성자
     public ChatParticipant(ChatRoom chatRoom, User user) {
         this.chatRoom = chatRoom;
         this.user = user;

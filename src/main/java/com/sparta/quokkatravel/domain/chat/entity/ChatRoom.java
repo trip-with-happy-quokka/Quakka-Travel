@@ -36,6 +36,7 @@ public class ChatRoom extends Timestamped {
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Chatting> messages;
 
+    // 생성자
     public ChatRoom(String title, User createdBy) {
         this.title = title;
         this.createdBy = createdBy;
