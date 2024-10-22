@@ -23,6 +23,10 @@ server:
       force: true
   port: 8080
 
+jwt:
+  secret:
+    key: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==
+
 log:
   export:
     path: src/main/log
@@ -30,3 +34,20 @@ log:
 logging:
   level:
     root: info
+
+springdoc:
+  api-docs:
+    path: /api-docs
+    groups:
+      enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    groups-order: ASC
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    doc-expansion: none
+    cache:
+      disabled: true
+    model-and-view-allowed: true

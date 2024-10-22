@@ -1,0 +1,29 @@
+package com.sparta.quokkatravel.domain.event.entity;
+
+import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Getter
+@NoArgsConstructor
+@Table(name = "events")
+public class Event {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "event_title", nullable = false)
+    private String name;
+
+    @Column(name = "event_content", nullable = false)
+    private String content;
+
+    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Coupon> coupons = new ArrayList<>();
+}
