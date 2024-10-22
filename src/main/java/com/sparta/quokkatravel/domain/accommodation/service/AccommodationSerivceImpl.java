@@ -2,6 +2,7 @@ package com.sparta.quokkatravel.domain.accommodation.service;
 
 import com.sparta.quokkatravel.domain.accommodation.dto.AccommodationRequestDto;
 import com.sparta.quokkatravel.domain.accommodation.dto.AccommodationResponseDto;
+import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepositorySupport;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
@@ -18,12 +19,15 @@ public class AccommodationSerivceImpl implements AccommodationService {
     @Override
     public AccommodationResponseDto createAccommodation(CustomUserDetails customUserDetails, AccommodationRequestDto accommodationRequestDto) {
 
+        // CustomUserDetails 에서 User Role 을 가져와 인증을 해야함
+
+        Accommodation accommodation = new Accommodation(accommodationRequestDto);
 
         return null;
     }
 
     @Override
-    public AccommodationResponseDto getAllAccommodations(CustomUserDetails customUserDetails) {
+    public AccommodationResponseDto getAllAccommodation(CustomUserDetails customUserDetails) {
         return null;
     }
 
