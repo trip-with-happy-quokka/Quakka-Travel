@@ -4,7 +4,6 @@ import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.chat.entity.ChatParticipant;
 import com.sparta.quokkatravel.domain.chat.entity.Chatting;
 import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
-import com.sparta.quokkatravel.domain.coupon.entity.CouponUser;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.review.entity.Review;
 import jakarta.persistence.*;
