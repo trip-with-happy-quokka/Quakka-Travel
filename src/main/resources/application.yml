@@ -1,9 +1,12 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/quokka_travel
-    username: root
-    password: 1q2w3e4r5t
+    #quokka_travel
+    url: jdbc:mysql://localhost:3306/${DB_NAME}
+    # root
+    username: ${DB_USERNAME}
+    # 1q2w3e4r5t
+    password: ${DB_PASSWORD}
 
   jpa:
     show-sql: true
@@ -24,7 +27,8 @@ server:
 
 jwt:
   secret:
-    key: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==
+    # 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==
+    key: ${JWT_SECRETKEY}
 
 log:
   export:
