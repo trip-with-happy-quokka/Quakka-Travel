@@ -26,11 +26,18 @@ public class Reservation extends Timestamped {
     @Column(nullable = false)
     private LocalDate endDate;
 
-    @Column
+    @Column(nullable = false)
     private int numberOfGuests;
 
-    @Column
+    @Column(nullable = false)
     private int totalPrice;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReservationStatus status = ReservationStatus.PENDING;
+
+    @Column(nullable = false)
+    private LocalDate reservationDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
