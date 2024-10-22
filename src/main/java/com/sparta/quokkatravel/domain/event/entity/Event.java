@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "events")
+@Table(name = "event")
 public class Event {
 
     @Id
@@ -24,6 +24,6 @@ public class Event {
     @Column(name = "event_content", nullable = false)
     private String content;
 
-    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Coupon> coupons = new ArrayList<>();
 }

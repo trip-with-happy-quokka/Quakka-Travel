@@ -17,7 +17,7 @@ import java.util.Set;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "coupons")
+@Table(name = "coupon")
 public class Coupon extends Timestamped {
 
     @Id
@@ -53,7 +53,7 @@ public class Coupon extends Timestamped {
     @JoinColumn(name = "event_id")
     private Event event;
 
-    @OneToMany(mappedBy = "couponUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CouponUser> couponUsers = new ArrayList<>();
 
 

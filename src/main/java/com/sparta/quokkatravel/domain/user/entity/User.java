@@ -6,6 +6,7 @@ import com.sparta.quokkatravel.domain.chat.entity.ChatParticipant;
 import com.sparta.quokkatravel.domain.chat.entity.Chatting;
 import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
+import com.sparta.quokkatravel.domain.coupon.entity.CouponUser;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.review.entity.Review;
 import com.sparta.quokkatravel.domain.user.UserRole;
@@ -62,7 +63,7 @@ public class User extends Timestamped {
     private List<ChatParticipant> chatParticipants = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Coupon> coupons = new ArrayList<>();
+    private List<CouponUser> couponUsers = new ArrayList<>();
     
 
     public User(String email, String password, String name, String phoneNumber, UserRole userRole) {
