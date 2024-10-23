@@ -37,11 +37,10 @@ public class Accommodation extends Timestamped {
 
     public Accommodation() {}
 
-    public Accommodation(String name, String description, String address, int rating) {
+    public Accommodation(String name, String description, String address) {
         this.name = name;
         this.description = description;
         this.address = address;
-        this.rating = rating;
     }
 
     public void update(String name, String description, String address, int rating) {
