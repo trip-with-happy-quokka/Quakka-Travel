@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -68,7 +67,7 @@ public class Coupon extends Timestamped {
         this.discountAmount = discountAmount;
         this.validFrom = validFrom;
         this.validUntil = validUntil;
-        this.event=event;
+        this.event = event;
     }
 
     public Coupon(String couponName, String couponContent, String couponType, String couponCode,
@@ -81,7 +80,7 @@ public class Coupon extends Timestamped {
         this.discountAmount = discountAmount;
         this.validFrom = validFrom;
         this.validUntil = validUntil;
-        this.accommodation=accommodation;
+        this.accommodation = accommodation;
     }
 
     // UUID 기반의 쿠폰 코드 생성 메서드
