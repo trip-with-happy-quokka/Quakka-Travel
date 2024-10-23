@@ -1,5 +1,5 @@
 package com.sparta.quokkatravel.domain.payment.entity;
 
-public enum PayMethod {
+public enum PayType {
     CARD, BANK
 }
