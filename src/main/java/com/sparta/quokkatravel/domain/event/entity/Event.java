@@ -25,4 +25,9 @@ public class Event {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Coupon> coupons = new ArrayList<>();
+
+    public Event(String name, String content) {
+        this.name = name;
+        this.content = content;
+    }
 }
