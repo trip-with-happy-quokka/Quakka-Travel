@@ -21,5 +21,5 @@ public class TossPaymentConfig {
     private String failUrl;
 
     // 토스 페이먼트에 결제 승인 요청을 보낼 URL
-    private static final String URL = "https://api.quokkatravel.com/v1/payments/toss";
+    public static final String URL = "https://api.tosspayments.com/v1/payments/";
 }

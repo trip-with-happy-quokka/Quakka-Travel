@@ -25,10 +25,10 @@ public class Reservation extends Timestamped {
     private LocalDate endDate;
 
     @Column(nullable = false)
-    private int numberOfGuests;
+    private Long numberOfGuests;
 
     @Column(nullable = false)
-    private int totalPrice;
+    private Long totalPrice;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -52,7 +52,7 @@ public class Reservation extends Timestamped {
 
     public Reservation() {}
 
-    public Reservation(LocalDate startDate, LocalDate endDate, int numberOfGuests, User user, Room room) {
+    public Reservation(LocalDate startDate, LocalDate endDate, Long numberOfGuests, User user, Room room) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.numberOfGuests = numberOfGuests;
@@ -61,21 +61,21 @@ public class Reservation extends Timestamped {
         this.room = room;
     }
 
-    public void update(LocalDate startDate, LocalDate endDate, int numberOfGuests) {
+    public void update(LocalDate startDate, LocalDate endDate, Long numberOfGuests) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.numberOfGuests = numberOfGuests;
     }
 
-    public int calculateTotalPrice(LocalDate startDate, LocalDate endDate, Room room) {
+    public Long calculateTotalPrice(LocalDate startDate, LocalDate endDate, Room room) {
 
-        int pricePerNight = room.getPricePerNight();
+        Long pricePerNight = room.getPricePerNight();
 
         if(numberOfGuests < room.getCapacity()) {
-            pricePerNight += (room.getCapacity() - numberOfGuests) * room.getAdditionalPricePerOverCapacity();
+            pricePerNight += (room.getCapacity() - numberOfGuests) * room.getPricePerOverCapacity();
         }
 
-        int totalDays = (int) (ChronoUnit.DAYS.between(startDate, endDate) + 1);
+        Long totalDays =  ChronoUnit.DAYS.between(startDate, endDate) + 1;
 
         return pricePerNight * totalDays;
     }
