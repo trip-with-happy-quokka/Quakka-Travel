@@ -2,6 +2,7 @@ package com.sparta.quokkatravel.domain.chat.entity;
 
 import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
 import com.sparta.quokkatravel.domain.user.entity.User;
+import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,10 +27,15 @@ public class ChatParticipant extends Timestamped {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // 참가자 역할 (OWNER , USER)
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
+
     // 생성자
-    public ChatParticipant(ChatRoom chatRoom, User user) {
+    public ChatParticipant(ChatRoom chatRoom, User user, UserRole userRole) {
         this.chatRoom = chatRoom;
         this.user = user;
+        this.userRole = userRole;
     }
 
 }
