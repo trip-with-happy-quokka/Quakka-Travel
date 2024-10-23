@@ -1,6 +1,7 @@
 package com.sparta.quokkatravel.domain.common.config;
 
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
+import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -34,12 +35,18 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-    public String createToken(String email) {
+
+
+    public String createToken(Long userId, String email, String name, String phoneNumber, UserRole userRole) {
         Date date = new Date();
 
-        return Jwts.builder()
-                .setSubject(email)
+        return BEARER_PREFIX +
+                Jwts.builder()
+                .setSubject(String.valueOf(userId))
                 .claim("email", email)
+                .claim("name", name)
+                .claim("phoneNumber", phoneNumber)
+                .claim("userRole", userRole)
                 .setExpiration(new Date(date.getTime() + TOKEN_TIME))
                 .setIssuedAt(date)
                 .signWith(key, signatureAlgorithm)

@@ -1,6 +1,7 @@
 package com.sparta.quokkatravel.domain.common.config;
 
 import com.sparta.quokkatravel.domain.common.service.CustomUserDetailsService;
+import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -43,11 +44,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+
+        Long userId = Long.parseLong(claims.getSubject());
         String email = claims.get("email", String.class);
+        String name = claims.get("name", String.class);
+        String phoneNumber = claims.get("phoneNumber", String.class);
+        UserRole userRole = UserRole.of(claims.get("userRole", String.class));
+
 
         // HttpServletRequest에 사용자 정보 저장 (기존 방식 유지)
+        request.setAttribute("userId", userId);
         request.setAttribute("email", email);
         log.info("email:{} ", email);
+        request.setAttribute("name", name);
+        log.info("name:{} ", name);
+        request.setAttribute("phoneNumber", phoneNumber);
+        request.setAttribute("userRole", userRole);
+
 
         // SecurityContextHolder에 인증 정보 저장
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
