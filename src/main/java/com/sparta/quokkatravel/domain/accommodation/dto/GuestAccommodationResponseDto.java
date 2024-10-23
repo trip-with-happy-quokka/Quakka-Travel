@@ -12,7 +12,7 @@ public class GuestAccommodationResponseDto {
     private String name;
     private String description;
     private String address;
-    private int rating;
+    private Long rating;
 
     public GuestAccommodationResponseDto(Accommodation accommodation) {
         this.accommodationId = accommodation.getId();

@@ -6,13 +6,13 @@ import lombok.Getter;
 public class RoomRequestDto {
     private String name;
     private String description;
-    private int capacity;
-    private int pricePerOverCapacity;
-    private int pricePerNight;
+    private Long capacity;
+    private Long pricePerOverCapacity;
+    private Long pricePerNight;
 
     public RoomRequestDto() {}
 
-    public RoomRequestDto(String name, String description, int capacity, int pricePerOverCapacity, int pricePerNight) {
+    public RoomRequestDto(String name, String description, Long capacity, Long pricePerOverCapacity, Long pricePerNight) {
         this.name = name;
         this.description = description;
         this.capacity = capacity;

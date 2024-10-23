@@ -43,6 +43,10 @@ public class User extends Timestamped {
     @Column(nullable = false)
     private Boolean isDelete = false;
 
+    @Column(nullable = false)
+    private String status; // 사용자 상태 필드
+
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Accommodation> accommodations = new ArrayList<>();
 
@@ -73,5 +77,10 @@ public class User extends Timestamped {
 
     public void deleteAccount(){
         this.isDelete = true;
+    }
+
+    // 상태 업데이트 메서드
+    public void updateStatus(String status) {
+        this.status = status;
     }
 }

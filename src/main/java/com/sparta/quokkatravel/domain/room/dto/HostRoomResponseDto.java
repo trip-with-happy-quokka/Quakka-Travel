@@ -9,9 +9,9 @@ public class HostRoomResponseDto {
     private Long id;
     private String name;
     private String description;
-    private int capacity;
-    private int pricePerOverCapacity;
-    private int pricePerNight;
+    private Long capacity;
+    private Long pricePerOverCapacity;
+    private Long pricePerNight;
     private String accommodationName;
 
     public HostRoomResponseDto() {}

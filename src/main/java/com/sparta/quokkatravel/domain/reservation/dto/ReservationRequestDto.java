@@ -16,9 +16,9 @@ public class ReservationRequestDto {
 
     private LocalDate startDate;
     private LocalDate endDate;
-    private int numberOfGuests;
+    private Long numberOfGuests;
 
-    public ReservationRequestDto(LocalDate startDate, LocalDate endDate, int numberOfGuests, int totalPrice, LocalDate reservationDate) {
+    public ReservationRequestDto(LocalDate startDate, LocalDate endDate, Long numberOfGuests, Long totalPrice, LocalDate reservationDate) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.numberOfGuests = numberOfGuests;

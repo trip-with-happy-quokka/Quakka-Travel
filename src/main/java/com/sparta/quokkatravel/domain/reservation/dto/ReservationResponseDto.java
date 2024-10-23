@@ -4,15 +4,19 @@ import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.reservation.entity.ReservationStatus;
 import com.sparta.quokkatravel.domain.user.entity.User;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+@Getter
+@NoArgsConstructor
 public class ReservationResponseDto {
 
     private LocalDate startDate;
     private LocalDate endDate;
-    private int numberOfGuests;
-    private int totalPrice;
+    private Long numberOfGuests;
+    private Long totalPrice;
     private ReservationStatus status;
     private LocalDate reservationDate;
     private User user;

@@ -9,11 +9,11 @@ import org.springframework.data.domain.Pageable;
 public interface HostRoomService {
 
     // 생성
-    HostRoomResponseDto createRoom(CustomUserDetails userDetails, RoomRequestDto roomRequestDto);
+    HostRoomResponseDto createRoom(CustomUserDetails userDetails, Long accommodationId, RoomRequestDto roomRequestDto);
 
     // 조회
-    HostRoomResponseDto getRoom(Long accommodationId, Long roomId);
-    Page<HostRoomResponseDto> getAllRoom(Long accommodationId, Pageable pageable);
+    HostRoomResponseDto getRoom(CustomUserDetails customUserDetails, Long accommodationId, Long roomId);
+    Page<HostRoomResponseDto> getAllRoom(CustomUserDetails customUserDetails, Long accommodationId, Pageable pageable);
 
     // 수정
     HostRoomResponseDto updateRoom(CustomUserDetails customUserDetails, Long roomId, RoomRequestDto roomRequestDto);
