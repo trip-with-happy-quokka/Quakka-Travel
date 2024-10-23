@@ -57,10 +57,6 @@ public class User extends Timestamped {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatParticipant> chatParticipants = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CouponUser> couponUsers = new ArrayList<>();
-    
-
     public User(String email, String password, String name, String phoneNumber, UserRole userRole) {
         this.email = email;
         this.password = password;
@@ -68,7 +64,6 @@ public class User extends Timestamped {
         this.phoneNumber = phoneNumber;
         this.userRole = userRole;
     }
-
 
     public void deleteAccount(){
         this.isDelete = true;

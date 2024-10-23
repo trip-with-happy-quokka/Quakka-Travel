@@ -1,6 +1,5 @@
 package com.sparta.quokkatravel.domain.event.entity;
 
-import com.sparta.quokkatravel.domain.coupon.entity.EventCoupon;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
