@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-public class MessageReadStatus {
+public class ChattingReadStatus {
 
     // 읽은 상태 ID
     @Id
@@ -22,6 +22,10 @@ public class MessageReadStatus {
     @JoinColumn(name = "messageId", nullable = false)
     private Chatting message;
 
+    @ManyToOne
+    @JoinColumn(name = "chatRoom_id", nullable = false)
+    private ChatRoom chatRoom;
+
     // 읽은 사용자 정보
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
@@ -31,9 +35,15 @@ public class MessageReadStatus {
     @Column(nullable = false)
     private LocalDateTime readAt;
 
-    public MessageReadStatus(Chatting messsage, User user){
+    public ChattingReadStatus(ChatRoom chatRoom,Chatting message, User user){
+        this.chatRoom = chatRoom;
         this.message = message;
         this.user = user;
+        this.readAt = LocalDateTime.now();
+    }
+
+    // 메세지 읽음으로 표시
+    public void markAsRead(){
         this.readAt = LocalDateTime.now();
     }
 

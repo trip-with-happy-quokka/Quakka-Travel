@@ -15,7 +15,7 @@ public class ChatParticipant extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long chatParticipantId;
 
     // 여러 참여자가 하나의 채팅방에 속함
     @ManyToOne

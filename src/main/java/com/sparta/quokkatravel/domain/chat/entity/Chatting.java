@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -28,6 +30,10 @@ public class Chatting extends Timestamped {
 
     @Column(nullable = false)
     private String content;
+
+    // 메시지 전송 시간
+    @Column(nullable = false)
+    private LocalDateTime sentAt = LocalDateTime.now();
 
     public Chatting(ChatRoom chatRoom, User user, String content){
         this.chatRoom = chatRoom;
