@@ -14,7 +14,7 @@ public class MessageReadStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
     @ManyToOne
     @JoinColumn(name = "messageId", nullable = false)

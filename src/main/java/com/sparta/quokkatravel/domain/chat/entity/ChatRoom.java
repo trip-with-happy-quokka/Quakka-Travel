@@ -2,7 +2,6 @@ package com.sparta.quokkatravel.domain.chat.entity;
 
 import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
 import com.sparta.quokkatravel.domain.user.entity.User;
-import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,23 +28,18 @@ public class ChatRoom extends Timestamped {
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserRole userRole;
-
     // 각 방에 여러 참여자 연결될 수 있음
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChatParticipant> participants = new ArrayList<>();
+    private List<ChatParticipant> participants;
 
     // 각 방에 여러 메시지 저장될 수 있음
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Chatting> messages = new ArrayList<>();
+    private List<Chatting> messages;
 
     // 생성자
-    public ChatRoom(String title, User createdBy, UserRole userRole) {
+    public ChatRoom(String title, User createdBy) {
         this.title = title;
         this.createdBy = createdBy;
-        this.userRole = userRole;
     }
 
 }
