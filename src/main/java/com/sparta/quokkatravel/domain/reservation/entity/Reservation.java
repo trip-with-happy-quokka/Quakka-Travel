@@ -1,7 +1,6 @@
 package com.sparta.quokkatravel.domain.reservation.entity;
 
-import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
-import com.sparta.quokkatravel.domain.accommodation.entity.Room;
+import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
 import com.sparta.quokkatravel.domain.payment.entity.Payment;
 import com.sparta.quokkatravel.domain.user.entity.User;
@@ -9,7 +8,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 @Entity

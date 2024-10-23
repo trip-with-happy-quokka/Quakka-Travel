@@ -1,15 +1,19 @@
 package com.sparta.quokkatravel.domain.accommodation.entity;
 
 import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
+import com.sparta.quokkatravel.domain.review.entity.Review;
+import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Accommodation extends Timestamped {
 
     @Id
@@ -35,18 +39,23 @@ public class Accommodation extends Timestamped {
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Room> rooms;
 
-    public Accommodation() {}
+    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews;
 
-    public Accommodation(String name, String description, String address) {
+
+    public Accommodation(String name, String description, String address, User user) {
+        this.name = name;
+        this.description = description;
+        this.address = address;
+        this.user = user;
+    }
+
+    public void update(String name, String description, String address) {
         this.name = name;
         this.description = description;
         this.address = address;
     }
 
-    public void update(String name, String description, String address, int rating) {
-        this.name = name;
-        this.description = description;
-        this.address = address;
-        this.rating = rating;
-    }
+    // 리뷰를 바탕으로 한 별점 평균 메서드 필요함
+
 }

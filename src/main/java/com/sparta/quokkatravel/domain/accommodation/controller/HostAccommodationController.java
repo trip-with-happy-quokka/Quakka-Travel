@@ -1,9 +1,8 @@
 package com.sparta.quokkatravel.domain.accommodation.controller;
 
 import com.sparta.quokkatravel.domain.accommodation.dto.AccommodationRequestDto;
-import com.sparta.quokkatravel.domain.accommodation.dto.AccommodationOfHostResponseDto;
-import com.sparta.quokkatravel.domain.accommodation.service.AccommodationOfHostService;
-import com.sparta.quokkatravel.domain.accommodation.service.AccommodationOfHostServiceImpl;
+import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationResponseDto;
+import com.sparta.quokkatravel.domain.accommodation.service.HostAccommodationService;
 import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.user.entity.UserRole;
@@ -22,9 +21,9 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('ROLE_HOST')")
 @RequiredArgsConstructor
 @Tag(name = "Accommodation", description = "Host 숙소 관련 컨트롤러")
-public class AccommodationOfHostController {
+public class HostAccommodationController {
 
-    private final AccommodationOfHostService accommodationOfHostService;
+    private final HostAccommodationService hostAccommodationService;
 
     // 숙소 생성
     @PostMapping("/accommodations")
@@ -32,8 +31,8 @@ public class AccommodationOfHostController {
     public ResponseEntity<?> createAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                  @RequestBody AccommodationRequestDto accommodationRequestDto) {
 
-        AccommodationOfHostResponseDto accommodationOfHostResponseDto = accommodationOfHostService.createAccommodation(customUserDetails, accommodationRequestDto);
-        return ResponseEntity.ok(ApiResponse.created("숙소 생성 성공", accommodationOfHostResponseDto));
+        HostAccommodationResponseDto hostAccommodationResponseDto = hostAccommodationService.createAccommodation(customUserDetails, accommodationRequestDto);
+        return ResponseEntity.ok(ApiResponse.created("숙소 생성 성공", hostAccommodationResponseDto));
     }
 
     // 숙소 전체 조회
@@ -44,7 +43,7 @@ public class AccommodationOfHostController {
         if(customUserDetails.getUserRole() == UserRole.GUEST) {
 
         }
-        Page<AccommodationOfHostResponseDto> accommodations = accommodationOfHostService.getAllAccommodation(customUserDetails, pageable);
+        Page<HostAccommodationResponseDto> accommodations = hostAccommodationService.getAllAccommodation(customUserDetails, pageable);
         return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", accommodations));
     }
 
@@ -54,8 +53,8 @@ public class AccommodationOfHostController {
     public ResponseEntity<?> getAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                               @PathVariable(name = "accommodationId") Long accommodationId) {
 
-        AccommodationOfHostResponseDto accommodationOfHostResponseDto = accommodationOfHostService.getAccommodation(customUserDetails, accommodationId);
-        return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", accommodationOfHostResponseDto));
+        HostAccommodationResponseDto hostAccommodationResponseDto = hostAccommodationService.getAccommodation(customUserDetails, accommodationId);
+        return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", hostAccommodationResponseDto));
     }
 
     // 숙소 수정
@@ -65,8 +64,8 @@ public class AccommodationOfHostController {
                                                  @PathVariable(name = "accommodationId") Long accommodationId,
                                                  @RequestBody AccommodationRequestDto accommodationRequestDto) {
 
-        AccommodationOfHostResponseDto accommodationOfHostResponseDto = accommodationOfHostService.updateAccommodation(customUserDetails, accommodationId, accommodationRequestDto);
-        return ResponseEntity.ok(ApiResponse.success("숙소 수정 성공", accommodationOfHostResponseDto));
+        HostAccommodationResponseDto hostAccommodationResponseDto = hostAccommodationService.updateAccommodation(customUserDetails, accommodationId, accommodationRequestDto);
+        return ResponseEntity.ok(ApiResponse.success("숙소 수정 성공", hostAccommodationResponseDto));
     }
 
     // 숙소 삭제
@@ -75,8 +74,8 @@ public class AccommodationOfHostController {
     public ResponseEntity<?> updateAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                  @PathVariable(name = "accommodationId") Long accommodationId) {
 
-        AccommodationOfHostResponseDto accommodationOfHostResponseDto = accommodationOfHostService.deleteAccommodation(customUserDetails, accommodationId);
-        return ResponseEntity.ok(ApiResponse.success("숙소 수정 성공", accommodationOfHostResponseDto));
+        String deleteMessage = hostAccommodationService.deleteAccommodation(customUserDetails, accommodationId);
+        return ResponseEntity.ok(ApiResponse.success("숙소 수정 성공", deleteMessage));
     }
 
 }
