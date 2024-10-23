@@ -31,8 +31,6 @@ public class QChatParticipant extends EntityPathBase<ChatParticipant> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final EnumPath<ChatStatus> status = createEnum("status", ChatStatus.class);
-
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
@@ -56,7 +54,7 @@ public class QChatParticipant extends EntityPathBase<ChatParticipant> {
 
     public QChatParticipant(Class<? extends ChatParticipant> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.chatRoom = inits.isInitialized("chatRoom") ? new QChatRoom(forProperty("chatRoom")) : null;
+        this.chatRoom = inits.isInitialized("chatRoom") ? new QChatRoom(forProperty("chatRoom"), inits.get("chatRoom")) : null;
         this.user = inits.isInitialized("user") ? new com.sparta.quokkatravel.domain.user.entity.QUser(forProperty("user")) : null;
     }
 

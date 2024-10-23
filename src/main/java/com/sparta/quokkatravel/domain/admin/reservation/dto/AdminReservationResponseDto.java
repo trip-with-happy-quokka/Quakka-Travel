@@ -2,11 +2,13 @@ package com.sparta.quokkatravel.domain.admin.reservation.dto;
 
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
+@NoArgsConstructor
 public class AdminReservationResponseDto {
 
     private Long reservationId;
@@ -24,7 +26,7 @@ public class AdminReservationResponseDto {
         this.accommodationId = reservation.getRoom().getId();
         this.reservationStatus = reservation.getStatus().name(); // Enum을 String으로 변환
         this.reservationDate = reservation.getReservationDate().atStartOfDay(); // LocalDate를 LocalDateTime으로 변환
-        this.totalPrice = BigDecimal.valueOf(reservation.getTotalPrice()); // int를 BigDecimal로 변환
+        this.totalPrice = BigDecimal.valueOf(reservation.getTotalPrice()); // int를 BigDecimal로 변환 (BigDecimal이 가격 계산에 더 효율적이라 판단)
         this.userName = reservation.getUser().getName();  // 관리자가 보는 유저 이름
     }
 }

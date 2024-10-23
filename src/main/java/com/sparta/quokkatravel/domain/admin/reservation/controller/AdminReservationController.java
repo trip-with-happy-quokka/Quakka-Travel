@@ -4,6 +4,8 @@ import com.sparta.quokkatravel.domain.admin.reservation.dto.AdminReservationResp
 import com.sparta.quokkatravel.domain.admin.reservation.service.AdminReservationService;
 import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +16,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/reservations")
 @PreAuthorize("hasRole('ADMIN')")
+@RequiredArgsConstructor
+@Tag(name = "AdminReservation", description = "Admin 예약 관련 컨트롤러")
 public class AdminReservationController {
 
     private final AdminReservationService adminReservationService;
-
-    public AdminReservationController(AdminReservationService adminReservationService) {
-        this.adminReservationService = adminReservationService;
-    }
 
     // 모든 예약 목록 조회
     @GetMapping

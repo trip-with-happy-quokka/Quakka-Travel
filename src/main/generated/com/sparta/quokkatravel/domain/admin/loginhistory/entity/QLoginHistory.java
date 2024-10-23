@@ -30,8 +30,6 @@ public class QLoginHistory extends EntityPathBase<LoginHistory> {
 
     public final com.sparta.quokkatravel.domain.user.entity.QUser user;
 
-    public final NumberPath<Long> userI = createNumber("userI", Long.class);
-
     public QLoginHistory(String variable) {
         this(LoginHistory.class, forVariable(variable), INITS);
     }

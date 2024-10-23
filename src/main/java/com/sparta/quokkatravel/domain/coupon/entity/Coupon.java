@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +40,10 @@ public class Coupon extends Timestamped {
     private int discountAmount;
 
     @Column(name = "valid_from", nullable = false)
-    private LocalDateTime validFrom;
+    private LocalDate validFrom;
 
     @Column(name = "valid_until", nullable = false)
-    private LocalDateTime validUntil;
+    private LocalDate validUntil;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "accommodation_id")
@@ -55,5 +56,11 @@ public class Coupon extends Timestamped {
     @OneToMany(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CouponUser> couponUsers = new ArrayList<>();
 
+    // 새로운 생성자 추가
+    public Coupon(String name, int discountAmount, LocalDate validUntil) {
+        this.name = name;
+        this.discountAmount = discountAmount;
+        this.validUntil = validUntil;
+    }
 
 }
