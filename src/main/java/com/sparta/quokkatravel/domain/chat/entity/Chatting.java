@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Chatting extends Timestamped {
 
     @Id
@@ -27,5 +26,12 @@ public class Chatting extends Timestamped {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(nullable = false)
     private String content;
+
+    public Chatting(ChatRoom chatRoom, User user, String content){
+        this.chatRoom = chatRoom;
+        this.user = user;
+        this.content = content;
+    }
 }
