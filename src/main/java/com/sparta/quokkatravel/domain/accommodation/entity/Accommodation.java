@@ -30,7 +30,7 @@ public class Accommodation extends Timestamped {
     private String address;
 
     @Column
-    private int rating;
+    private Long rating;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
