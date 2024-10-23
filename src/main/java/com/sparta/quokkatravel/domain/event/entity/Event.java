@@ -1,5 +1,6 @@
 package com.sparta.quokkatravel.domain.event.entity;
 
+import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,5 +24,10 @@ public class Event {
     private String content;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EventCoupon> coupons = new ArrayList<>();
+    private List<Coupon> coupons = new ArrayList<>();
+
+    public Event(String name, String content) {
+        this.name = name;
+        this.content = content;
+    }
 }
