@@ -6,15 +6,15 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class AccommodationOfGuestResponseDto {
+public class HostAccommodationResponseDto {
 
     private Long accommodationId;
     private String name;
     private String description;
     private String address;
-    private int rating;
+    private Long rating;
 
-    public AccommodationOfGuestResponseDto(Accommodation accommodation) {
+    public HostAccommodationResponseDto(Accommodation accommodation) {
         this.accommodationId = accommodation.getId();
         this.name = accommodation.getName();
         this.description = accommodation.getDescription();
