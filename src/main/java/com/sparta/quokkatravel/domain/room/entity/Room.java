@@ -25,13 +25,13 @@ public class Room extends Timestamped {
     private String description;
 
     @Column
-    private int capacity;
+    private Long capacity;
 
     @Column
-    private int pricePerOverCapacity;
+    private Long pricePerOverCapacity;
 
     @Column
-    private int pricePerNight;
+    private Long pricePerNight;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "accommodation_id")
@@ -47,7 +47,7 @@ public class Room extends Timestamped {
         this.accommodation = accommodation;
     }
 
-    public void update(String name, String description, int capacity, int pricePerOverCapacity, int pricePerNight) {
+    public void update(String name, String description, Long capacity, Long pricePerOverCapacity, Long pricePerNight) {
         this.name = name;
         this.description = description;
         this.capacity = capacity;
