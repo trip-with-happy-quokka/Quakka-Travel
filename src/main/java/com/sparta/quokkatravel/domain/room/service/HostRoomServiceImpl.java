@@ -27,22 +27,44 @@ public class HostRoomServiceImpl implements HostRoomService {
     private final AccommodationRepository accommodationRepository;
 
     @Override
-    public HostRoomResponseDto createRoom(CustomUserDetails userDetails, RoomRequestDto roomRequestDto) {
-        Room room = new Room(roomRequestDto);
+    public HostRoomResponseDto createRoom(CustomUserDetails userDetails, Long accommodationId, RoomRequestDto roomRequestDto) {
+        Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("accommodation not found"));
+        Room room = new Room(roomRequestDto, accommodation);
         roomRepository.save(room);
         return new HostRoomResponseDto(room);
     }
 
     @Override
-    public HostRoomResponseDto getRoom(Long accommodationId, Long roomId) {
-        return new HostRoomResponseDto(roomRepository.findById(accommodationId)
-                .orElseThrow(() -> new NotFoundException("Room Not Found")));
+    public HostRoomResponseDto getRoom(CustomUserDetails customUserDetails, Long accommodationId, Long roomId) {
+        // 유저 조회
+        User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
+
+        // 유저가 해당 숙소를 소유하고 있는지 확인
+        Accommodation accommodation = user.getAccommodations().stream()
+                .filter(acc -> acc.getId().equals(accommodationId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("You do not own this accommodation"));
+
+        // 숙소에 속한 객실(Room) 조회
+        Room room = accommodation.getRooms().stream()
+                .filter(r -> r.getId().equals(roomId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Room not found in your accommodation"));
+
+        return new HostRoomResponseDto(room);
     }
 
     @Override
-    public Page<HostRoomResponseDto> getAllRoom(Long accommodationId, Pageable pageable) {
-        Accommodation accommodation = accommodationRepository.findById(accommodationId)
-                .orElseThrow(() -> new NotFoundException("Accommodation Not Found"));
+    public Page<HostRoomResponseDto> getAllRoom(CustomUserDetails customUserDetails, Long accommodationId, Pageable pageable) {
+
+        // 유저 조회
+        User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
+
+        // 유저가 해당 숙소를 소유하고 있는지 확인
+        Accommodation accommodation = user.getAccommodations().stream()
+                .filter(acc -> acc.getId().equals(accommodationId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("You do not own this accommodation"));
 
         return roomRepository.findByAccommodation(accommodation, pageable)
                 .map(HostRoomResponseDto::new);

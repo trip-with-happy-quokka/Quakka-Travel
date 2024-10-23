@@ -38,12 +38,13 @@ public class Room extends Timestamped {
     private Accommodation accommodation;
 
 
-    public Room(RoomRequestDto roomRequestDto) {
+    public Room(RoomRequestDto roomRequestDto, Accommodation accommodation) {
         this.name = roomRequestDto.getName();
         this.description = roomRequestDto.getDescription();
         this.capacity = roomRequestDto.getCapacity();
         this.pricePerOverCapacity = roomRequestDto.getPricePerOverCapacity();
         this.pricePerNight = roomRequestDto.getPricePerNight();
+        this.accommodation = accommodation;
     }
 
     public void update(String name, String description, int capacity, int pricePerOverCapacity, int pricePerNight) {

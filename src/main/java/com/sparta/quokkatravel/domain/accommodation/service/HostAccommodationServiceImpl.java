@@ -7,6 +7,7 @@ import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepo
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepositorySupport;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
+import com.sparta.quokkatravel.domain.common.exception.UnAuthorizedException;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +44,16 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
     @Override
     public HostAccommodationResponseDto getAccommodation(CustomUserDetails customUserDetails, Long accommodationId) {
 
-        return new HostAccommodationResponseDto(accommodationRepository.findById(accommodationId)
-                .orElseThrow(() -> new NotFoundException("Accommodation Not Found")));
+        User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
+
+        Accommodation accommodation = accommodationRepository.findById(accommodationId)
+                .orElseThrow(() -> new NotFoundException("Accommodation Not Found"));
+
+        if (!accommodation.getUser().getId().equals(user.getId())) {
+            throw new UnAuthorizedException("You do not own this accommodation");
+        }
+
+        return new HostAccommodationResponseDto(accommodation);
     }
 
     @Override
