@@ -1,5 +1,6 @@
 package com.sparta.quokkatravel.domain.payment.entity;
 
+import com.sparta.quokkatravel.domain.payment.dto.PaymentRequestDto;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -42,8 +43,6 @@ public class Payment {
     private String paymentKey; // 외부 결제 시스템에서 제공하는 고유 결제 키
 
     @Column
-    private boolean paySuccessYN; // 결제 성공 여부
-    @Column
     private String failReason; // 결제 실패 시 실패 사유
 
 
@@ -62,8 +61,8 @@ public class Payment {
     private Reservation reservation;
 
 
-    public Payment(Long amount, PayType payType, User user, Reservation reservation) {
-        this.amount = amount;
+    public Payment(PayType payType, User user, Reservation reservation) {
+        this.amount = reservation.getTotalPrice();
         this.payType = payType;
         this.user = user;
         this.reservation = reservation;
