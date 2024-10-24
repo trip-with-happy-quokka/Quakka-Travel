@@ -28,8 +28,6 @@ public class QUser extends EntityPathBase<User> {
 
     public final ListPath<com.sparta.quokkatravel.domain.chat.entity.Chatting, com.sparta.quokkatravel.domain.chat.entity.QChatting> chattings = this.<com.sparta.quokkatravel.domain.chat.entity.Chatting, com.sparta.quokkatravel.domain.chat.entity.QChatting>createList("chattings", com.sparta.quokkatravel.domain.chat.entity.Chatting.class, com.sparta.quokkatravel.domain.chat.entity.QChatting.class, PathInits.DIRECT2);
 
-    public final ListPath<com.sparta.quokkatravel.domain.coupon.entity.CouponUser, com.sparta.quokkatravel.domain.coupon.entity.QCouponUser> couponUsers = this.<com.sparta.quokkatravel.domain.coupon.entity.CouponUser, com.sparta.quokkatravel.domain.coupon.entity.QCouponUser>createList("couponUsers", com.sparta.quokkatravel.domain.coupon.entity.CouponUser.class, com.sparta.quokkatravel.domain.coupon.entity.QCouponUser.class, PathInits.DIRECT2);
-
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
@@ -39,11 +37,9 @@ public class QUser extends EntityPathBase<User> {
 
     public final BooleanPath isDelete = createBoolean("isDelete");
 
-    public final StringPath name = createString("name");
+    public final StringPath nickname = createString("nickname");
 
     public final StringPath password = createString("password");
-
-    public final StringPath phoneNumber = createString("phoneNumber");
 
     public final ListPath<com.sparta.quokkatravel.domain.reservation.entity.Reservation, com.sparta.quokkatravel.domain.reservation.entity.QReservation> reservations = this.<com.sparta.quokkatravel.domain.reservation.entity.Reservation, com.sparta.quokkatravel.domain.reservation.entity.QReservation>createList("reservations", com.sparta.quokkatravel.domain.reservation.entity.Reservation.class, com.sparta.quokkatravel.domain.reservation.entity.QReservation.class, PathInits.DIRECT2);
 

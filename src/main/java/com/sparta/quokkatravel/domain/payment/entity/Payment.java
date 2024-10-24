@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(indexes = {
-        @Index(name = "idx_payment_user", columnList = "user_id"),
-        @Index(name = "idx_payment_reservation", columnList = "reservation_id"),
-        @Index(name = "idx_payment_paymentKey", columnList = "paymentKey")
-})
+//@Table(indexes = {
+//        @Index(name = "idx_payment_user", columnList = "user_id"),
+//        @Index(name = "idx_payment_reservation", columnList = "reservation_id"),
+//        @Index(name = "idx_payment_paymentKey", columnList = "paymentKey")
+//})
 public class Payment {
 
     @Id
@@ -56,8 +56,8 @@ public class Payment {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne(mappedBy = "payment")
-    @JoinColumn(name = "reservation_id", nullable = false)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "payment_id", referencedColumnName = "id")
     private Reservation reservation;
 
 

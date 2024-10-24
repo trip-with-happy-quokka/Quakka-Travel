@@ -4,7 +4,6 @@ import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.chat.entity.ChatParticipant;
 import com.sparta.quokkatravel.domain.chat.entity.Chatting;
 import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
-import com.sparta.quokkatravel.domain.coupon.entity.CouponUser;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.review.entity.Review;
 import jakarta.persistence.*;
@@ -31,10 +30,7 @@ public class User extends Timestamped {
     private String password;
 
     @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private String phoneNumber;
+    private String nickname;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -43,7 +39,7 @@ public class User extends Timestamped {
     @Column(nullable = false)
     private Boolean isDelete = false;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String status; // 사용자 상태 필드
 
 
@@ -62,20 +58,14 @@ public class User extends Timestamped {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatParticipant> chatParticipants = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CouponUser> couponUsers = new ArrayList<>();
-    
-
-    public User(String email, String password, String name, String phoneNumber, UserRole userRole) {
+    public User(String email, String password, String nickname, UserRole userRole) {
         this.email = email;
         this.password = password;
-        this.name = name;
-        this.phoneNumber = phoneNumber;
+        this.nickname = nickname;
         this.userRole = userRole;
     }
 
-
-    public void deleteAccount(){
+    public void deleteAccount() {
         this.isDelete = true;
     }
 
