@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(indexes = {
-        @Index(name = "idx_payment_user", columnList = "user_id"),
-        @Index(name = "idx_payment_reservation", columnList = "reservation_id"),
-        @Index(name = "idx_payment_paymentKey", columnList = "paymentKey")
-})
+//@Table(indexes = {
+//        @Index(name = "idx_payment_user", columnList = "user_id"),
+//        @Index(name = "idx_payment_reservation", columnList = "reservation_id"),
+//        @Index(name = "idx_payment_paymentKey", columnList = "paymentKey")
+//})
 public class Payment {
 
     @Id

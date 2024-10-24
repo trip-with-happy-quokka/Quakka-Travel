@@ -46,7 +46,7 @@ public class PaymentResponseDto {
         this.paymentDate = payment.getPaymentDate();
 
         this.userEmail = payment.getUser().getEmail();
-        this.userName = payment.getUser().getName();
+        this.userName = payment.getUser().getNickname();
 
         this.reservationId = payment.getReservation().getId();
         this.reservationDate = payment.getReservation().getReservationDate();
