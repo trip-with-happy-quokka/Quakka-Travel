@@ -10,10 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -29,6 +26,13 @@ public class Coupon extends Timestamped {
 
     @Column(name = "coupon_contents", nullable = false)
     private String content;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CouponType couponType;
+
+    @Column(name = "coupon_code", unique = true, nullable = false)
+    private String code;
 
     @Min(0)
     @Max(100)
@@ -53,14 +57,40 @@ public class Coupon extends Timestamped {
     @JoinColumn(name = "event_id")
     private Event event;
 
-    @OneToMany(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CouponUser> couponUsers = new ArrayList<>();
+    public Coupon(String couponName, String couponContent, String couponType, String couponCode,
+                  int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil, Event event) {
+        this.name = couponName;
+        this.content = couponContent;
+        this.couponType = CouponType.valueOf(couponType);
+        this.code = couponCode;
+        this.discountRate = discountRate;
+        this.discountAmount = discountAmount;
+        this.validFrom = validFrom;
+        this.validUntil = validUntil;
+        this.event = event;
+    }
 
-    // 새로운 생성자 추가
+    public Coupon(String couponName, String couponContent, String couponType, String couponCode,
+                  int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil, Accommodation accommodation) {
+        this.name = couponName;
+        this.content = couponContent;
+        this.couponType = CouponType.valueOf(couponType);
+        this.code = couponCode;
+        this.discountRate = discountRate;
+        this.discountAmount = discountAmount;
+        this.validFrom = validFrom;
+        this.validUntil = validUntil;
+        this.accommodation = accommodation;
+    }
+
+    // UUID 기반의 쿠폰 코드 생성 메서드
+    public String createCouponCode() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
+    }
+
     public Coupon(String name, int discountAmount, LocalDate validUntil) {
         this.name = name;
         this.discountAmount = discountAmount;
         this.validUntil = validUntil;
     }
-
 }
