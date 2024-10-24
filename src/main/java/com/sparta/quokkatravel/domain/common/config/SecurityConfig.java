@@ -20,7 +20,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (JWT 사용 시 필요하지 않음)
                 .sessionManagement(session ->
@@ -34,8 +34,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/notify/").hasRole("ADMIN")
                         .requestMatchers("/topic/notifications/").permitAll()
                         .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("/users/**").permitAll()
+                        .requestMatchers("/api/**").permitAll()
                         .anyRequest().authenticated() // 그 외의 모든 요청은 인증 필요
+                )
+                .formLogin(form -> form // 로그인 성공 핸들러 추가
+                        .loginPage("/login") // 로그인 페이지 경로 설정(필요시 맞춤 설정 가능)
+                        .successHandler(customAuthenticationSuccessHandler) // 로그인 성공 시 핸들러 등록
+                        .permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가
                 .build();

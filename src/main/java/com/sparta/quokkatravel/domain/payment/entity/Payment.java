@@ -1,6 +1,6 @@
 package com.sparta.quokkatravel.domain.payment.entity;
 
-import com.sparta.quokkatravel.domain.payment.dto.PaymentRequestDto;
+import com.sparta.quokkatravel.domain.payment.dto.PaymentCreateRequestDto;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -45,9 +45,9 @@ public class Payment {
     @Column
     private String failReason; // 결제 실패 시 실패 사유
 
-
     @Column
     private boolean cancelYN; // 결제 취소 여부
+
     @Column
     private String cancelReason; // 결제 취소 사유
 
@@ -61,7 +61,7 @@ public class Payment {
     private Reservation reservation;
 
 
-    public Payment(PayType payType, User user, Reservation reservation) {
+    public Payment(PaymentCreateRequestDto paymentCreateRequestDto, User user, Reservation reservation) {
         this.amount = reservation.getTotalPrice();
         this.payType = payType;
         this.user = user;
