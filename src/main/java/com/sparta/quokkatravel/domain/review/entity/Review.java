@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Review extends Timestamped {
 
     @Id
@@ -19,14 +18,27 @@ public class Review extends Timestamped {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne
     @JoinColumn(name = "accommodation_id")
     private Accommodation accommodation;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    private Long rating;
+
     private String content;
-    private int rating;
+
+    public Review(Accommodation accommodation, User user, Long rating, String content) {
+        this.accommodation = accommodation;
+        this.user = user;
+        this.rating = rating;
+        this.content = content;
+    }
+
+    public void update(Long rating, String content) {
+        this.rating = rating;
+        this.content = content;
+    }
 
 }
