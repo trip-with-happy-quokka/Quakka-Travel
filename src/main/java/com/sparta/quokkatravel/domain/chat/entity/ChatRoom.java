@@ -2,13 +2,19 @@ package com.sparta.quokkatravel.domain.chat.entity;
 
 import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
 import com.sparta.quokkatravel.domain.user.entity.User;
+import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.socket.WebSocketSession;
 
+import java.net.http.WebSocket;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -23,23 +29,20 @@ public class ChatRoom extends Timestamped {
     @Column(nullable = false)
     private String title;
 
-    // 채팅방을 생성한 방장
+    // 방 소유자 (User 객체로 변경)
     @ManyToOne
-    @JoinColumn(name = "created_by", nullable = false)
-    private User createdBy;
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner; // ownerId에서 User 객체로 변경
 
-    // 각 방에 여러 참여자 연결될 수 있음
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChatParticipant> participants;
+    // 참여자 리스트 추가
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    private List<ChatParticipant> participants = new ArrayList<>();
 
-    // 각 방에 여러 메시지 저장될 수 있음
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Chatting> messages;
 
-    // 생성자
-    public ChatRoom(String title, User createdBy) {
+    // 생성자: 채팅방 제목을 받아서 ChatRoom 객체 생성
+    public ChatRoom(String title, User owner) {
         this.title = title;
-        this.createdBy = createdBy;
+        this.owner = owner;
     }
 
 }
