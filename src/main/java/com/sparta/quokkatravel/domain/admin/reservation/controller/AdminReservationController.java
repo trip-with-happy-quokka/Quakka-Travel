@@ -14,7 +14,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/admin/reservations")
+@RequestMapping("api/v1/admin/reservations")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 @Tag(name = "AdminReservation", description = "Admin 예약 관련 컨트롤러")

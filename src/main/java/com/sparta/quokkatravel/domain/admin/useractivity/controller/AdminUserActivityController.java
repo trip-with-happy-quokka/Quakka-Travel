@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/users")
+@RequestMapping("api/v1/admin/users")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 @Tag(name = "AdminUserActivity", description = "Admin 사용자 활동 관련 컨트롤러")
