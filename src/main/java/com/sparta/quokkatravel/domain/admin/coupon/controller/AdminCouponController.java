@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/coupons")
+@RequestMapping("api/v1/admin/coupons")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 @Tag(name = "AdminCoupon", description = "Admin 쿠폰 관련 컨트롤러")

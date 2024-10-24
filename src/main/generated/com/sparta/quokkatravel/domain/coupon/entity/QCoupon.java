@@ -26,9 +26,11 @@ public class QCoupon extends EntityPathBase<Coupon> {
 
     public final com.sparta.quokkatravel.domain.accommodation.entity.QAccommodation accommodation;
 
+    public final StringPath code = createString("code");
+
     public final StringPath content = createString("content");
 
-    public final ListPath<CouponUser, QCouponUser> couponUsers = this.<CouponUser, QCouponUser>createList("couponUsers", CouponUser.class, QCouponUser.class, PathInits.DIRECT2);
+    public final EnumPath<CouponType> couponType = createEnum("couponType", CouponType.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;

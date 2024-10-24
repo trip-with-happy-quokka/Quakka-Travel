@@ -59,13 +59,14 @@ public class User extends Timestamped {
     private List<ChatParticipant> chatParticipants = new ArrayList<>();
 
     public User(String email, String password, String nickname, UserRole userRole) {
+
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.userRole = userRole;
     }
 
-    public void deleteAccount() {
+    public void deleteAccount(){
         this.isDelete = true;
     }
 
