@@ -3,6 +3,7 @@ package com.sparta.quokkatravel.domain.coupon.entity;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
 import com.sparta.quokkatravel.domain.event.entity.Event;
+import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -10,7 +11,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
+
 
 @Entity
 @Getter
@@ -49,6 +52,15 @@ public class Coupon extends Timestamped {
     @Column(name = "valid_until", nullable = false)
     private LocalDate validUntil;
 
+    @Column(name = "is_available")
+    private Boolean isAvailable = true;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "accommodation_id")
     private Accommodation accommodation;
@@ -57,8 +69,13 @@ public class Coupon extends Timestamped {
     @JoinColumn(name = "event_id")
     private Event event;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by")
+    private User createdBy;
+
     public Coupon(String couponName, String couponContent, String couponType, String couponCode,
-                  int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil, Event event) {
+                  int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil,
+                  Event event) {
         this.name = couponName;
         this.content = couponContent;
         this.couponType = CouponType.valueOf(couponType);
@@ -71,7 +88,8 @@ public class Coupon extends Timestamped {
     }
 
     public Coupon(String couponName, String couponContent, String couponType, String couponCode,
-                  int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil, Accommodation accommodation) {
+                  int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil,
+                  Accommodation accommodation) {
         this.name = couponName;
         this.content = couponContent;
         this.couponType = CouponType.valueOf(couponType);
@@ -92,5 +110,10 @@ public class Coupon extends Timestamped {
         this.name = name;
         this.discountAmount = discountAmount;
         this.validUntil = validUntil;
+    }
+
+    public void deleteCoupon() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();  // 삭제 시점 저장
     }
 }

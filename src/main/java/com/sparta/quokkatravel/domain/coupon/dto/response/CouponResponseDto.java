@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 public class CouponResponseDto {
 
+    private final Long couponId;
     private final String couponName;
     private final CouponType couponType;
     private final String couponCode;
@@ -16,10 +17,15 @@ public class CouponResponseDto {
     private final int discountAmount;
     private final LocalDate validFrom;
     private final LocalDate validUntil;
+    private final Boolean isAvailable;
+    private final Boolean isDeleted;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public CouponResponseDto(String couponName, CouponType couponType, String couponCode, int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public CouponResponseDto(Long couponId, String couponName, CouponType couponType, String couponCode, int discountRate,
+                             int discountAmount, LocalDate validFrom, LocalDate validUntil, Boolean isAvailable,
+                             Boolean isDeleted, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.couponId = couponId;
         this.couponName = couponName;
         this.couponType = couponType;
         this.couponCode = couponCode;
@@ -27,6 +33,8 @@ public class CouponResponseDto {
         this.discountAmount = discountAmount;
         this.validFrom = validFrom;
         this.validUntil = validUntil;
+        this.isAvailable = isAvailable;
+        this.isDeleted = isDeleted;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }

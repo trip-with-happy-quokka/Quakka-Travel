@@ -26,12 +26,18 @@ public class QCoupon extends EntityPathBase<Coupon> {
 
     public final com.sparta.quokkatravel.domain.accommodation.entity.QAccommodation accommodation;
 
+    public final StringPath code = createString("code");
+
     public final StringPath content = createString("content");
 
-    public final ListPath<CouponUser, QCouponUser> couponUsers = this.<CouponUser, QCouponUser>createList("couponUsers", CouponUser.class, QCouponUser.class, PathInits.DIRECT2);
+    public final EnumPath<CouponType> couponType = createEnum("couponType", CouponType.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
+    public final com.sparta.quokkatravel.domain.user.entity.QUser createdBy;
+
+    public final DateTimePath<java.time.LocalDateTime> deletedAt = createDateTime("deletedAt", java.time.LocalDateTime.class);
 
     public final NumberPath<Integer> discountAmount = createNumber("discountAmount", Integer.class);
 
@@ -40,6 +46,10 @@ public class QCoupon extends EntityPathBase<Coupon> {
     public final com.sparta.quokkatravel.domain.event.entity.QEvent event;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final BooleanPath isAvailable = createBoolean("isAvailable");
+
+    public final BooleanPath isDeleted = createBoolean("isDeleted");
 
     public final StringPath name = createString("name");
 
@@ -69,6 +79,7 @@ public class QCoupon extends EntityPathBase<Coupon> {
     public QCoupon(Class<? extends Coupon> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.accommodation = inits.isInitialized("accommodation") ? new com.sparta.quokkatravel.domain.accommodation.entity.QAccommodation(forProperty("accommodation"), inits.get("accommodation")) : null;
+        this.createdBy = inits.isInitialized("createdBy") ? new com.sparta.quokkatravel.domain.user.entity.QUser(forProperty("createdBy")) : null;
         this.event = inits.isInitialized("event") ? new com.sparta.quokkatravel.domain.event.entity.QEvent(forProperty("event")) : null;
     }
 
