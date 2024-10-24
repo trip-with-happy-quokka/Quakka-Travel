@@ -32,7 +32,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
-    @Value("${test_secrete_api_key}")
+    @Value("${payments.toss.test_secrete_api_key}")
     private String tossSecretKey;
 
     public static final String URL = "https://api.tosspayments.com/v1/payments/confirm";
@@ -79,6 +79,7 @@ public class PaymentServiceImpl implements PaymentService {
         responseStream.close();
 
         // 오류 처리
+        // 결제 실패용 DTO 필요
         if (responseCode != 200) {
             logger.error("Payment failed: {}", response);
             throw new RuntimeException("결제 실패: " + response);

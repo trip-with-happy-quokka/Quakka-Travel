@@ -44,8 +44,6 @@ public class JwtUtil {
                 Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .claim("email", email)
-                .claim("name", name)
-                .claim("phoneNumber", phoneNumber)
                 .claim("userRole", userRole)
                 .setExpiration(new Date(date.getTime() + TOKEN_TIME))
                 .setIssuedAt(date)
