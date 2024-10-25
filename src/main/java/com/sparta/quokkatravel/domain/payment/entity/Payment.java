@@ -1,5 +1,6 @@
 package com.sparta.quokkatravel.domain.payment.entity;
 
+import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
 import com.sparta.quokkatravel.domain.payment.dto.PaymentCreateRequestDto;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.user.entity.User;
@@ -19,25 +20,22 @@ import java.time.LocalDateTime;
 //        @Index(name = "idx_payment_reservation", columnList = "reservation_id"),
 //        @Index(name = "idx_payment_paymentKey", columnList = "paymentKey")
 //})
-public class Payment {
+public class Payment extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, unique = true)
     private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private PayStatus payStatus; // 결제 상태 SUCCESS, FAILED, PENDING
+    private PayStatus payStatus = PayStatus.PENDING; // 결제 상태 SUCCESS, FAILED, PENDING
 
     @Column(nullable = false)
     private PayType payType; // 결제 수단 CARD, BANK
 
     @Column(nullable = false)
-    private Long amount; // 결제 금액
+    private int amount; // 결제 금액
 
-    @Column(nullable = false)
-    private LocalDateTime paymentDate; // 결제 일시
 
     @Column(unique = true)
     private String paymentKey; // 외부 결제 시스템에서 제공하는 고유 결제 키
@@ -62,9 +60,13 @@ public class Payment {
 
 
     public Payment(PaymentCreateRequestDto paymentCreateRequestDto, User user, Reservation reservation) {
-        this.amount = reservation.getTotalPrice();
-        this.payType = payType;
+        this.amount = Math.toIntExact(reservation.getTotalPrice());
+        this.payType = paymentCreateRequestDto.getPayType();
         this.user = user;
         this.reservation = reservation;
+    }
+
+    public void updatePaystatus(PayStatus payStatus) {
+        this.payStatus = payStatus;
     }
 }

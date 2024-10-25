@@ -14,11 +14,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PaymentCreateRequestDto {
 
-    private PayStatus payStatus; // 결제 상태 SUCCESS, FAILED, PENDING
     private PayType payType; // 결제 수단 CARD, BANK
 
-    public PaymentCreateRequestDto(PayStatus payStatus, PayType payType) {
-        this.payStatus = payStatus;
+    public PaymentCreateRequestDto(PayType payType) {
         this.payType = payType;
     }
 }

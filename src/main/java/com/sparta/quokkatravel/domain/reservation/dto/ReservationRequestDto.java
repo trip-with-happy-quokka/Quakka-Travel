@@ -1,10 +1,5 @@
 package com.sparta.quokkatravel.domain.reservation.dto;
 
-import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
-import com.sparta.quokkatravel.domain.reservation.entity.ReservationStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,10 +12,12 @@ public class ReservationRequestDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private Long numberOfGuests;
+    private String couponCode;
 
-    public ReservationRequestDto(LocalDate startDate, LocalDate endDate, Long numberOfGuests, Long totalPrice, LocalDate reservationDate) {
+    public ReservationRequestDto(LocalDate startDate, LocalDate endDate, Long numberOfGuests, String couponCode) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.numberOfGuests = numberOfGuests;
+        this.couponCode = couponCode;
     }
 }

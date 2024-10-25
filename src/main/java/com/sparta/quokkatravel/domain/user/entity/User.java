@@ -1,5 +1,6 @@
 package com.sparta.quokkatravel.domain.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.chat.entity.ChatParticipant;
 import com.sparta.quokkatravel.domain.chat.entity.Chatting;

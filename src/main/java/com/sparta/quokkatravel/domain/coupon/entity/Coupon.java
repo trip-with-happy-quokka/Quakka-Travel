@@ -37,11 +37,11 @@ public class Coupon extends Timestamped {
     @Min(0)
     @Max(100)
     @Column(name = "discount_rate")
-    private int discountRate;
+    private Integer discountRate;
 
     @Min(0)
     @Column(name = "discount_amount")
-    private int discountAmount;
+    private Integer discountAmount;
 
     @Column(name = "valid_from", nullable = false)
     private LocalDate validFrom;
