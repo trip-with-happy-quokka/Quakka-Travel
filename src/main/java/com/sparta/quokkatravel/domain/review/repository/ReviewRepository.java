@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     // 특정 숙소에 대한 리뷰 목록을 페이징 처리하여 조회
-    Page<Review> findByAccommodationId(Long accommodationId, Pageable pageable);
+    Page<Review> findByAccommodation_Id(Long accommodationId, Pageable pageable);
 }
