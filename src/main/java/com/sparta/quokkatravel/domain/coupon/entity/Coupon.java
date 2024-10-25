@@ -53,7 +53,7 @@ public class Coupon extends Timestamped {
     private LocalDate validUntil;
 
     @Column(name = "is_available")
-    private Boolean isAvailable = true;
+    private Boolean isAvailable = false;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
@@ -73,9 +73,16 @@ public class Coupon extends Timestamped {
     @JoinColumn(name = "created_by")
     private User createdBy;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner")
+    private User owner;
+
+    @Column(name = "registered_at")
+    private LocalDateTime registeredAt;
+
     public Coupon(String couponName, String couponContent, String couponType, String couponCode,
                   int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil,
-                  Event event) {
+                  Event event, User createdBy) {
         this.name = couponName;
         this.content = couponContent;
         this.couponType = CouponType.valueOf(couponType);
@@ -85,11 +92,12 @@ public class Coupon extends Timestamped {
         this.validFrom = validFrom;
         this.validUntil = validUntil;
         this.event = event;
+        this.createdBy = createdBy;
     }
 
     public Coupon(String couponName, String couponContent, String couponType, String couponCode,
                   int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil,
-                  Accommodation accommodation) {
+                  Accommodation accommodation, User createdBy) {
         this.name = couponName;
         this.content = couponContent;
         this.couponType = CouponType.valueOf(couponType);
@@ -99,6 +107,7 @@ public class Coupon extends Timestamped {
         this.validFrom = validFrom;
         this.validUntil = validUntil;
         this.accommodation = accommodation;
+        this.createdBy = createdBy;
     }
 
     // UUID 기반의 쿠폰 코드 생성 메서드

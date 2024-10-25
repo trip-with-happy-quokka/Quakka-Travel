@@ -2,9 +2,12 @@ package com.sparta.quokkatravel.domain.coupon.controller;
 
 import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponRequestDto;
+import com.sparta.quokkatravel.domain.coupon.dto.response.CouponCodeResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponDeleteResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
+import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.service.CouponService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +28,7 @@ public class CouponController {
     private final CouponService couponService;
 
     @PostMapping("/admin/events/{eventId}/coupons")
-    @Operation(summary = "행사 쿠폰 발급", description = "관리자 권한으로 쿠폰을 발급하는 API")
+    @Operation(summary = "행사 쿠폰 발급", description = "관리자 권한으로 쿠폰을 발행하는 API")
     public ResponseEntity<?> createEventCoupon(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long eventId,
@@ -36,7 +39,7 @@ public class CouponController {
     }
 
     @PostMapping("/admin/accommodations/{accommodationId}/coupons")
-    @Operation(summary = "숙소 쿠폰 발급", description = "관리자 권한으로 쿠폰을 발급하는 API")
+    @Operation(summary = "숙소 쿠폰 발급", description = "관리자 권한으로 쿠폰을 발행하는 API")
     public ResponseEntity<?> createAccommodationCoupon(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long accommodationId,
@@ -44,6 +47,16 @@ public class CouponController {
 
         CouponResponseDto couponResponseDto = couponService.createAccommodationCoupon(customUserDetails, accommodationId, couponRequestDto);
         return ResponseEntity.ok(ApiResponse.created("숙소 쿠폰 발급 성공", couponResponseDto));
+    }
+
+    @PostMapping("/coupons")
+    @Operation(summary = "쿠폰 등록", description = "유저가 쿠폰 번호를 등록해서 본인 쿠폰으로 만드는 API")
+    public ResponseEntity<?> registerCoupon(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @Valid @RequestBody CouponCodeRequestDto couponCodeRequestDto) {
+
+        CouponCodeResponseDto couponCodeResponseDto = couponService.registerCoupon(customUserDetails, couponCodeRequestDto);
+        return ResponseEntity.ok(  )
     }
 
     @GetMapping("/coupons")

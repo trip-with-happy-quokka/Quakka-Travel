@@ -35,9 +35,9 @@ public class CouponServiceImpl implements CouponService {
     public CouponResponseDto createEventCoupon(CustomUserDetails customUserDetails, Long eventId, CouponRequestDto couponRequestDto) {
 
         // customUserDetails 에서 생성자 정보 불러오기
-//        User user = userRepository.findByEmail(customUserDetails.getEmail()).orElseThrow(
-//                ()-> new InvalidRequestStateException("가입되지 않은 이메일 유저입니다.")
-//        );
+        User user = userRepository.findByEmail(customUserDetails.getEmail()).orElseThrow(
+                ()-> new InvalidRequestStateException("가입되지 않은 이메일 유저입니다.")
+        );
 
         // eventId 로 event 조회
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("해당 행사 조회 불가"));
@@ -55,7 +55,8 @@ public class CouponServiceImpl implements CouponService {
                 couponRequestDto.getDiscountAmount(),
                 couponRequestDto.getValidFrom(),
                 couponRequestDto.getValidUntil(),
-                event
+                event,
+                user
         );
 
         // 쿠폰 레퍼지토리에 쿠폰 데이터를 저장 (save)
@@ -83,6 +84,9 @@ public class CouponServiceImpl implements CouponService {
     public CouponResponseDto createAccommodationCoupon(CustomUserDetails customUserDetails, Long accommodationId, CouponRequestDto couponRequestDto) {
 
         // customUserDetails 에서 생성자 정보 불러오기
+        User user = userRepository.findByEmail(customUserDetails.getEmail()).orElseThrow(
+                ()-> new InvalidRequestStateException("가입되지 않은 이메일 유저입니다.")
+        );
 
         // accommodationId 로 accommodation 조회
         Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("해당 숙소 조회 불가"));
@@ -100,7 +104,8 @@ public class CouponServiceImpl implements CouponService {
                 couponRequestDto.getDiscountAmount(),
                 couponRequestDto.getValidFrom(),
                 couponRequestDto.getValidUntil(),
-                accommodation
+                accommodation,
+                user
         );
 
         // 쿠폰 레퍼지토리에 쿠폰 데이터를 저장 (save)
