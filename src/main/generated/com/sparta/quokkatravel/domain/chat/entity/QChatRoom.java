@@ -27,11 +27,9 @@ public class QChatRoom extends EntityPathBase<ChatRoom> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final com.sparta.quokkatravel.domain.user.entity.QUser createdBy;
-
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final ListPath<Chatting, QChatting> messages = this.<Chatting, QChatting>createList("messages", Chatting.class, QChatting.class, PathInits.DIRECT2);
+    public final com.sparta.quokkatravel.domain.user.entity.QUser owner;
 
     public final ListPath<ChatParticipant, QChatParticipant> participants = this.<ChatParticipant, QChatParticipant>createList("participants", ChatParticipant.class, QChatParticipant.class, PathInits.DIRECT2);
 
@@ -58,7 +56,7 @@ public class QChatRoom extends EntityPathBase<ChatRoom> {
 
     public QChatRoom(Class<? extends ChatRoom> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.createdBy = inits.isInitialized("createdBy") ? new com.sparta.quokkatravel.domain.user.entity.QUser(forProperty("createdBy")) : null;
+        this.owner = inits.isInitialized("owner") ? new com.sparta.quokkatravel.domain.user.entity.QUser(forProperty("owner")) : null;
     }
 
 }

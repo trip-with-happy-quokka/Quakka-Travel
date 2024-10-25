@@ -88,9 +88,13 @@ public class Coupon extends Timestamped {
         return UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
     }
 
-    public Coupon(String name, int discountAmount, LocalDate validUntil) {
+    public Coupon(String code, String name, int discountAmount, LocalDate validFrom, LocalDate validUntil, CouponType couponType, String content) {
+        this.code = code; // 추가
         this.name = name;
         this.discountAmount = discountAmount;
+        this.validFrom = validFrom;
         this.validUntil = validUntil;
+        this.couponType = couponType; // 추가
+        this.content = content; // 추가
     }
 }

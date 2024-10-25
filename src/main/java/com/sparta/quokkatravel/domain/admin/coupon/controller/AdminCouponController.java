@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/admin/coupons")
-@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 @Tag(name = "AdminCoupon", description = "Admin 쿠폰 관련 컨트롤러")
 public class AdminCouponController {
