@@ -45,8 +45,7 @@ public class Reservation extends Timestamped {
     @JoinColumn(name = "room_id")
     private Room room;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "payment_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "reservation")
     private Payment payment;
 
 

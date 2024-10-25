@@ -1,6 +1,6 @@
 package com.sparta.quokkatravel.domain.payment.entity;
 
-import com.sparta.quokkatravel.domain.payment.dto.PaymentRequestDto;
+import com.sparta.quokkatravel.domain.payment.dto.PaymentCreateRequestDto;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(indexes = {
-        @Index(name = "idx_payment_user", columnList = "user_id"),
-        @Index(name = "idx_payment_reservation", columnList = "reservation_id"),
-        @Index(name = "idx_payment_paymentKey", columnList = "paymentKey")
-})
+//@Table(indexes = {
+//        @Index(name = "idx_payment_user", columnList = "user_id"),
+//        @Index(name = "idx_payment_reservation", columnList = "reservation_id"),
+//        @Index(name = "idx_payment_paymentKey", columnList = "paymentKey")
+//})
 public class Payment {
 
     @Id
@@ -45,9 +45,9 @@ public class Payment {
     @Column
     private String failReason; // 결제 실패 시 실패 사유
 
-
     @Column
     private boolean cancelYN; // 결제 취소 여부
+
     @Column
     private String cancelReason; // 결제 취소 사유
 
@@ -56,12 +56,12 @@ public class Payment {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne(mappedBy = "payment")
-    @JoinColumn(name = "reservation_id", nullable = false)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "payment_id", referencedColumnName = "id")
     private Reservation reservation;
 
 
-    public Payment(PayType payType, User user, Reservation reservation) {
+    public Payment(PaymentCreateRequestDto paymentCreateRequestDto, User user, Reservation reservation) {
         this.amount = reservation.getTotalPrice();
         this.payType = payType;
         this.user = user;

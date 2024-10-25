@@ -37,11 +37,9 @@ public class QUser extends EntityPathBase<User> {
 
     public final BooleanPath isDelete = createBoolean("isDelete");
 
-    public final StringPath name = createString("name");
+    public final StringPath nickname = createString("nickname");
 
     public final StringPath password = createString("password");
-
-    public final StringPath phoneNumber = createString("phoneNumber");
 
     public final ListPath<com.sparta.quokkatravel.domain.reservation.entity.Reservation, com.sparta.quokkatravel.domain.reservation.entity.QReservation> reservations = this.<com.sparta.quokkatravel.domain.reservation.entity.Reservation, com.sparta.quokkatravel.domain.reservation.entity.QReservation>createList("reservations", com.sparta.quokkatravel.domain.reservation.entity.Reservation.class, com.sparta.quokkatravel.domain.reservation.entity.QReservation.class, PathInits.DIRECT2);
 
