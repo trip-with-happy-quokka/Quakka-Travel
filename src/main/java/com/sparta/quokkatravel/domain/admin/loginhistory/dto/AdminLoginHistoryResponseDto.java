@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 public class AdminLoginHistoryResponseDto {
 
     private Long userId;
-    private String userName;
+    private String nickname;
     private String ipAddress;
     private LocalDateTime loginTime;
 
     public AdminLoginHistoryResponseDto(LoginHistory loginHistory) {
         this.userId = loginHistory.getUser().getId();
-        this.userName = loginHistory.getUser().getName();
+        this.nickname = loginHistory.getUser().getNickname();
         this.ipAddress = loginHistory.getIpAddress();
         this.loginTime = loginHistory.getLoginTime();
     }
