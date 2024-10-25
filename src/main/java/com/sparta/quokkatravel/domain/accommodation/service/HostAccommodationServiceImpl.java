@@ -15,9 +15,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class HostAccommodationServiceImpl implements HostAccommodationService {
 
     private final AccommodationRepository accommodationRepository;
@@ -25,6 +27,7 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public HostAccommodationResponseDto createAccommodation(CustomUserDetails customUserDetails, AccommodationRequestDto accommodationRequestDto) {
         User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
         Accommodation accommodation = new Accommodation(accommodationRequestDto.getName(), accommodationRequestDto.getDescription(), accommodationRequestDto.getAddress(), user);
@@ -57,6 +60,7 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
     }
 
     @Override
+    @Transactional
     public HostAccommodationResponseDto updateAccommodation(CustomUserDetails customUserDetails, Long accommodationId, AccommodationRequestDto accommodationRequestDto) {
 
         User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
@@ -72,6 +76,7 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
     }
 
     @Override
+    @Transactional
     public String deleteAccommodation(CustomUserDetails customUserDetails, Long accommodationId) {
 
         User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());

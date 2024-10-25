@@ -40,9 +40,7 @@ public class HostAccommodationController {
     @Operation(summary = "숙소 전체 조회", description = "HOST 유저의 숙소들을 조회하는 API")
     public ResponseEntity<?> getAllAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                  @RequestParam(required = false) Pageable pageable) {
-        if(customUserDetails.getUserRole() == UserRole.GUEST) {
 
-        }
         Page<HostAccommodationResponseDto> accommodations = hostAccommodationService.getAllAccommodation(customUserDetails, pageable);
         return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", accommodations));
     }
