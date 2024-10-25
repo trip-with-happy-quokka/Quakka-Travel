@@ -20,7 +20,7 @@ public class ChatController {
     // 채팅방 생성
     @PostMapping("/chattings/room")
     public void createChatRoom(@RequestBody ChatRoomDto chatRoomDto) {
-        chatService.creatChatRoom(chatRoomDto);
+        chatService.createChatRoom(chatRoomDto);
     }
 
     // 채팅방 참여

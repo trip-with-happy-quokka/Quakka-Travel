@@ -49,6 +49,7 @@ public class JwtUtil {
                         .setIssuedAt(date)
                         .signWith(key, signatureAlgorithm)
                         .compact();
+
     }
 
     public String substringToken(String tokenValue) {

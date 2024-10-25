@@ -24,17 +24,19 @@ public class QChatParticipant extends EntityPathBase<ChatParticipant> {
 
     public final com.sparta.quokkatravel.domain.common.timestamped.QTimestamped _super = new com.sparta.quokkatravel.domain.common.timestamped.QTimestamped(this);
 
+    public final NumberPath<Long> chatParticipantId = createNumber("chatParticipantId", Long.class);
+
     public final QChatRoom chatRoom;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
-
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public final com.sparta.quokkatravel.domain.user.entity.QUser user;
+
+    public final EnumPath<com.sparta.quokkatravel.domain.user.entity.UserRole> userRole = createEnum("userRole", com.sparta.quokkatravel.domain.user.entity.UserRole.class);
 
     public QChatParticipant(String variable) {
         this(ChatParticipant.class, forVariable(variable), INITS);

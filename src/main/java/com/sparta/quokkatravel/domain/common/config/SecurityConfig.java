@@ -34,7 +34,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/notify/").hasRole("ADMIN")
                         .requestMatchers("/topic/notifications/").permitAll()
                         .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
                         .anyRequest().authenticated() // 그 외의 모든 요청은 인증 필요
                 )
