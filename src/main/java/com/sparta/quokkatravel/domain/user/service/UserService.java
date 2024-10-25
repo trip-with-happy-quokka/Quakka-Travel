@@ -8,7 +8,7 @@ public interface UserService {
 
     UserResponseDto signup(UserSignupRequestDto userSignupRequestDto);
 
-    String login(UserLoginRequestDto UserLoginRequestDto);
+    String login(UserLoginRequestDto userLoginRequestDto);
 
     void deleteUser(String email,String password);
 
