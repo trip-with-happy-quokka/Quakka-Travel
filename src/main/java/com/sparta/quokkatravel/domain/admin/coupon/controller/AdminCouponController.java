@@ -38,6 +38,14 @@ public class AdminCouponController {
         return ResponseEntity.ok(ApiResponse.created("쿠폰 발급 성공", coupon));
     }
 
+    // 쿠폰 수정 (관리자 전용)
+    @PutMapping("/{couponId}")
+    @Operation(summary = "쿠폰 수정", description = "관리자가 쿠폰을 수정하는 API")
+    public ResponseEntity<?> updateCoupon(@PathVariable Long couponId, @RequestBody AdminCouponCreateRequestDto couponRequestDto) {
+        AdminCouponResponseDto updatedCoupon = adminCouponService.updateCoupon(couponId, couponRequestDto);
+        return ResponseEntity.ok(ApiResponse.success("쿠폰 수정 성공", updatedCoupon));
+    }
+
     // 쿠폰 삭제 (관리자 전용)
     @DeleteMapping("/{couponId}")
     @Operation(summary = "쿠폰 삭제", description = "관리자가 쿠폰을 삭제하는 API")
