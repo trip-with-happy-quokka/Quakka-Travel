@@ -86,7 +86,7 @@ public class ReservationServiceImpl implements ReservationService {
     // 예약 삭제
     @Override
     @Transactional
-    public String deleteReservation(CustomUserDetails userDetails, Long id) throws AccessDeniedException {
+    public String cancelReservation(CustomUserDetails userDetails, Long id) throws AccessDeniedException {
 
         User user = userRepository.findByEmailOrElseThrow(userDetails.getEmail());
         Reservation reservation = reservationRepository.findById(id).orElseThrow();
