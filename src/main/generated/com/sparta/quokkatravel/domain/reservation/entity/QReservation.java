@@ -33,8 +33,6 @@ public class QReservation extends EntityPathBase<Reservation> {
 
     public final NumberPath<Long> numberOfGuests = createNumber("numberOfGuests", Long.class);
 
-    public final com.sparta.quokkatravel.domain.payment.entity.QPayment payment;
-
     public final com.sparta.quokkatravel.domain.room.entity.QRoom room;
 
     public final DatePath<java.time.LocalDate> startDate = createDate("startDate", java.time.LocalDate.class);
@@ -66,7 +64,6 @@ public class QReservation extends EntityPathBase<Reservation> {
 
     public QReservation(Class<? extends Reservation> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.payment = inits.isInitialized("payment") ? new com.sparta.quokkatravel.domain.payment.entity.QPayment(forProperty("payment"), inits.get("payment")) : null;
         this.room = inits.isInitialized("room") ? new com.sparta.quokkatravel.domain.room.entity.QRoom(forProperty("room"), inits.get("room")) : null;
         this.user = inits.isInitialized("user") ? new com.sparta.quokkatravel.domain.user.entity.QUser(forProperty("user")) : null;
     }
