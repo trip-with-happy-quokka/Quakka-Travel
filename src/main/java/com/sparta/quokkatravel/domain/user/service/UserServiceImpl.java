@@ -2,7 +2,8 @@ package com.sparta.quokkatravel.domain.user.service;
 
 import com.sparta.quokkatravel.domain.common.config.JwtUtil;
 import com.sparta.quokkatravel.domain.common.config.PasswordEncoder;
-import com.sparta.quokkatravel.domain.user.dto.UserRequestDto;
+import com.sparta.quokkatravel.domain.user.dto.UserLoginRequestDto;
+import com.sparta.quokkatravel.domain.user.dto.UserSignupRequestDto;
 import com.sparta.quokkatravel.domain.user.dto.UserResponseDto;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.entity.UserRole;
@@ -25,19 +26,19 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public UserResponseDto signup(UserRequestDto userRequestDto){
-        if(userRepository.existsByEmail(userRequestDto.getEmail())){
+    public UserResponseDto signup(UserSignupRequestDto userSignupRequestDto){
+        if(userRepository.existsByEmail(userSignupRequestDto.getEmail())){
             throw new UserExistsException("이미 존재하는 이메일 입니다.");
         }
-        String password = passwordEncoder.encode(userRequestDto.getPassword());
-        UserRole role = Optional.ofNullable(userRequestDto.getUserRole())
+        String password = passwordEncoder.encode(userSignupRequestDto.getPassword());
+        UserRole role = Optional.ofNullable(userSignupRequestDto.getUserRole())
                 .orElse(UserRole.GUEST);
         UserRole.of(String.valueOf(role));
 
         User user = new User(
-                userRequestDto.getEmail(),
+                userSignupRequestDto.getEmail(),
                 password,
-                userRequestDto.getNickname(),
+                userSignupRequestDto.getNickname(),
                 role
         );
         userRepository.save(user);
@@ -46,12 +47,12 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public String login(UserRequestDto userRequestDto) {
+    public String login(UserLoginRequestDto UserLoginRequestDto) {
         // 사용자 이메일로 사용자 찾기
-        User user = userRepository.findByEmailOrElseThrow(userRequestDto.getEmail());
+        User user = userRepository.findByEmailOrElseThrow(UserLoginRequestDto.getEmail());
 
         // 비밀번호 확인
-        if (!passwordEncoder.matches(userRequestDto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(UserLoginRequestDto.getPassword(), user.getPassword())) {
             throw new NotMatchPassword("비밀번호가 일치하지 않습니다.");
         }
 

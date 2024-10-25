@@ -23,5 +23,5 @@ public interface ReservationService {
     ReservationResponseDto updateReservation(CustomUserDetails userDetails, Long id, ReservationRequestDto reservationRequestDto) throws AccessDeniedException;
 
     // 예약 삭제
-    String deleteReservation(CustomUserDetails userDetails, Long id) throws AccessDeniedException;
+    String cancelReservation(CustomUserDetails userDetails, Long id) throws AccessDeniedException;
 }
