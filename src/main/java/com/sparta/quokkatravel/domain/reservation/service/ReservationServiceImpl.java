@@ -15,11 +15,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -29,6 +31,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     // 예약 생성
     @Override
+    @Transactional
     public ReservationResponseDto createReservation(CustomUserDetails userDetails, Long roomId, ReservationRequestDto reservationRequestDto) {
 
         User user = userRepository.findByEmailOrElseThrow(userDetails.getEmail());
@@ -65,6 +68,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     // 예약 수정
     @Override
+    @Transactional
     public ReservationResponseDto updateReservation(CustomUserDetails userDetails, Long id, ReservationRequestDto reservationRequestDto) throws AccessDeniedException {
 
         User user = userRepository.findByEmailOrElseThrow(userDetails.getEmail());
@@ -81,6 +85,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     // 예약 삭제
     @Override
+    @Transactional
     public String deleteReservation(CustomUserDetails userDetails, Long id) throws AccessDeniedException {
 
         User user = userRepository.findByEmailOrElseThrow(userDetails.getEmail());
