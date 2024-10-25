@@ -1,5 +1,6 @@
 package com.sparta.quokkatravel.domain.coupon.dto.response;
 
+import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponType;
 import lombok.Getter;
 
@@ -17,14 +18,13 @@ public class CouponResponseDto {
     private final int discountAmount;
     private final LocalDate validFrom;
     private final LocalDate validUntil;
-    private final Boolean isAvailable;
+    private final CouponStatus couponStatus;
     private final Boolean isDeleted;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public CouponResponseDto(Long couponId, String couponName, CouponType couponType, String couponCode, int discountRate,
-                             int discountAmount, LocalDate validFrom, LocalDate validUntil, Boolean isAvailable,
-                             Boolean isDeleted, LocalDateTime createdAt, LocalDateTime updatedAt) {
+
+    public CouponResponseDto(Long couponId, String couponName, CouponType couponType, String couponCode, int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil, CouponStatus couponStatus, Boolean isDeleted, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.couponId = couponId;
         this.couponName = couponName;
         this.couponType = couponType;
@@ -33,7 +33,7 @@ public class CouponResponseDto {
         this.discountAmount = discountAmount;
         this.validFrom = validFrom;
         this.validUntil = validUntil;
-        this.isAvailable = isAvailable;
+        this.couponStatus = couponStatus;
         this.isDeleted = isDeleted;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;

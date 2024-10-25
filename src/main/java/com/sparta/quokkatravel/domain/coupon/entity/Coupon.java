@@ -37,14 +37,18 @@ public class Coupon extends Timestamped {
     @Column(name = "coupon_code", unique = true, nullable = false)
     private String code;
 
+    @Enumerated(EnumType.STRING)
+    @Column
+    private CouponStatus couponStatus;
+
     @Min(0)
     @Max(100)
     @Column(name = "discount_rate")
-    private int discountRate;
+    private Integer discountRate;
 
     @Min(0)
     @Column(name = "discount_amount")
-    private int discountAmount;
+    private Integer discountAmount;
 
     @Column(name = "valid_from", nullable = false)
     private LocalDate validFrom;
@@ -70,11 +74,11 @@ public class Coupon extends Timestamped {
     private Event event;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
+    @JoinColumn(name = "created_by")  // 생성자에 대한 외래 키
     private User createdBy;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner")  // 소유자에 대한 외래 키
     private User owner;
 
     @Column(name = "registered_at")
@@ -124,5 +128,11 @@ public class Coupon extends Timestamped {
     public void deleteCoupon() {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();  // 삭제 시점 저장
+    }
+
+    public void registerCoupon(User user) {
+        this.owner = user;
+        this.registeredAt = LocalDateTime.now();
+        this.couponStatus = CouponStatus.REGISTERED;
     }
 }

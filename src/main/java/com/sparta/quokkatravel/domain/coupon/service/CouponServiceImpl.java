@@ -3,9 +3,13 @@ package com.sparta.quokkatravel.domain.coupon.service;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.exception.BadRequestException;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
+import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponRequestDto;
+import com.sparta.quokkatravel.domain.coupon.dto.response.CouponCodeResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponDeleteResponseDto;
+import com.sparta.quokkatravel.domain.coupon.dto.response.CouponRedeemResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
@@ -30,6 +34,7 @@ public class CouponServiceImpl implements CouponService {
     private final AccommodationRepository accommodationRepository;
     private final UserRepository userRepository;
 
+    // 행사 쿠폰 발급 메서드
     @Override
     @Transactional
     public CouponResponseDto createEventCoupon(CustomUserDetails customUserDetails, Long eventId, CouponRequestDto couponRequestDto) {
@@ -72,13 +77,14 @@ public class CouponServiceImpl implements CouponService {
                 savedCoupon.getDiscountAmount(),
                 savedCoupon.getValidFrom(),
                 savedCoupon.getValidFrom(),
-                savedCoupon.getIsAvailable(),
+                savedCoupon.getCouponStatus(),
                 savedCoupon.getIsDeleted(),
                 savedCoupon.getCreatedAt(),
                 savedCoupon.getUpdatedAt()
         );
     }
 
+    // 숙소 쿠폰 발급 메서드
     @Override
     @Transactional
     public CouponResponseDto createAccommodationCoupon(CustomUserDetails customUserDetails, Long accommodationId, CouponRequestDto couponRequestDto) {
@@ -121,13 +127,49 @@ public class CouponServiceImpl implements CouponService {
                 savedCoupon.getDiscountAmount(),
                 savedCoupon.getValidFrom(),
                 savedCoupon.getValidUntil(),
-                savedCoupon.getIsAvailable(),
+                savedCoupon.getCouponStatus(),
                 savedCoupon.getIsDeleted(),
                 savedCoupon.getCreatedAt(),
                 savedCoupon.getUpdatedAt()
         );
     }
 
+    // 쿠폰 등록 메서드
+    @Override
+    @Transactional
+    public CouponCodeResponseDto registerCoupon(CustomUserDetails customUserDetails, Long userId, CouponCodeRequestDto couponCodeRequestDto){
+
+        // userId 로 User 조회
+        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException("유저 조회 불가"));
+
+        // 쿠폰 코드로 쿠폰 찾기
+        Coupon coupon = couponRepository.findByCode(couponCodeRequestDto.getCouponCode());
+
+        // 쿠폰 코드가 잘못 입력되었을 때, 에러메시지 출력
+        if (coupon == null) {
+            throw new BadRequestException("유효하지 않은 쿠폰 코드입니다: " + couponCodeRequestDto.getCouponCode());
+        }
+
+        // 쿠폰 소유자 및 등록일자 등록
+        // 쿠폰 사용 가능 상태로 변경
+        coupon.registerCoupon(user);
+
+        return new CouponCodeResponseDto(
+                coupon.getId(),
+                coupon.getName(),
+                coupon.getCode(),
+                coupon.getCouponStatus(),
+                coupon.getValidFrom(),
+                coupon.getValidUntil()
+        );
+    }
+
+    @Override
+    public CouponRedeemResponseDto redeemCoupon(CustomUserDetails customUserDetails, Long userId, Long couponId){
+        return null;
+    }
+
+    // 쿠폰 전체 조회
     @Override
     public List<CouponResponseDto> getAllCoupons(CustomUserDetails customUserDetails) {
 
@@ -142,13 +184,14 @@ public class CouponServiceImpl implements CouponService {
                 coupon.getDiscountAmount(),
                 coupon.getValidFrom(),
                 coupon.getValidUntil(),
-                coupon.getIsAvailable(),
+                coupon.getCouponStatus(),
                 coupon.getIsDeleted(),
                 coupon.getCreatedAt(),
                 coupon.getUpdatedAt()
         )).toList();
     }
 
+    // 쿠폰 삭제
     @Override
     @Transactional
     public CouponDeleteResponseDto deleteCoupon(CustomUserDetails customUserDetails, Long couponId) {

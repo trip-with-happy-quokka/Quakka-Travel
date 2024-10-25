@@ -30,6 +30,8 @@ public class QCoupon extends EntityPathBase<Coupon> {
 
     public final StringPath content = createString("content");
 
+    public final EnumPath<CouponStatus> couponStatus = createEnum("couponStatus", CouponStatus.class);
+
     public final EnumPath<CouponType> couponType = createEnum("couponType", CouponType.class);
 
     //inherited
@@ -52,6 +54,10 @@ public class QCoupon extends EntityPathBase<Coupon> {
     public final BooleanPath isDeleted = createBoolean("isDeleted");
 
     public final StringPath name = createString("name");
+
+    public final com.sparta.quokkatravel.domain.user.entity.QUser owner;
+
+    public final DateTimePath<java.time.LocalDateTime> registeredAt = createDateTime("registeredAt", java.time.LocalDateTime.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
@@ -81,6 +87,7 @@ public class QCoupon extends EntityPathBase<Coupon> {
         this.accommodation = inits.isInitialized("accommodation") ? new com.sparta.quokkatravel.domain.accommodation.entity.QAccommodation(forProperty("accommodation"), inits.get("accommodation")) : null;
         this.createdBy = inits.isInitialized("createdBy") ? new com.sparta.quokkatravel.domain.user.entity.QUser(forProperty("createdBy")) : null;
         this.event = inits.isInitialized("event") ? new com.sparta.quokkatravel.domain.event.entity.QEvent(forProperty("event")) : null;
+        this.owner = inits.isInitialized("owner") ? new com.sparta.quokkatravel.domain.user.entity.QUser(forProperty("owner")) : null;
     }
 
 }
