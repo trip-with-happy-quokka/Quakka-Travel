@@ -44,15 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-
         String email = claims.get("email", String.class);
-        UserRole userRole = UserRole.of(claims.get("userRole", String.class));
-        // HttpServletRequest에 사용자 정보 저장 (기존 방식 유지)
-        request.setAttribute("email", email);
-        log.info("email:{} ", email);
-        request.setAttribute("userRole", userRole);
-        log.info("userRole:{} ", userRole);
-
 
         // SecurityContextHolder에 인증 정보 저장
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
