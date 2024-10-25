@@ -45,6 +45,25 @@ public class AdminCouponService {
         return new AdminCouponResponseDto(coupon);
     }
 
+    // 쿠폰 수정
+    public AdminCouponResponseDto updateCoupon(Long couponId, AdminCouponCreateRequestDto couponRequestDto) {
+        Coupon coupon = adminCouponRepository.findById(couponId)
+                .orElseThrow(() -> new EntityNotFoundException("쿠폰을 찾을 수 없습니다."));
+
+        coupon.updateCoupon(
+                couponRequestDto.getCode(),
+                couponRequestDto.getName(),
+                couponRequestDto.getDiscountAmount(),
+                couponRequestDto.getValidFrom(),
+                couponRequestDto.getValidUntil(),
+                couponRequestDto.getCouponType(),
+                couponRequestDto.getContent()
+        );
+
+        adminCouponRepository.save(coupon);
+        return new AdminCouponResponseDto(coupon);
+    }
+
     // 쿠폰 삭제
     public void deleteCoupon(Long couponId) {
         Coupon coupon = adminCouponRepository.findById(couponId)

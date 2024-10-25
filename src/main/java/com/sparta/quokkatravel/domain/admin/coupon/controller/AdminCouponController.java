@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/admin/coupons")
+@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 @Tag(name = "AdminCoupon", description = "Admin 쿠폰 관련 컨트롤러")
 public class AdminCouponController {
@@ -35,6 +36,14 @@ public class AdminCouponController {
     public ResponseEntity<?> createCoupon(@RequestBody AdminCouponCreateRequestDto couponRequestDto) {
         AdminCouponResponseDto coupon = adminCouponService.createCoupon(couponRequestDto);
         return ResponseEntity.ok(ApiResponse.created("쿠폰 발급 성공", coupon));
+    }
+
+    // 쿠폰 수정 (관리자 전용)
+    @PutMapping("/{couponId}")
+    @Operation(summary = "쿠폰 수정", description = "관리자가 쿠폰을 수정하는 API")
+    public ResponseEntity<?> updateCoupon(@PathVariable Long couponId, @RequestBody AdminCouponCreateRequestDto couponRequestDto) {
+        AdminCouponResponseDto updatedCoupon = adminCouponService.updateCoupon(couponId, couponRequestDto);
+        return ResponseEntity.ok(ApiResponse.success("쿠폰 수정 성공", updatedCoupon));
     }
 
     // 쿠폰 삭제 (관리자 전용)

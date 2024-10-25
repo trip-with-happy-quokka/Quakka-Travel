@@ -97,4 +97,15 @@ public class Coupon extends Timestamped {
         this.couponType = couponType; // 추가
         this.content = content; // 추가
     }
+
+    // 쿠폰 수정 메서드 추가
+    public void updateCoupon(String code, String name, int discountAmount, LocalDate validFrom, LocalDate validUntil, CouponType couponType, String content) {
+        this.code = code;
+        this.name = name;
+        this.discodauntAmount = discountAmount;
+        this.validFrom = validFrom;
+        this.validUntil = validUntil;
+        this.couponType = couponType;
+        this.content = content;
+    }
 }
