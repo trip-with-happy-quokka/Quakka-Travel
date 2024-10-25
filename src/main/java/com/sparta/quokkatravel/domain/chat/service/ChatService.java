@@ -30,7 +30,8 @@ public class ChatService {
     private final UserRepository userRepository;
 
     // 채팅방 생성
-    public void creatChatRoom(ChatRoomDto chatRoomDto) {
+    @Transactional
+    public void createChatRoom(ChatRoomDto chatRoomDto) {
         User owner = userRepository.findById(chatRoomDto.getOwnerId())
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 

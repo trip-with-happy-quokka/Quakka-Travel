@@ -37,18 +37,19 @@ public class JwtUtil {
 
 
 
-    public String createToken(Long userId, String email, String name, String phoneNumber, UserRole userRole) {
+    public String createToken(String email, UserRole userRole) {
         Date date = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
-                .setSubject(String.valueOf(userId))
-                .claim("email", email)
-                .claim("userRole", userRole)
-                .setExpiration(new Date(date.getTime() + TOKEN_TIME))
-                .setIssuedAt(date)
-                .signWith(key, signatureAlgorithm)
-                .compact();
+                        .setSubject(email)
+                        .claim("email", email)
+                        .claim("userRole", userRole)
+                        .setExpiration(new Date(date.getTime() + TOKEN_TIME))
+                        .setIssuedAt(date)
+                        .signWith(key, signatureAlgorithm)
+                        .compact();
+
     }
 
     public String substringToken(String tokenValue) {
