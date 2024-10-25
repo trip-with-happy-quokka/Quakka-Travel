@@ -34,12 +34,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Value("${payments.toss.test_secrete_api_key}")
     private String tossSecretKey;
 
     public static final String URL = "https://api.tosspayments.com/v1/payments/confirm";
-    private final PaymentRepository paymentRepository;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
     @Override
     public PaymentResponseDto createPayment(CustomUserDetails userDetails, Long reservationId, PaymentCreateRequestDto paymentCreateRequestDto) {
@@ -53,8 +55,46 @@ public class PaymentServiceImpl implements PaymentService {
         return new PaymentResponseDto(payment);
     }
 
+
     @Override
-    public PaymentResponseDto confirmPayment(PaymentConfirmRequestDto paymentConfirmRequestDto) throws IOException {
+    public PaymentResponseDto approvePayment(String paymentKey, String orderId, int amount) throws Exception {
+
+        String secretKey = tossSecretKey;
+
+        URL url = new URL(URL);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Authorization", "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes()));
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setDoOutput(true);
+
+        String requestBody = "{ \"paymentKey\": \"" + paymentKey + "\", \"orderId\": \"" + orderId + "\", \"amount\": " + amount + " }";
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(requestBody.getBytes("UTF-8"));
+        }
+
+        int responseCode = conn.getResponseCode();
+        InputStream responseStream = (responseCode == 200) ? conn.getInputStream() : conn.getErrorStream();
+        PaymentResponseDto response = new ObjectMapper().readValue(responseStream, PaymentResponseDto.class);
+        responseStream.close();
+
+        if (responseCode == 200) {
+            logger.info("Payment successful: {}", response);
+            return response;
+        } else {
+            logger.error("Payment failed: {}", response);
+            throw new RuntimeException("결제 실패: " + response);
+        }
+    }
+
+
+
+
+    @Override
+    public PaymentResponseDto confirmPayment(Long paymentId) throws IOException {
+
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow();
 
         // 헤더 생성
         URL url = new URL(URL); // toss 결제 승인 API 엔드포인트
@@ -67,6 +107,8 @@ public class PaymentServiceImpl implements PaymentService {
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
+
+        PaymentConfirmRequestDto paymentConfirmRequestDto = new PaymentConfirmRequestDto(payment);
 
         // 요청 데이터 전송
         OutputStream outputStream = connection.getOutputStream();

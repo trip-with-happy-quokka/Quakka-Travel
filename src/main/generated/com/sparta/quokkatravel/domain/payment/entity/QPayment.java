@@ -22,17 +22,20 @@ public class QPayment extends EntityPathBase<Payment> {
 
     public static final QPayment payment = new QPayment("payment");
 
-    public final NumberPath<Long> amount = createNumber("amount", Long.class);
+    public final com.sparta.quokkatravel.domain.common.timestamped.QTimestamped _super = new com.sparta.quokkatravel.domain.common.timestamped.QTimestamped(this);
+
+    public final NumberPath<Integer> amount = createNumber("amount", Integer.class);
 
     public final StringPath cancelReason = createString("cancelReason");
 
     public final BooleanPath cancelYN = createBoolean("cancelYN");
 
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
     public final StringPath failReason = createString("failReason");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
-
-    public final DateTimePath<java.time.LocalDateTime> paymentDate = createDateTime("paymentDate", java.time.LocalDateTime.class);
 
     public final StringPath paymentKey = createString("paymentKey");
 
@@ -41,6 +44,9 @@ public class QPayment extends EntityPathBase<Payment> {
     public final EnumPath<PayType> payType = createEnum("payType", PayType.class);
 
     public final com.sparta.quokkatravel.domain.reservation.entity.QReservation reservation;
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public final com.sparta.quokkatravel.domain.user.entity.QUser user;
 

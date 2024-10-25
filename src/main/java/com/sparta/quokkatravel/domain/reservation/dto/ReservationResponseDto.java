@@ -19,8 +19,9 @@ public class ReservationResponseDto {
     private Long totalPrice;
     private ReservationStatus status;
     private LocalDate reservationDate;
-    private User user;
-    private Room room;
+
+    private UserDto user;
+    private RoomDto room;
 
     public ReservationResponseDto(Reservation reservation) {
         this.startDate = reservation.getStartDate();
@@ -28,8 +29,8 @@ public class ReservationResponseDto {
         this.numberOfGuests = reservation.getNumberOfGuests();
         this.totalPrice = reservation.getTotalPrice();
         this.status = reservation.getStatus();
-        this.reservationDate = reservation.getReservationDate();
-        this.user = reservation.getUser();
-        this.room = reservation.getRoom();
+        this.reservationDate = reservation.getCreatedAt().toLocalDate();
+        this.user = new UserDto(reservation.getUser());
+        this.room = new RoomDto(reservation.getRoom());
     }
 }
