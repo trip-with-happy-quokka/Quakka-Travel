@@ -3,6 +3,7 @@ package com.sparta.quokkatravel.domain.user.controller;
 import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
 import com.sparta.quokkatravel.domain.common.config.JwtUtil;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.user.dto.UserLoginRequestDto;
 import com.sparta.quokkatravel.domain.user.dto.UserSignupRequestDto;
 import com.sparta.quokkatravel.domain.user.dto.UserResponseDto;
 import com.sparta.quokkatravel.domain.user.service.UserServiceImpl;
@@ -38,8 +39,8 @@ public class UserController {
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "로그인하는 API")
     public ResponseEntity<ApiResponse<String>> login(
-            @RequestBody UserSignupRequestDto userSignupRequestDto){
-        String token = userService.login(userSignupRequestDto);
+            @RequestBody UserLoginRequestDto userLoginRequestDto){
+        String token = userService.login(userLoginRequestDto);
         return ResponseEntity.ok(ApiResponse.success("로그인 성공", token));
     }
 
