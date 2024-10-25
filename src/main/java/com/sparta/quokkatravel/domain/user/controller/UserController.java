@@ -3,7 +3,7 @@ package com.sparta.quokkatravel.domain.user.controller;
 import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
 import com.sparta.quokkatravel.domain.common.config.JwtUtil;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
-import com.sparta.quokkatravel.domain.user.dto.UserRequestDto;
+import com.sparta.quokkatravel.domain.user.dto.UserSignupRequestDto;
 import com.sparta.quokkatravel.domain.user.dto.UserResponseDto;
 import com.sparta.quokkatravel.domain.user.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,8 +29,8 @@ public class UserController {
     @Operation(summary = "회원가입", description = "회원 가입하는 API")
     public ResponseEntity<ApiResponse<UserResponseDto>> signup(
             @Valid
-            @RequestBody UserRequestDto userRequestDto) {
-        UserResponseDto user = userService.signup(userRequestDto);
+            @RequestBody UserSignupRequestDto userSignupRequestDto) {
+        UserResponseDto user = userService.signup(userSignupRequestDto);
         return ResponseEntity.ok(ApiResponse.success("회원가입 성공",user));
     }
 
@@ -38,8 +38,8 @@ public class UserController {
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "로그인하는 API")
     public ResponseEntity<ApiResponse<String>> login(
-            @RequestBody UserRequestDto userRequestDto){
-        String token = userService.login(userRequestDto);
+            @RequestBody UserSignupRequestDto userSignupRequestDto){
+        String token = userService.login(userSignupRequestDto);
         return ResponseEntity.ok(ApiResponse.success("로그인 성공", token));
     }
 
@@ -48,11 +48,11 @@ public class UserController {
     @Operation(summary = "유저 삭제", description = "유저 삭제하는 API")
     public ResponseEntity<ApiResponse<String>> logout(
             @AuthenticationPrincipal CustomUserDetails authUser,
-            @RequestBody UserRequestDto userRequestDto
+            @RequestBody UserSignupRequestDto userSignupRequestDto
     ){
         log.info("user:{}",authUser);
         String email = authUser.getEmail();
-        userService.deleteUser(email,userRequestDto.getPassword());
+        userService.deleteUser(email, userSignupRequestDto.getPassword());
         return ResponseEntity.ok(ApiResponse.success("회원 탈퇴 성공"));
     }
 }
