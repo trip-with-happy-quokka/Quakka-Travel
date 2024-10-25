@@ -17,9 +17,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class HostRoomServiceImpl implements HostRoomService {
 
     private final UserRepository userRepository;
@@ -27,6 +29,7 @@ public class HostRoomServiceImpl implements HostRoomService {
     private final AccommodationRepository accommodationRepository;
 
     @Override
+    @Transactional
     public HostRoomResponseDto createRoom(CustomUserDetails userDetails, Long accommodationId, RoomRequestDto roomRequestDto) {
         Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("accommodation not found"));
         Room room = new Room(roomRequestDto, accommodation);
@@ -71,6 +74,7 @@ public class HostRoomServiceImpl implements HostRoomService {
     }
 
     @Override
+    @Transactional
     public HostRoomResponseDto updateRoom(CustomUserDetails customUserDetails, Long roomId, RoomRequestDto roomRequestDto) {
         User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room Not Found"));
@@ -85,6 +89,7 @@ public class HostRoomServiceImpl implements HostRoomService {
     }
 
     @Override
+    @Transactional
     public String deleteRoom(CustomUserDetails customUserDetails, Long roomId) {
         User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room Not Found"));
