@@ -47,8 +47,6 @@ public class Reservation extends Timestamped {
     @JsonBackReference
     private Room room;
 
-    @OneToOne(mappedBy = "reservation")
-    private Payment payment;
 
 
     public Reservation() {}

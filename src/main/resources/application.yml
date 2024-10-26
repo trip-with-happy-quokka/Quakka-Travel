@@ -19,8 +19,11 @@ spring:
 
   data:
     redis:
-      port: ${REDIS_PORT:6379}
-      host: ${REDIS_HOST:localhost}
+      host: localhost
+      port: 6379
+
+slack:
+  webhook-url: https://hooks.slack.com/services/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
 
 server:
   servlet:
@@ -49,9 +52,9 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-payments:
+payment:
   toss:
-    test_client_api_key : "test_ck_DnyRpQWGrNq0JvqNMAA0VKwv1M9E"
-    test_secrete_api_key : "test_sk_0RnYX2w532z6Mm5Ll1Qg3NeyqApQ"
+    test_client_api_key : test_ck_DnyRpQWGrNq0JvqNMAA0VKwv1M9E
+    test_secrete_api_key : test_sk_0RnYX2w532z6Mm5Ll1Qg3NeyqApQ
     success_url : "http://localhost:8080/api/v1/payments/toss/success"
     fail_url : "http://localhost:8080/api/v1/payments/toss/fail"

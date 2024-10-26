@@ -1,6 +1,7 @@
 package com.sparta.quokkatravel.domain.review.entity;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
+import com.sparta.quokkatravel.domain.accommodation.listener.AccommodationListener;
 import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@EntityListeners(AccommodationListener.class)
 @NoArgsConstructor
 public class Review extends Timestamped {
 
