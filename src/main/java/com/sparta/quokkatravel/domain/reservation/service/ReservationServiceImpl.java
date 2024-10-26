@@ -3,6 +3,7 @@ package com.sparta.quokkatravel.domain.reservation.service;
 import com.sparta.quokkatravel.domain.common.exception.InvalidRequestException;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
+import com.sparta.quokkatravel.domain.notification.service.NotificationService;
 import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
@@ -32,6 +33,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final CouponRepository couponRepository;
+    private final NotificationService notificationService;
 
     // 예약 생성
     @Override
@@ -51,6 +53,8 @@ public class ReservationServiceImpl implements ReservationService {
 
         Reservation reservation = new Reservation(reservationRequestDto.getStartDate(), reservationRequestDto.getEndDate(), reservationRequestDto.getNumberOfGuests(), user, room, coupon);
         reservationRepository.save(reservation);
+
+        notificationService.sendRealTimeNotification(" 예약 생성 완료 ", room.getName().toString() + " 방이 예약되었습니다. ");
 
         return new ReservationResponseDto(reservation);
     }
