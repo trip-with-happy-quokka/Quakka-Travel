@@ -144,12 +144,8 @@ public class CouponServiceImpl implements CouponService {
         User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException("유저 조회 불가"));
 
         // 쿠폰 코드로 쿠폰 찾기
-        Coupon coupon = couponRepository.findByCode(couponCodeRequestDto.getCouponCode());
-
-        // 쿠폰 코드가 잘못 입력되었을 때, 에러메시지 출력
-        if (coupon == null) {
-            throw new BadRequestException("유효하지 않은 쿠폰 코드입니다: " + couponCodeRequestDto.getCouponCode());
-        }
+        Coupon coupon = couponRepository.findByCode(couponCodeRequestDto.getCouponCode())
+                .orElseThrow(() -> new NotFoundException("coupon is not found"));
 
         // 쿠폰 소유자 및 등록일자 등록
         // 쿠폰 사용 가능 상태로 변경

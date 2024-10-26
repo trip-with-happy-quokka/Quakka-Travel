@@ -32,10 +32,22 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success("결제 요청 생성", paymentResponseDto));
     }
 
-    @PostMapping("/payments/confirm")
-    public ResponseEntity<?> confirmReservationPayment(@PathVariable("reservationId") String reservationId,
-                                                       @RequestBody PaymentConfirmRequestDto paymentConfirmRequestDto) throws IOException {
-        PaymentResponseDto paymentResponseDto = paymentService.confirmPayment(paymentConfirmRequestDto);
+    @PostMapping("/payments/{paymentId}/confirm")
+    public ResponseEntity<?> confirmReservationPayment(@PathVariable("reservationId") Long reservationId,
+                                                       @PathVariable("paymentId") Long paymentId) throws IOException {
+
+        PaymentResponseDto paymentResponseDto = paymentService.confirmPayment(paymentId);
+
+        return ResponseEntity.ok(ApiResponse.success("결제 승인 요청 성공", paymentResponseDto));
+    }
+
+    @PostMapping("/payments/approve")
+    public ResponseEntity<?> approvePayment(@RequestBody PaymentConfirmRequestDto paymentConfirmRequestDto) throws Exception {
+
+        String paymentKey = paymentConfirmRequestDto.getPaymentKey();
+        String orderId = paymentConfirmRequestDto.getOrderId();
+        int amount = paymentConfirmRequestDto.getAmount();
+        PaymentResponseDto paymentResponseDto = paymentService.approvePayment(paymentKey, orderId, amount);
 
         return ResponseEntity.ok(ApiResponse.success("결제 승인 요청 성공", paymentResponseDto));
     }

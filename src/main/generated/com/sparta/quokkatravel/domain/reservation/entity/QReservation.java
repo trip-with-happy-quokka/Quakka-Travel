@@ -35,8 +35,6 @@ public class QReservation extends EntityPathBase<Reservation> {
 
     public final com.sparta.quokkatravel.domain.payment.entity.QPayment payment;
 
-    public final DatePath<java.time.LocalDate> reservationDate = createDate("reservationDate", java.time.LocalDate.class);
-
     public final com.sparta.quokkatravel.domain.room.entity.QRoom room;
 
     public final DatePath<java.time.LocalDate> startDate = createDate("startDate", java.time.LocalDate.class);

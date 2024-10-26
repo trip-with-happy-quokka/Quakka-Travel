@@ -11,5 +11,6 @@ import java.io.IOException;
 @Service
 public interface PaymentService {
     PaymentResponseDto createPayment(CustomUserDetails userDetails, Long reservationId, PaymentCreateRequestDto paymentCreateRequestDto);
-    PaymentResponseDto confirmPayment(PaymentConfirmRequestDto paymentConfirmRequestDto) throws IOException;
+    PaymentResponseDto confirmPayment(Long paymentId) throws IOException;
+    PaymentResponseDto approvePayment(String paymentKey, String orderId, int amount) throws Exception;
 }
