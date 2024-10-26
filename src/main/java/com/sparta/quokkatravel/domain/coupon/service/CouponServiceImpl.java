@@ -12,6 +12,7 @@ import com.sparta.quokkatravel.domain.coupon.dto.response.CouponDeleteResponseDt
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponRedeemResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
+import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
 import com.sparta.quokkatravel.domain.event.entity.Event;
 import com.sparta.quokkatravel.domain.event.repository.EventRepository;
@@ -56,6 +57,7 @@ public class CouponServiceImpl implements CouponService {
                 couponRequestDto.getCouponContent(),
                 couponRequestDto.getCouponType(),
                 newCouponCode,
+                CouponStatus.ISSUED,
                 couponRequestDto.getDiscountRate(),
                 couponRequestDto.getDiscountAmount(),
                 couponRequestDto.getValidFrom(),
@@ -73,12 +75,11 @@ public class CouponServiceImpl implements CouponService {
                 savedCoupon.getName(),
                 savedCoupon.getCouponType(),
                 newCouponCode,
+                savedCoupon.getCouponStatus(),
                 savedCoupon.getDiscountRate(),
                 savedCoupon.getDiscountAmount(),
                 savedCoupon.getValidFrom(),
                 savedCoupon.getValidFrom(),
-                savedCoupon.getCouponStatus(),
-                savedCoupon.getIsDeleted(),
                 savedCoupon.getCreatedAt(),
                 savedCoupon.getUpdatedAt()
         );
@@ -106,6 +107,7 @@ public class CouponServiceImpl implements CouponService {
                 couponRequestDto.getCouponContent(),
                 couponRequestDto.getCouponType(),
                 newCouponCode,
+                CouponStatus.ISSUED,
                 couponRequestDto.getDiscountRate(),
                 couponRequestDto.getDiscountAmount(),
                 couponRequestDto.getValidFrom(),
@@ -123,12 +125,11 @@ public class CouponServiceImpl implements CouponService {
                 savedCoupon.getName(),
                 savedCoupon.getCouponType(),
                 newCouponCode,
+                savedCoupon.getCouponStatus(),
                 savedCoupon.getDiscountRate(),
                 savedCoupon.getDiscountAmount(),
                 savedCoupon.getValidFrom(),
                 savedCoupon.getValidUntil(),
-                savedCoupon.getCouponStatus(),
-                savedCoupon.getIsDeleted(),
                 savedCoupon.getCreatedAt(),
                 savedCoupon.getUpdatedAt()
         );
@@ -166,26 +167,53 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public CouponRedeemResponseDto redeemCoupon(CustomUserDetails customUserDetails, Long userId, Long couponId){
-        return null;
+
+        // userId 로 User 조회
+        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException("유저 조회 불가"));
+
+        // couponId 로 Coupon 조회
+        Coupon coupon = couponRepository.findById(couponId).orElseThrow(()-> new NotFoundException("쿠폰 조회 불가"));
+
+        // coupon 상태 => 사용됨으로 변경
+        coupon.redeemCoupon();
+
+        return new CouponRedeemResponseDto(
+                coupon.getId(),
+                coupon.getName(),
+                coupon.getCode(),
+                coupon.getCouponStatus(),
+                coupon.getDiscountRate(),
+                coupon.getDiscountAmount(),
+                coupon.getValidFrom(),
+                coupon.getValidUntil()
+        );
     }
 
-    // 쿠폰 전체 조회
+    // 내 쿠폰 전체 조회
     @Override
-    public List<CouponResponseDto> getAllCoupons(CustomUserDetails customUserDetails) {
+    public List<CouponResponseDto> getAllMyCoupons(CustomUserDetails customUserDetails, Long userId) {
 
-        List<Coupon> coupons = couponRepository.findAll();
+        // User 정보 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new NotFoundException("유저 조회 불가"));
+
+        // 유저 정보 일치하는지 확인
+        if(!customUserDetails.getEmail().equals(user.getEmail())){
+            throw new BadRequestException("본인 쿠폰만 조회 가능합니다.");
+        }
+
+        List<Coupon> coupons = couponRepository.findAllByOwner(user);
 
         return coupons.stream().map(coupon -> new CouponResponseDto(
                 coupon.getId(),
                 coupon.getName(),
                 coupon.getCouponType(),
                 coupon.getCode(),
+                coupon.getCouponStatus(),
                 coupon.getDiscountRate(),
                 coupon.getDiscountAmount(),
                 coupon.getValidFrom(),
                 coupon.getValidUntil(),
-                coupon.getCouponStatus(),
-                coupon.getIsDeleted(),
                 coupon.getCreatedAt(),
                 coupon.getUpdatedAt()
         )).toList();

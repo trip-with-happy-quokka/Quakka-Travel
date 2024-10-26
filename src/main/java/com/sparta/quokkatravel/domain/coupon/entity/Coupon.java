@@ -56,9 +56,6 @@ public class Coupon extends Timestamped {
     @Column(name = "valid_until", nullable = false)
     private LocalDate validUntil;
 
-    @Column(name = "is_available")
-    private Boolean isAvailable = false;
-
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
@@ -85,12 +82,13 @@ public class Coupon extends Timestamped {
     private LocalDateTime registeredAt;
 
     public Coupon(String couponName, String couponContent, String couponType, String couponCode,
-                  int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil,
-                  Event event, User createdBy) {
+                  CouponStatus couponStatus, int discountRate, int discountAmount,
+                  LocalDate validFrom, LocalDate validUntil, Event event, User createdBy) {
         this.name = couponName;
         this.content = couponContent;
         this.couponType = CouponType.valueOf(couponType);
         this.code = couponCode;
+        this.couponStatus = couponStatus;
         this.discountRate = discountRate;
         this.discountAmount = discountAmount;
         this.validFrom = validFrom;
@@ -100,12 +98,13 @@ public class Coupon extends Timestamped {
     }
 
     public Coupon(String couponName, String couponContent, String couponType, String couponCode,
-                  int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil,
-                  Accommodation accommodation, User createdBy) {
+                  CouponStatus couponStatus, int discountRate, int discountAmount,
+                  LocalDate validFrom, LocalDate validUntil, Accommodation accommodation, User createdBy) {
         this.name = couponName;
         this.content = couponContent;
         this.couponType = CouponType.valueOf(couponType);
         this.code = couponCode;
+        this.couponStatus = couponStatus;
         this.discountRate = discountRate;
         this.discountAmount = discountAmount;
         this.validFrom = validFrom;
@@ -134,5 +133,9 @@ public class Coupon extends Timestamped {
         this.owner = user;
         this.registeredAt = LocalDateTime.now();
         this.couponStatus = CouponStatus.REGISTERED;
+    }
+
+    public void redeemCoupon() {
+        this.couponStatus= CouponStatus.REDEEMED;
     }
 }

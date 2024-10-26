@@ -17,7 +17,7 @@ public interface CouponService {
     CouponResponseDto createAccommodationCoupon(CustomUserDetails customUserDetails, Long accommodationId, CouponRequestDto couponRequestDto);
     CouponCodeResponseDto registerCoupon(CustomUserDetails customUserDetails, Long userId, CouponCodeRequestDto couponCodeRequestDto);
     CouponRedeemResponseDto redeemCoupon(CustomUserDetails customUserDetails, Long userId, Long couponId);
-    List<CouponResponseDto> getAllCoupons(CustomUserDetails customUserDetails);
+    List<CouponResponseDto> getAllMyCoupons(CustomUserDetails customUserDetails, Long userId);
     CouponDeleteResponseDto deleteCoupon(CustomUserDetails customUserDetails, Long couponId);
 
 }

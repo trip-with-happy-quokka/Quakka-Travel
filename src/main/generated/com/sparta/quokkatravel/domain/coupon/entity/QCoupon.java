@@ -49,8 +49,6 @@ public class QCoupon extends EntityPathBase<Coupon> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final BooleanPath isAvailable = createBoolean("isAvailable");
-
     public final BooleanPath isDeleted = createBoolean("isDeleted");
 
     public final StringPath name = createString("name");

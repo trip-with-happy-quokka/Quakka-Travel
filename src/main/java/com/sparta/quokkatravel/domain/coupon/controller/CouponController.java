@@ -71,11 +71,13 @@ public class CouponController {
         return ResponseEntity.ok(ApiResponse.created("쿠폰 등록 성공", couponRedeemResponseDto));
     }
 
-    @GetMapping("/coupons")
-    @Operation(summary = "쿠폰 조회", description = "쿠폰 전체 조회 API")
-    public ResponseEntity<?> getAllCoupons(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    @GetMapping("/users/{userId}/coupons")
+    @Operation(summary = "내 쿠폰 조회", description = "내 쿠폰 전체 조회 API")
+    public ResponseEntity<?> getAllMyCoupons(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long userId) {
 
-        List<CouponResponseDto> coupons = couponService.getAllCoupons(customUserDetails);
+        List<CouponResponseDto> coupons = couponService.getAllMyCoupons(customUserDetails, userId);
         return ResponseEntity.ok(ApiResponse.success("쿠폰 전체 조회 성공", coupons));
     }
 
