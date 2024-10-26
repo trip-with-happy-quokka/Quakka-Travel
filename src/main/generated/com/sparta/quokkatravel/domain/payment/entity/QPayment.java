@@ -24,7 +24,7 @@ public class QPayment extends EntityPathBase<Payment> {
 
     public final com.sparta.quokkatravel.domain.common.timestamped.QTimestamped _super = new com.sparta.quokkatravel.domain.common.timestamped.QTimestamped(this);
 
-    public final NumberPath<Integer> amount = createNumber("amount", Integer.class);
+    public final NumberPath<Long> amount = createNumber("amount", Long.class);
 
     public final StringPath cancelReason = createString("cancelReason");
 
@@ -35,15 +35,17 @@ public class QPayment extends EntityPathBase<Payment> {
 
     public final StringPath failReason = createString("failReason");
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    public final StringPath orderId = createString("orderId");
+
+    public final StringPath orderName = createString("orderName");
+
+    public final NumberPath<Long> paymentId = createNumber("paymentId", Long.class);
 
     public final StringPath paymentKey = createString("paymentKey");
 
-    public final EnumPath<PayStatus> payStatus = createEnum("payStatus", PayStatus.class);
+    public final BooleanPath paySuccessYN = createBoolean("paySuccessYN");
 
     public final EnumPath<PayType> payType = createEnum("payType", PayType.class);
-
-    public final com.sparta.quokkatravel.domain.reservation.entity.QReservation reservation;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
@@ -68,7 +70,6 @@ public class QPayment extends EntityPathBase<Payment> {
 
     public QPayment(Class<? extends Payment> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.reservation = inits.isInitialized("reservation") ? new com.sparta.quokkatravel.domain.reservation.entity.QReservation(forProperty("reservation"), inits.get("reservation")) : null;
         this.user = inits.isInitialized("user") ? new com.sparta.quokkatravel.domain.user.entity.QUser(forProperty("user")) : null;
     }
 
