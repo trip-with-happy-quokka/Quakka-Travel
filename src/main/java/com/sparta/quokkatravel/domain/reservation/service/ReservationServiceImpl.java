@@ -3,6 +3,7 @@ package com.sparta.quokkatravel.domain.reservation.service;
 import com.sparta.quokkatravel.domain.common.exception.InvalidRequestException;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
+import com.sparta.quokkatravel.domain.notification.service.NotificationService;
 import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
