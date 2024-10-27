@@ -86,10 +86,11 @@ public class ReservationServiceImpl implements ReservationService {
     // 예약 수정
     @Override
     @Transactional
-    public ReservationResponseDto updateReservation(CustomUserDetails userDetails, Long id, ReservationRequestDto reservationRequestDto) throws AccessDeniedException {
+    public ReservationResponseDto updateReservation(CustomUserDetails userDetails, Long roomId, Long reservationId, ReservationRequestDto reservationRequestDto) throws AccessDeniedException {
 
         User user = userRepository.findByEmailOrElseThrow(userDetails.getEmail());
-        Reservation reservation = reservationRepository.findById(id).orElseThrow();
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("room is not found"));
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
 
         if(!reservation.getUser().equals(user)) {
             throw new AccessDeniedException("You are not the owner of this reservation");
@@ -97,22 +98,27 @@ public class ReservationServiceImpl implements ReservationService {
 
         reservation.update(reservationRequestDto.getStartDate(), reservationRequestDto.getEndDate(), reservationRequestDto.getNumberOfGuests());
 
+        notificationService.sendRealTimeNotification(" 예약 수정 완료 ", room.getName().toString() + " 방의 예약 정보가 수정되었습니다. ");
+
         return new ReservationResponseDto(reservation);
     }
 
     // 예약 삭제
     @Override
     @Transactional
-    public String cancelReservation(CustomUserDetails userDetails, Long id) throws AccessDeniedException {
+    public String cancelReservation(CustomUserDetails userDetails, Long roomId, Long reservationId) throws AccessDeniedException {
 
         User user = userRepository.findByEmailOrElseThrow(userDetails.getEmail());
-        Reservation reservation = reservationRepository.findById(id).orElseThrow();
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("room is not found"));
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
 
         if(!reservation.getUser().equals(user)) {
             throw new AccessDeniedException("You are not the owner of this reservation");
         }
 
-        reservationRepository.deleteById(id);
+        reservationRepository.deleteById(reservationId);
+
+        notificationService.sendRealTimeNotification(" 예약 취소 완료 ", room.getName().toString() + " 방이 취소되었습니다. ");
 
         return "Reservation deleted";
     }
