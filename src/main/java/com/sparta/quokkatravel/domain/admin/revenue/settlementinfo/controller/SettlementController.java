@@ -3,7 +3,10 @@ package com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.controller;
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.dto.SettlementRequestDto;
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.dto.SettlementResponseDto;
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.service.SettlementService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -11,14 +14,13 @@ import java.time.YearMonth;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/settlements")
+@RequestMapping("/api/v1/admin/settlements")
+@PreAuthorize("hasRole('ADMIN')")
+@RequiredArgsConstructor
+@Tag(name = "AdminSettlement", description = "Admin 정산 관련 컨트롤러")
 public class SettlementController {
 
     private final SettlementService settlementService;
-
-    public SettlementController(SettlementService settlementService) {
-        this.settlementService = settlementService;
-    }
 
     // 날짜별 정산 목록 조회 (시작일과 종료일 필터링)
     @GetMapping
