@@ -20,7 +20,7 @@ public interface ReservationService {
     Page<ReservationResponseDto> getAllReservation(CustomUserDetails userDetails, Pageable pageable);
 
     // 예약 수정
-    ReservationResponseDto updateReservation(CustomUserDetails userDetails, Long id, ReservationRequestDto reservationRequestDto) throws AccessDeniedException;
+    ReservationResponseDto updateReservation(CustomUserDetails userDetails, Long roomId, Long reservationId, ReservationRequestDto reservationRequestDto) throws AccessDeniedException;
 
     // 예약 삭제
     String cancelReservation(CustomUserDetails userDetails, Long roomId, Long reservationId) throws AccessDeniedException;
