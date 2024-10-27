@@ -61,11 +61,12 @@ public class ReservationController {
     }
 
     // 예약 취소
-    @DeleteMapping("/reservations/{reservationId}")
+    @DeleteMapping("/rooms/{roomId}/reservations/{reservationId}")
     public ResponseEntity<?> cancelReservation(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                               @PathVariable Long roomId,
                                                @PathVariable Long reservationId) throws AccessDeniedException {
 
-        String cancelMessage = reservationService.cancelReservation(userDetails, reservationId);
+        String cancelMessage = reservationService.cancelReservation(userDetails, roomId, reservationId);
         return ResponseEntity.ok(ApiResponse.success("예약 취소 성공", cancelMessage));
     }
 
