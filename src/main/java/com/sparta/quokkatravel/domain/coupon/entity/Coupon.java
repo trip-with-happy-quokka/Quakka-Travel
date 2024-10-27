@@ -102,7 +102,7 @@ public class Coupon extends Timestamped {
     public void updateCoupon(String code, String name, int discountAmount, LocalDate validFrom, LocalDate validUntil, CouponType couponType, String content) {
         this.code = code;
         this.name = name;
-        this.discodauntAmount = discountAmount;
+        this.discountAmount = discountAmount;
         this.validFrom = validFrom;
         this.validUntil = validUntil;
         this.couponType = couponType;
