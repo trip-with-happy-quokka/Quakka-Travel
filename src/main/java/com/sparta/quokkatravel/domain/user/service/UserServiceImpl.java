@@ -1,16 +1,16 @@
 package com.sparta.quokkatravel.domain.user.service;
 
 import com.sparta.quokkatravel.domain.common.config.JwtUtil;
-import com.sparta.quokkatravel.domain.common.config.PasswordEncoder;
 import com.sparta.quokkatravel.domain.user.dto.UserLoginRequestDto;
-import com.sparta.quokkatravel.domain.user.dto.UserSignupRequestDto;
 import com.sparta.quokkatravel.domain.user.dto.UserResponseDto;
+import com.sparta.quokkatravel.domain.user.dto.UserSignupRequestDto;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import com.sparta.quokkatravel.domain.user.exception.NotMatchPassword;
 import com.sparta.quokkatravel.domain.user.exception.UserExistsException;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,15 +19,15 @@ import java.util.Optional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
     @Transactional
     @Override
-    public UserResponseDto signup(UserSignupRequestDto userSignupRequestDto){
-        if(userRepository.existsByEmail(userSignupRequestDto.getEmail())){
+    public UserResponseDto signup(UserSignupRequestDto userSignupRequestDto) {
+        if (userRepository.existsByEmail(userSignupRequestDto.getEmail())) {
             throw new UserExistsException("이미 존재하는 이메일 입니다.");
         }
         String password = passwordEncoder.encode(userSignupRequestDto.getPassword());
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService{
         }
 
         // JWT 토큰 생성
-        String token = jwtUtil.createToken(user.getEmail(),user.getUserRole());
+        String token = jwtUtil.createToken(user.getEmail(), user.getUserRole());
         return token;
     }
 

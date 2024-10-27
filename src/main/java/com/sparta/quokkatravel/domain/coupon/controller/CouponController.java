@@ -2,7 +2,11 @@ package com.sparta.quokkatravel.domain.coupon.controller;
 
 import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponRequestDto;
+import com.sparta.quokkatravel.domain.coupon.dto.response.CouponCodeResponseDto;
+import com.sparta.quokkatravel.domain.coupon.dto.response.CouponDeleteResponseDto;
+import com.sparta.quokkatravel.domain.coupon.dto.response.CouponRedeemResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.service.CouponService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,18 +28,18 @@ public class CouponController {
     private final CouponService couponService;
 
     @PostMapping("/admin/events/{eventId}/coupons")
-    @Operation(summary = "행사 쿠폰 발급", description = "관리자 권한으로 쿠폰을 발급하는 API")
+    @Operation(summary = "행사 쿠폰 발급", description = "관리자 권한으로 쿠폰을 발행하는 API")
     public ResponseEntity<?> createEventCoupon(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long eventId,
             @Valid @RequestBody CouponRequestDto couponRequestDto) {
 
-        CouponResponseDto couponResponseDto = couponService.createEventCoupon(userDetails, eventId, couponRequestDto);
+        CouponResponseDto couponResponseDto = couponService.createEventCoupon(customUserDetails, eventId, couponRequestDto);
         return ResponseEntity.ok(ApiResponse.created("행사 쿠폰 발급 성공", couponResponseDto));
     }
 
     @PostMapping("/admin/accommodations/{accommodationId}/coupons")
-    @Operation(summary = "숙소 쿠폰 발급", description = "관리자 권한으로 쿠폰을 발급하는 API")
+    @Operation(summary = "숙소 쿠폰 발급", description = "관리자 권한으로 쿠폰을 발행하는 API")
     public ResponseEntity<?> createAccommodationCoupon(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long accommodationId,
@@ -45,21 +49,44 @@ public class CouponController {
         return ResponseEntity.ok(ApiResponse.created("숙소 쿠폰 발급 성공", couponResponseDto));
     }
 
-    @GetMapping("/coupons")
-    @Operation(summary = "쿠폰 조회", description = "쿠폰 전체 조회 API")
-    public ResponseEntity<?> getAllCoupons(
-            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    @PutMapping("/users/{userId}/coupons")
+    @Operation(summary = "쿠폰 등록", description = "유저가 쿠폰 번호를 등록해서 본인 쿠폰으로 만드는 API")
+    public ResponseEntity<?> registerCoupon(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long userId,
+            @Valid @RequestBody CouponCodeRequestDto couponCodeRequestDto) {
 
-        List<CouponResponseDto> coupons = couponService.getAllCoupons(customUserDetails);
+        CouponCodeResponseDto couponCodeResponseDto = couponService.registerCoupon(customUserDetails, userId, couponCodeRequestDto);
+        return ResponseEntity.ok(ApiResponse.created("쿠폰 등록 성공", couponCodeResponseDto));
+    }
+
+    @PutMapping("/users/{userId}/coupons/{couponId}")
+    @Operation(summary = "쿠폰 사용", description = "쿠폰을 사용하는 API")
+    public ResponseEntity<?> redeemCoupon(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long userId,
+            @PathVariable Long couponId) {
+
+        CouponRedeemResponseDto couponRedeemResponseDto = couponService.redeemCoupon(customUserDetails, userId, couponId);
+        return ResponseEntity.ok(ApiResponse.created("쿠폰 등록 성공", couponRedeemResponseDto));
+    }
+
+    @GetMapping("/users/{userId}/coupons")
+    @Operation(summary = "내 쿠폰 조회", description = "내 쿠폰 전체 조회 API")
+    public ResponseEntity<?> getAllMyCoupons(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long userId) {
+
+        List<CouponResponseDto> coupons = couponService.getAllMyCoupons(customUserDetails, userId);
         return ResponseEntity.ok(ApiResponse.success("쿠폰 전체 조회 성공", coupons));
     }
 
-    @DeleteMapping("/coupons/{couponId}")
-    @Operation(summary = "쿠폰 삭제", description = "쿠폰 삭제 API")
-    public ResponseEntity<ApiResponse<Void>> deleteCoupon(
+    @PutMapping("/coupons/{couponId}")
+    @Operation(summary = "쿠폰 삭제", description = "쿠폰 삭제(Soft Delete) API")
+    public ResponseEntity<?> deleteCoupon(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @PathVariable Long couponId){
-        couponService.deleteCoupon(customUserDetails, couponId);
-        return ResponseEntity.ok(ApiResponse.success("쿠폰 삭제 성공"));
+            @PathVariable Long couponId) {
+        CouponDeleteResponseDto couponDeleteResponseDto = couponService.deleteCoupon(customUserDetails, couponId);
+        return ResponseEntity.ok(ApiResponse.success("쿠폰 삭제 성공", couponDeleteResponseDto));
     }
 }
