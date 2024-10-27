@@ -10,10 +10,12 @@ import com.sparta.quokkatravel.domain.chat.repository.ChatParticipantRepository;
 import com.sparta.quokkatravel.domain.chat.repository.ChatRoomRepository;
 import com.sparta.quokkatravel.domain.chat.repository.ChattingReadStatusRepository;
 import com.sparta.quokkatravel.domain.chat.repository.ChattingRepository;
+import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +33,8 @@ public class ChatService {
 
     // 채팅방 생성
     @Transactional
-    public void createChatRoom(ChatRoomDto chatRoomDto) {
-        User owner = userRepository.findById(chatRoomDto.getOwnerId())
+    public void createChatRoom(ChatRoomDto chatRoomDto, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        User owner = userRepository.findByEmail(userDetails.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         ChatRoom chatRoom = new ChatRoom(chatRoomDto.getTitle(), owner);
@@ -46,17 +48,18 @@ public class ChatService {
 
     // 채팅방 참여
     @Transactional
-    public void joinChatRoom(Long chatRoomId, Long userId) {
+    public void joinChatRoom(Long chatRoomId, @AuthenticationPrincipal CustomUserDetails userDetails) {
         // 채팅방 찾기
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
 
         // 유저 찾기
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(userDetails.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
+
         // 이미 채팅방에 참여하고 있는지 확인
-        boolean isAlreadyParticipant = chatParticipantRepository.findByChatRoomIdAndUserId(chatRoom.getId(), userId).isPresent();
+        boolean isAlreadyParticipant = chatParticipantRepository.findByChatRoomIdAndUserEmail(chatRoom.getId(), user.getEmail()).isPresent();
         if (isAlreadyParticipant) {
             throw new IllegalArgumentException("이미 채팅방에 참여하고 있습니다.");
         }
@@ -67,11 +70,11 @@ public class ChatService {
     }
 
     // 채팅방 삭제 (방장만 가능)
-    public void deleteChatRoom(Long chatRoomId, Long userId) {
+    public void deleteChatRoom(Long chatRoomId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
-        ChatParticipant participant = chatParticipantRepository.findByChatRoomIdAndUserId(chatRoomId, userId)
+        ChatParticipant participant = chatParticipantRepository.findByChatRoomIdAndUserEmail(chatRoomId, customUserDetails.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("참여자를 찾을 수 없습니다."));
 
         if (participant.getUserRole() != UserRole.OWNER) {
@@ -83,11 +86,11 @@ public class ChatService {
     }
 
     // 채팅 메세지 저장
-    public Chatting saveMessage(ChatMessageDto messageDto) {
+    public Chatting saveMessage(ChatMessageDto messageDto, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
         ChatRoom chatRoom = chatRoomRepository.findById(messageDto.getChatRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
-        User user = userRepository.findById(messageDto.getUserId())
+        User user = userRepository.findByEmail(customUserDetails.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         // 메세지 저장
@@ -108,9 +111,9 @@ public class ChatService {
     }
 
     // 메세지 읽음 처리
-    public void markMessageAsRead(Long chatRoomId, Long messageId, Long userId){
+    public void markMessageAsRead(Long chatRoomId, Long messageId, String email){
         ChattingReadStatus readStatus = chattingReadStatusRepository
-                .findByChatRoomIdAndMessageIdAndUserId(chatRoomId,messageId,userId)
+                .findByChatRoomIdAndMessageIdAndUserEmail(chatRoomId,messageId,email)
                 .orElseThrow(() -> new IllegalArgumentException("읽음 상태를 찾을 수 없습니다?"));
 
         readStatus.markAsRead(); // 시간 기록
