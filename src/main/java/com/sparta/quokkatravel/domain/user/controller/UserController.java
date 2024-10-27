@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "User", description = "User 관련 컨트롤러")
 public class UserController {
     private final UserServiceImpl userService;
-    private final JwtUtil jwtUtil;
 
     // 회원 가입
     @PostMapping

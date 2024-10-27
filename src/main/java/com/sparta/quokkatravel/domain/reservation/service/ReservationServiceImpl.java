@@ -1,5 +1,9 @@
 package com.sparta.quokkatravel.domain.reservation.service;
 
+import com.sparta.quokkatravel.domain.common.exception.InvalidRequestException;
+import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
+import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
+import com.sparta.quokkatravel.domain.notification.service.NotificationService;
 import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +32,8 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
-    private final ReservationRepositorySupport reservationRepositorySupport;
+    private final CouponRepository couponRepository;
+    private final NotificationService notificationService;
 
     // 예약 생성
     @Override
@@ -36,8 +42,19 @@ public class ReservationServiceImpl implements ReservationService {
 
         User user = userRepository.findByEmailOrElseThrow(userDetails.getEmail());
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("room is not found"));
-        Reservation reservation = new Reservation(reservationRequestDto.getStartDate(), reservationRequestDto.getEndDate(), reservationRequestDto.getNumberOfGuests(), user, room);
+        Coupon coupon = null;
+
+        if(reservationRequestDto.getCouponCode() != null) {
+            coupon = couponRepository.findByCode(reservationRequestDto.getCouponCode()).orElseThrow(() -> new NotFoundException("coupon is not found"));
+            if(!Objects.equals(coupon.getAccommodation(), room.getAccommodation())) {
+                throw new InvalidRequestException("coupon code is incorrect");
+            }
+        }
+
+        Reservation reservation = new Reservation(reservationRequestDto.getStartDate(), reservationRequestDto.getEndDate(), reservationRequestDto.getNumberOfGuests(), user, room, coupon);
         reservationRepository.save(reservation);
+
+        notificationService.sendRealTimeNotification(" 예약 생성 완료 ", room.getName().toString() + " 방이 예약되었습니다. ");
 
         return new ReservationResponseDto(reservation);
     }

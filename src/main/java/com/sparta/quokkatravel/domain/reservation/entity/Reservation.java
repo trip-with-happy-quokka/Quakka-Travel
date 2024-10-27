@@ -1,5 +1,8 @@
 package com.sparta.quokkatravel.domain.reservation.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
 import com.sparta.quokkatravel.domain.payment.entity.Payment;
@@ -34,28 +37,25 @@ public class Reservation extends Timestamped {
     @Column(nullable = false)
     private ReservationStatus status = ReservationStatus.PENDING;
 
-    @Column(nullable = false)
-    private LocalDate reservationDate;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
+    @JsonBackReference
     private Room room;
 
-    @OneToOne(mappedBy = "reservation")
-    private Payment payment;
 
 
     public Reservation() {}
 
-    public Reservation(LocalDate startDate, LocalDate endDate, Long numberOfGuests, User user, Room room) {
+    public Reservation(LocalDate startDate, LocalDate endDate, Long numberOfGuests, User user, Room room, Coupon coupon) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.numberOfGuests = numberOfGuests;
-        this.totalPrice = calculateTotalPrice(startDate, endDate, room);
+        this.totalPrice = calculateTotalPrice(startDate, endDate, room, coupon);
         this.user = user;
         this.room = room;
     }
@@ -66,7 +66,7 @@ public class Reservation extends Timestamped {
         this.numberOfGuests = numberOfGuests;
     }
 
-    public Long calculateTotalPrice(LocalDate startDate, LocalDate endDate, Room room) {
+    public Long calculateTotalPrice(LocalDate startDate, LocalDate endDate, Room room, Coupon coupon) {
 
         Long pricePerNight = room.getPricePerNight();
 
@@ -76,6 +76,16 @@ public class Reservation extends Timestamped {
 
         Long totalDays =  ChronoUnit.DAYS.between(startDate, endDate) + 1;
 
-        return pricePerNight * totalDays;
+        long totalprice = pricePerNight * totalDays;
+
+        if(coupon != null) {
+            if(coupon.getDiscountRate() != null) {
+                totalprice = totalprice * (100 - coupon.getDiscountRate()) / 100;
+            } else if(coupon.getDiscountAmount() != null) {
+                totalprice = totalprice - coupon.getDiscountAmount();
+            }
+        }
+
+        return totalprice;
     }
 }

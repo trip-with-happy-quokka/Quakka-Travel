@@ -9,14 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReviewRequestDto {
 
-    private Long accomodationId;
-    private Long userId;
+    private Long accommodationId;
     private Long rating;
     private String content;
 
-    public ReviewRequestDto(Long accomodationId, Long userId, Long rating, String content){
-        this.accomodationId = accomodationId;
-        this.userId = userId;
+    public ReviewRequestDto(Long accommodationId, Long rating, String content){
+        this.accommodationId = accommodationId;
         this.rating = rating;
         this.content = content;
     }

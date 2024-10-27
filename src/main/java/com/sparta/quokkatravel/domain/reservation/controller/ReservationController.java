@@ -18,7 +18,7 @@ import java.nio.file.AccessDeniedException;
 
 @RestController
 @RequestMapping("/api/v1/guest")
-@PreAuthorize("hasRole('ROLE_GUEST') or hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('GUEST') or hasRole('ADMIN')")
 @RequiredArgsConstructor
 @Tag(name = "Reservation", description = "예약 관련 컨트롤러")
 public class ReservationController {

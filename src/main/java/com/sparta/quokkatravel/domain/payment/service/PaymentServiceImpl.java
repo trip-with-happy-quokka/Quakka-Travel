@@ -1,101 +1,155 @@
 package com.sparta.quokkatravel.domain.payment.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
-import com.sparta.quokkatravel.domain.payment.dto.PaymentCreateRequestDto;
-import com.sparta.quokkatravel.domain.payment.dto.PaymentConfirmRequestDto;
-import com.sparta.quokkatravel.domain.payment.dto.PaymentResponseDto;
+import ch.qos.logback.core.spi.ErrorCodes;
+import com.sparta.quokkatravel.domain.common.config.TossPaymentConfig;
+import com.sparta.quokkatravel.domain.payment.dto.PaymentSuccessDto;
 import com.sparta.quokkatravel.domain.payment.entity.Payment;
 import com.sparta.quokkatravel.domain.payment.repository.PaymentRepository;
-import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
-import com.sparta.quokkatravel.domain.reservation.repository.ReservationRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
+import com.sparta.quokkatravel.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.json.simple.JSONObject;
+import org.springframework.data.domain.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Map;
 
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
-
-    private final UserRepository userRepository;
-    private final ReservationRepository reservationRepository;
-    @Value("${payments.toss.test_secrete_api_key}")
-    private String tossSecretKey;
-
-    public static final String URL = "https://api.tosspayments.com/v1/payments/confirm";
     private final PaymentRepository paymentRepository;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final TossPaymentConfig tossPaymentConfig;
+    private final UserRepository userRepository;
 
-    @Override
-    public PaymentResponseDto createPayment(CustomUserDetails userDetails, Long reservationId, PaymentCreateRequestDto paymentCreateRequestDto) {
-
-        User user = userRepository.findByEmailOrElseThrow(userDetails.getEmail());
-        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
-
-        Payment payment = new Payment(paymentCreateRequestDto, user, reservation);
-        paymentRepository.save(payment);
-
-        return new PaymentResponseDto(payment);
+    // 결제 요청 처리 메서드
+    // 사용자의 결제정보를 받아서 검증하고 데이터베이스에 결제 내역 저장
+    public Payment requestTossPayment(Payment payment, String userEmail) {
+        User user = userRepository.findByEmailOrElseThrow(userEmail);
+        if (payment.getAmount() < 1000) {
+            throw new RuntimeException("INVALID_PAYMENT_AMOUNT");
+        }
+        payment.setUser(user);
+        return paymentRepository.save(payment);
     }
 
-    @Override
-    public PaymentResponseDto confirmPayment(PaymentConfirmRequestDto paymentConfirmRequestDto) throws IOException {
+    // 결제 승인시 호출되는 메서드
+    // orderId, amount를 검증하고 결제를 승인해서 최종 결제 상탤르 업데이트함
+    @Transactional
+    public PaymentSuccessDto tossPaymentSuccess(String paymentKey, String orderId, Long amount) {
+        Payment payment = verifyPayment(orderId, amount);
+        PaymentSuccessDto result = requestPaymentAccept(paymentKey, orderId, amount);
+        payment.setPaymentKey(paymentKey);
+        payment.setPaySuccessYN(true);
+        return result;
+    }
 
-        // 헤더 생성
-        URL url = new URL(URL); // toss 결제 승인 API 엔드포인트
-        String authorizations = getBasicAuth(tossSecretKey);
+    // 결제 승인 요청 메서드
+    // 승인 url을 호출해서 결제 승인을 요청
+    @Transactional
+    public PaymentSuccessDto requestPaymentAccept(String paymentKey, String orderId, Long amount) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = getHeaders();
+        JSONObject params = new JSONObject();
+        params.put("orderId", orderId);
+        params.put("amount", amount);
 
-        // 결제 승인 API 호출
-        // API 연결 설정 및 POST 요청 설정
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestProperty("Authorization", authorizations);
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setRequestMethod("POST");
-        connection.setDoOutput(true);
-
-        // 요청 데이터 전송
-        OutputStream outputStream = connection.getOutputStream();
-        outputStream.write(new ObjectMapper().writeValueAsBytes(paymentConfirmRequestDto));
-
-        // 응답 코드 확인 및 응답스트림 선택
-        int responseCode = connection.getResponseCode();
-        InputStream responseStream = (responseCode == 200) ? connection.getInputStream() : connection.getErrorStream();
-
-        // 응답 처리
-        PaymentResponseDto response = new ObjectMapper().readValue(responseStream, PaymentResponseDto.class);
-        responseStream.close();
-
-        // 오류 처리
-        // 결제 실패용 DTO 필요
-        if (responseCode != 200) {
-            logger.error("Payment failed: {}", response);
-            throw new RuntimeException("결제 실패: " + response);
+        PaymentSuccessDto result = null;
+        try {
+            result = restTemplate.postForObject(TossPaymentConfig.URL + paymentKey,
+                    new HttpEntity<>(params, headers),
+                    PaymentSuccessDto.class);
+        } catch (Exception e) {
+            throw new RuntimeException("ALREADY_APPROVED");
         }
 
-        // 성공 로그 기록
-        logger.info("Payment successful: {}", response);
+        return result;
+
+    }
+
+    // orderId, amount를 기반으로 결제 정보를 검증하는 메서드
+    public Payment verifyPayment(String orderId, Long amount) {
+        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> {
+            throw new RuntimeException("PAYMENT_NOT_FOUND");
+        });
+        if (!payment.getAmount().equals(amount)) {
+            throw new RuntimeException("PAYMENT_AMOUNT_EXP");
+        }
+        return payment;
+    }
+
+    // 결제 실패시 호출되는 메서드
+    // 실패 원인 기록 및 결제 상태 업데이트
+    @Transactional
+    public void tossPaymentFail(String code, String message, String orderId) {
+        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> {
+            throw new RuntimeException("PAYMENT_NOT_FOUND");
+        });
+        payment.setPaySuccessYN(false);
+        payment.setFailReason(message);
+    }
+
+
+    @Transactional
+    public Map cancelPaymentPoint(String userEmail, String paymentKey, String cancelReason) {
+        Payment payment = paymentRepository.findByPaymentKeyAndUser_Email(paymentKey, userEmail).orElseThrow(() -> {
+            throw new RuntimeException("PAYMENT_NOT_FOUND");
+        });
+
+        // 결제 취소 요청을 Toss Payments API에 보냄
+        Map<String, Object> response = tossPaymentCancel(paymentKey, cancelReason);
+
+        // 결제 상태를 취소로 업데이트
+        payment.setCancelYN(true);
+        payment.setCancelReason(cancelReason);
+        paymentRepository.save(payment);
+
         return response;
     }
 
-    // 인증 헤더 생성 메서드
-    private String getBasicAuth(String widgetSecretKey) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
-        return "Basic " + new String(encodedBytes);
+    // 결제 취소 메서드
+    // paymentKey와 cancelReason으로 취소를 진행
+    public Map tossPaymentCancel(String paymentKey, String cancelReason) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = getHeaders();
+        JSONObject params = new JSONObject();
+        params.put("cancelReason", cancelReason);
+
+        return restTemplate.postForObject(TossPaymentConfig.URL + paymentKey + "/cancel",
+                new HttpEntity<>(params, headers),
+                Map.class);
+    }
+
+    // 결제 내역 조회 메서드
+    @Override
+    public Page<Payment> findAllChargingHistories(String username, Pageable pageable) {
+        return paymentRepository.findAllByUser_Email(username,
+                PageRequest.of(
+                        pageable.getPageNumber(),
+                        pageable.getPageSize(),
+                        Sort.Direction.DESC,
+                        "paymentId")
+        );
+    }
+
+    // HTTP 헤더 설정 메서드
+    private HttpHeaders getHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        String auth = tossPaymentConfig.getTestSecretKey() + ":";
+        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+        headers.set("Authorization", "Basic " + encodedAuth);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        return headers;
     }
 }

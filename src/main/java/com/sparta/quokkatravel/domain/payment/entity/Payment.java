@@ -1,70 +1,63 @@
 package com.sparta.quokkatravel.domain.payment.entity;
 
-import com.sparta.quokkatravel.domain.payment.dto.PaymentCreateRequestDto;
+import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
+import com.sparta.quokkatravel.domain.payment.dto.PaymentResponseDto;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import lombok.*;
+import org.springframework.data.domain.Auditable;
 
 @Entity
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-//@Table(indexes = {
-//        @Index(name = "idx_payment_user", columnList = "user_id"),
-//        @Index(name = "idx_payment_reservation", columnList = "reservation_id"),
-//        @Index(name = "idx_payment_paymentKey", columnList = "paymentKey")
-//})
-public class Payment {
-
+@Setter
+@Table(indexes = {
+        @Index(name = "idx_payment_user", columnList = "user_id"),
+        @Index(name = "idx_payment_paymentKey", columnList = "paymentKey" ),
+})
+public class Payment extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, unique = true)
-    private Long id;
-
+    @Column(name = "payment_id", nullable = false, unique = true)
+    private Long paymentId;
+    @Column(nullable = false , name = "pay_type")
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PayStatus payStatus; // 결제 상태 SUCCESS, FAILED, PENDING
+    private PayType payType;
+    @Column(nullable = false , name = "pay_amount")
+    private Long amount;
+    @Column(nullable = false , name = "pay_name")
+    private String orderName;
+    @Column(nullable = false , name = "order_id")
+    private String orderId;
 
-    @Column(nullable = false)
-    private PayType payType; // 결제 수단 CARD, BANK
-
-    @Column(nullable = false)
-    private Long amount; // 결제 금액
-
-    @Column(nullable = false)
-    private LocalDateTime paymentDate; // 결제 일시
-
-    @Column(unique = true)
-    private String paymentKey; // 외부 결제 시스템에서 제공하는 고유 결제 키
-
-    @Column
-    private String failReason; // 결제 실패 시 실패 사유
-
-    @Column
-    private boolean cancelYN; // 결제 취소 여부
-
-    @Column
-    private String cancelReason; // 결제 취소 사유
-
-
+    private boolean paySuccessYN;
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
+    @Column
+    private String paymentKey;
+    @Column
+    private String failReason;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "reservation_id", referencedColumnName = "id")
-    private Reservation reservation;
+    @Column
+    private boolean cancelYN;
+    @Column
+    private String cancelReason;
 
-
-    public Payment(PaymentCreateRequestDto paymentCreateRequestDto, User user, Reservation reservation) {
-        this.amount = reservation.getTotalPrice();
-        this.payType = payType;
-        this.user = user;
-        this.reservation = reservation;
+    public PaymentResponseDto toPaymentResponseDto() { // DB에 저장하게 될 결제 관련 정보들
+        return PaymentResponseDto.builder()
+                .payType(payType.getDescription())
+                .amount(amount)
+                .orderName(orderName)
+                .orderId(orderId)
+                .customerEmail(user.getEmail())
+                .customerName(user.getNickname())
+                .createdAt(String.valueOf(getCreatedAt()))
+                .cancelYN(cancelYN)
+                .failReason(failReason)
+                .build();
     }
 }
