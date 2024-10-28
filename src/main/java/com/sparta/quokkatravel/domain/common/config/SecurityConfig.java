@@ -44,11 +44,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/guest/**").permitAll()
                         .anyRequest().authenticated() // 그 외의 모든 요청은 인증 필요
                 )
-                .formLogin(form -> form // 로그인 성공 핸들러 추가
-                        .loginPage("/login") // 로그인 페이지 경로 설정(필요시 맞춤 설정 가능)
-                        .successHandler(customAuthenticationSuccessHandler) // 로그인 성공 시 핸들러 등록
-                        .permitAll()
-                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가
                 .build();
     }

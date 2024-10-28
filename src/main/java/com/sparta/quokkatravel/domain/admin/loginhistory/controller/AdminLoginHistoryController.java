@@ -1,8 +1,10 @@
 package com.sparta.quokkatravel.domain.admin.loginhistory.controller;
 
 import com.sparta.quokkatravel.domain.admin.loginhistory.dto.AdminLoginHistoryResponseDto;
+import com.sparta.quokkatravel.domain.admin.loginhistory.entity.LoginHistory;
 import com.sparta.quokkatravel.domain.admin.loginhistory.service.AdminLoginHistoryService;
 import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
+import com.sparta.quokkatravel.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -38,5 +41,11 @@ public class AdminLoginHistoryController {
     public ResponseEntity<?> getLoginHistoryByUserId(@PathVariable Long userId) {
         List<AdminLoginHistoryResponseDto> loginHistories = adminLoginHistoryService.getLoginHistoryByUserId(userId);
         return ResponseEntity.ok(ApiResponse.success("특정 사용자 로그인 기록 조회 성공", loginHistories));
+    }
+
+    // 새로운 로그인 기록 저장 메서드
+    public void saveLoginHistory(User user, String ipAddress) {
+        LoginHistory loginHistory = new LoginHistory(user, ipAddress, LocalDateTime.now());
+        loginHistoryRepository.save(loginHistory);
     }
 }

@@ -1,6 +1,8 @@
 package com.sparta.quokkatravel.domain.common.config;
 
+import com.sparta.quokkatravel.domain.admin.loginhistory.service.AdminLoginHistoryService;
 import com.sparta.quokkatravel.domain.common.service.CustomUserDetailsService;
+import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -25,6 +27,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService customUserDetailsService;
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler; // 추가된 필드
+    private final AdminLoginHistoryService adminLoginHistoryService; // 추가된 필드
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -54,10 +59,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                // UserDetails가 User 타입인지 확인한 후 기록 남기기
+                if (userDetails instanceof User) {
+                    User user = (User) userDetails;
+                    String ipAddress = request.getRemoteAddr();
+                    adminLoginHistoryService.saveLoginHistory(user, ipAddress);
+                }
             }
         }
 
         filterChain.doFilter(request, response);
     }
 }
-
