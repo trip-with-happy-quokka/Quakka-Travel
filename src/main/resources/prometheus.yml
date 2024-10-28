@@ -1,0 +1,10 @@
+# 메트릭을 수집할 주기
+global:
+  scrape_interval: 15s
+
+# 메트릭을 수집할 호스트 정보 & 메트릭 정보의 경로
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:8080']
+        metric_path: '/actuator/prometheus'

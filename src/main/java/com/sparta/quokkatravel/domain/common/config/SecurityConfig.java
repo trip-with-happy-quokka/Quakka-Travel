@@ -42,6 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
                         .requestMatchers("/api/v1/guest/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated() // 그 외의 모든 요청은 인증 필요
                 )
                 .formLogin(form -> form // 로그인 성공 핸들러 추가
