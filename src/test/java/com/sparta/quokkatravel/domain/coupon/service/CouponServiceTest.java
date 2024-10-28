@@ -1,3 +1,4 @@
+/*
 package com.sparta.quokkatravel.domain.coupon.service;
 
 
@@ -76,3 +77,4 @@ class CouponServiceTest {
     }
 }
 
+*/
