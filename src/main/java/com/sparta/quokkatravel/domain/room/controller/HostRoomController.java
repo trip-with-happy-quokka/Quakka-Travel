@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/host")
-@PreAuthorize("hasRole('ROLE_HOST')")
+@PreAuthorize("hasRole('HOST')")
 @RequiredArgsConstructor
 @Tag(name = "Room", description = "Host 객실 관련 컨트롤러")
 public class HostRoomController {
