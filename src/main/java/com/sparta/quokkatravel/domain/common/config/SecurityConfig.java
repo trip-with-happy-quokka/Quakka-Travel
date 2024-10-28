@@ -1,5 +1,6 @@
 package com.sparta.quokkatravel.domain.common.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,20 +35,19 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api-docs/**").permitAll()
-                        .requestMatchers("/v3/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/api/v1/users", "/api/v1/users/login").permitAll() // 인증 관련 엔드포인트는 모두 접근 가능
                         .requestMatchers("/api/v1/notify/").hasRole("ADMIN")
                         .requestMatchers("/topic/notifications/").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
-                        .requestMatchers("/api/v1/guest/**").permitAll()
+                        .requestMatchers("/api/v1/**").permitAll()
                         .anyRequest().authenticated() // 그 외의 모든 요청은 인증 필요
                 )
-                .formLogin(form -> form // 로그인 성공 핸들러 추가
-                        .loginPage("/login") // 로그인 페이지 경로 설정(필요시 맞춤 설정 가능)
-                        .successHandler(customAuthenticationSuccessHandler) // 로그인 성공 시 핸들러 등록
-                        .permitAll()
+                .exceptionHandling(e -> e
+                                .authenticationEntryPoint((request, response, authException) -> {
+                                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                                })
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가
                 .build();
