@@ -16,10 +16,16 @@ public class CustomUserDetails implements UserDetails {
 
     private final String email;
     private final UserRole userRole;
+    private final User user;
 
     public CustomUserDetails(User user) {
+        this.user = user;
         this.email = user.getEmail();
         this.userRole = user.getUserRole();
+    }
+
+    public User getUser() { // User 객체를 반환하는 메서드 추가
+        return user;
     }
 
     @Override

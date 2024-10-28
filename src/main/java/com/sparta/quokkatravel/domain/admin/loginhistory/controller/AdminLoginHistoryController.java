@@ -42,10 +42,4 @@ public class AdminLoginHistoryController {
         List<AdminLoginHistoryResponseDto> loginHistories = adminLoginHistoryService.getLoginHistoryByUserId(userId);
         return ResponseEntity.ok(ApiResponse.success("특정 사용자 로그인 기록 조회 성공", loginHistories));
     }
-
-    // 새로운 로그인 기록 저장 메서드
-    public void saveLoginHistory(User user, String ipAddress) {
-        LoginHistory loginHistory = new LoginHistory(user, ipAddress, LocalDateTime.now());
-        loginHistoryRepository.save(loginHistory);
-    }
 }

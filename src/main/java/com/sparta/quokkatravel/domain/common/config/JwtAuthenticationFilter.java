@@ -1,9 +1,9 @@
 package com.sparta.quokkatravel.domain.common.config;
 
 import com.sparta.quokkatravel.domain.admin.loginhistory.service.AdminLoginHistoryService;
+import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.service.CustomUserDetailsService;
 import com.sparta.quokkatravel.domain.user.entity.User;
-import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -61,8 +61,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 // UserDetails가 User 타입인지 확인한 후 기록 남기기
-                if (userDetails instanceof User) {
-                    User user = (User) userDetails;
+                if (userDetails instanceof CustomUserDetails) {
+                    User user = ((CustomUserDetails) userDetails).getUser();
                     String ipAddress = request.getRemoteAddr();
                     adminLoginHistoryService.saveLoginHistory(user, ipAddress);
                 }
