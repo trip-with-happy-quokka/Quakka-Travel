@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/host")
-@PreAuthorize("hasRole('ROLE_HOST')")
+@PreAuthorize("hasRole('HOST')")
 @RequiredArgsConstructor
 @Tag(name = "Room", description = "Host 객실 관련 컨트롤러")
 public class HostRoomController {
@@ -35,7 +35,7 @@ public class HostRoomController {
                                                  @PathVariable Long accommodationId,
                                                  @RequestBody RoomRequestDto roomRequestDto) {
 
-        HostRoomResponseDto hostRoomResponseDto = hostRoomService.createRoom(customUserDetails, accommodationId, roomRequestDto);
+        HostRoomResponseDto hostRoomResponseDto = hostRoomService.createRoom(customUserDetails.getEmail(), accommodationId, roomRequestDto);
         return ResponseEntity.ok(ApiResponse.created("객실 생성 성공", hostRoomResponseDto));
     }
 
@@ -46,7 +46,7 @@ public class HostRoomController {
                                                  @PathVariable Long accommodationId,
                                                  @RequestParam(required = false) Pageable pageable) {
 
-        Page<HostRoomResponseDto> rooms = hostRoomService.getAllRoom(customUserDetails, accommodationId, pageable);
+        Page<HostRoomResponseDto> rooms = hostRoomService.getAllRoom(customUserDetails.getEmail(), accommodationId, pageable);
         return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", rooms));
     }
 
@@ -57,7 +57,7 @@ public class HostRoomController {
                                               @PathVariable(name = "accommodationId") Long accommodationId,
                                               @PathVariable(name = "roomId") Long roomId) {
 
-        HostRoomResponseDto hostRoomResponseDto = hostRoomService.getRoom(customUserDetails, accommodationId, roomId);
+        HostRoomResponseDto hostRoomResponseDto = hostRoomService.getRoom(customUserDetails.getEmail(), accommodationId, roomId);
         return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", hostRoomResponseDto));
     }
 
@@ -68,7 +68,7 @@ public class HostRoomController {
                                                  @PathVariable(name = "roomId") Long roomId,
                                                  @RequestBody RoomRequestDto roomRequestDto) {
 
-        HostRoomResponseDto hostRoomResponseDto = hostRoomService.updateRoom(customUserDetails, roomId, roomRequestDto);
+        HostRoomResponseDto hostRoomResponseDto = hostRoomService.updateRoom(customUserDetails.getEmail(), roomId, roomRequestDto);
         return ResponseEntity.ok(ApiResponse.success("숙소 수정 성공", hostRoomResponseDto));
     }
 
@@ -78,7 +78,7 @@ public class HostRoomController {
     public ResponseEntity<?> updateAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                  @PathVariable(name = "accommodationId") Long accommodationId) {
 
-        String deleteMessage = hostRoomService.deleteRoom(customUserDetails, accommodationId);
+        String deleteMessage = hostRoomService.deleteRoom(customUserDetails.getEmail(), accommodationId);
         return ResponseEntity.ok(ApiResponse.success("숙소 수정 성공", deleteMessage));
     }
 }

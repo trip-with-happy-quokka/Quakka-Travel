@@ -36,7 +36,7 @@ public class CouponController {
             @PathVariable Long eventId,
             @Valid @RequestBody CouponRequestDto couponRequestDto) {
 
-        CouponResponseDto couponResponseDto = couponService.createEventCoupon(customUserDetails, eventId, couponRequestDto);
+        CouponResponseDto couponResponseDto = couponService.createEventCoupon(customUserDetails.getEmail(), eventId, couponRequestDto);
         return ResponseEntity.ok(ApiResponse.created("행사 쿠폰 발급 성공", couponResponseDto));
     }
 
@@ -47,7 +47,7 @@ public class CouponController {
             @PathVariable Long accommodationId,
             @Valid @RequestBody CouponRequestDto couponRequestDto) {
 
-        CouponResponseDto couponResponseDto = couponService.createAccommodationCoupon(customUserDetails, accommodationId, couponRequestDto);
+        CouponResponseDto couponResponseDto = couponService.createAccommodationCoupon(customUserDetails.getEmail(), accommodationId, couponRequestDto);
         return ResponseEntity.ok(ApiResponse.created("숙소 쿠폰 발급 성공", couponResponseDto));
     }
 
@@ -58,7 +58,7 @@ public class CouponController {
             @PathVariable Long userId,
             @Valid @RequestBody CouponCodeRequestDto couponCodeRequestDto) {
 
-        CouponCodeResponseDto couponCodeResponseDto = couponService.registerCoupon(customUserDetails, userId, couponCodeRequestDto);
+        CouponCodeResponseDto couponCodeResponseDto = couponService.registerCoupon(customUserDetails.getEmail(), userId, couponCodeRequestDto);
         return ResponseEntity.ok(ApiResponse.created("쿠폰 등록 성공", couponCodeResponseDto));
     }
 
@@ -69,7 +69,7 @@ public class CouponController {
             @PathVariable Long userId,
             @PathVariable Long couponId) {
 
-        CouponRedeemResponseDto couponRedeemResponseDto = couponService.redeemCoupon(customUserDetails, userId, couponId);
+        CouponRedeemResponseDto couponRedeemResponseDto = couponService.redeemCoupon(customUserDetails.getEmail(), userId, couponId);
         return ResponseEntity.ok(ApiResponse.created("쿠폰 등록 성공", couponRedeemResponseDto));
     }
 
@@ -79,7 +79,7 @@ public class CouponController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long userId) {
 
-        List<CouponResponseDto> coupons = couponService.getAllMyCoupons(customUserDetails, userId);
+        List<CouponResponseDto> coupons = couponService.getAllMyCoupons(customUserDetails.getEmail(), userId);
         return ResponseEntity.ok(ApiResponse.success("쿠폰 전체 조회 성공", coupons));
     }
 
@@ -88,7 +88,7 @@ public class CouponController {
     public ResponseEntity<?> deleteCoupon(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long couponId) {
-        CouponDeleteResponseDto couponDeleteResponseDto = couponService.deleteCoupon(customUserDetails, couponId);
+        CouponDeleteResponseDto couponDeleteResponseDto = couponService.deleteCoupon(customUserDetails.getEmail(), couponId);
         return ResponseEntity.ok(ApiResponse.success("쿠폰 삭제 성공", couponDeleteResponseDto));
     }
 }

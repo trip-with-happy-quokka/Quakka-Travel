@@ -13,11 +13,11 @@ import java.util.List;
 
 public interface CouponService {
 
-    CouponResponseDto createEventCoupon(CustomUserDetails customUserDetails, Long eventId, CouponRequestDto couponRequestDto);
-    CouponResponseDto createAccommodationCoupon(CustomUserDetails customUserDetails, Long accommodationId, CouponRequestDto couponRequestDto);
-    CouponCodeResponseDto registerCoupon(CustomUserDetails customUserDetails, Long userId, CouponCodeRequestDto couponCodeRequestDto);
-    CouponRedeemResponseDto redeemCoupon(CustomUserDetails customUserDetails, Long userId, Long couponId);
-    List<CouponResponseDto> getAllMyCoupons(CustomUserDetails customUserDetails, Long userId);
-    CouponDeleteResponseDto deleteCoupon(CustomUserDetails customUserDetails, Long couponId);
+    CouponResponseDto createEventCoupon(String email, Long eventId, CouponRequestDto couponRequestDto);
+    CouponResponseDto createAccommodationCoupon(String email, Long accommodationId, CouponRequestDto couponRequestDto);
+    CouponCodeResponseDto registerCoupon(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto);
+    CouponRedeemResponseDto redeemCoupon(String email, Long userId, Long couponId);
+    List<CouponResponseDto> getAllMyCoupons(String email, Long userId);
+    CouponDeleteResponseDto deleteCoupon(String email, Long couponId);
 
 }

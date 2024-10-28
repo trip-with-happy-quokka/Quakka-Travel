@@ -38,12 +38,10 @@ public class CouponServiceImpl implements CouponService {
     // 행사 쿠폰 발행 메서드
     @Override
     @Transactional
-    public CouponResponseDto createEventCoupon(CustomUserDetails customUserDetails, Long eventId, CouponRequestDto couponRequestDto) {
+    public CouponResponseDto createEventCoupon(String email, Long eventId, CouponRequestDto couponRequestDto) {
 
         // customUserDetails 에서 생성자 정보 불러오기
-        User user = userRepository.findByEmail(customUserDetails.getEmail()).orElseThrow(
-                ()-> new InvalidRequestStateException("가입되지 않은 이메일 유저입니다.")
-        );
+        User user = userRepository.findByEmailOrElseThrow(email);
 
         // eventId 로 event 조회
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("해당 행사 조회 불가"));
@@ -88,12 +86,10 @@ public class CouponServiceImpl implements CouponService {
     // 숙소 쿠폰 발행 메서드
     @Override
     @Transactional
-    public CouponResponseDto createAccommodationCoupon(CustomUserDetails customUserDetails, Long accommodationId, CouponRequestDto couponRequestDto) {
+    public CouponResponseDto createAccommodationCoupon(String email, Long accommodationId, CouponRequestDto couponRequestDto) {
 
         // customUserDetails 에서 생성자 정보 불러오기
-        User user = userRepository.findByEmail(customUserDetails.getEmail()).orElseThrow(
-                ()-> new InvalidRequestStateException("가입되지 않은 이메일 유저입니다.")
-        );
+        User user = userRepository.findByEmailOrElseThrow(email);
 
         // accommodationId 로 accommodation 조회
         Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("해당 숙소 조회 불가"));
@@ -138,10 +134,10 @@ public class CouponServiceImpl implements CouponService {
     // 쿠폰 등록 메서드
     @Override
     @Transactional
-    public CouponCodeResponseDto registerCoupon(CustomUserDetails customUserDetails, Long userId, CouponCodeRequestDto couponCodeRequestDto){
+    public CouponCodeResponseDto registerCoupon(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto){
 
         // userId 로 User 조회
-        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException("유저 조회 불가"));
+        User user = userRepository.findByEmailOrElseThrow(email);
 
         // 쿠폰 코드로 쿠폰 찾기
         Coupon coupon = couponRepository.findByCode(couponCodeRequestDto.getCouponCode())
@@ -162,10 +158,10 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public CouponRedeemResponseDto redeemCoupon(CustomUserDetails customUserDetails, Long userId, Long couponId){
+    public CouponRedeemResponseDto redeemCoupon(String email, Long userId, Long couponId){
 
         // userId 로 User 조회
-        User user = userRepository.findById(userId).orElseThrow(()-> new NotFoundException("유저 조회 불가"));
+        User user = userRepository.findByEmailOrElseThrow(email);
 
         // couponId 로 Coupon 조회
         Coupon coupon = couponRepository.findById(couponId).orElseThrow(()-> new NotFoundException("쿠폰 조회 불가"));
@@ -187,14 +183,13 @@ public class CouponServiceImpl implements CouponService {
 
     // 내 쿠폰 전체 조회
     @Override
-    public List<CouponResponseDto> getAllMyCoupons(CustomUserDetails customUserDetails, Long userId) {
+    public List<CouponResponseDto> getAllMyCoupons(String email, Long userId) {
 
         // User 정보 조회
-        User user = userRepository.findById(userId)
-                .orElseThrow(()-> new NotFoundException("유저 조회 불가"));
+        User user = userRepository.findByEmailOrElseThrow(email);
 
         // 유저 정보 일치하는지 확인
-        if(!customUserDetails.getEmail().equals(user.getEmail())){
+        if(!email.equals(user.getEmail())){
             throw new BadRequestException("본인 쿠폰만 조회 가능합니다.");
         }
 
@@ -218,7 +213,7 @@ public class CouponServiceImpl implements CouponService {
     // 쿠폰 삭제
     @Override
     @Transactional
-    public CouponDeleteResponseDto deleteCoupon(CustomUserDetails customUserDetails, Long couponId) {
+    public CouponDeleteResponseDto deleteCoupon(String email, Long couponId) {
 
         // couponId 로 해당 쿠폰 조회
         Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new NotFoundException("해당 쿠폰 조회 불가"));

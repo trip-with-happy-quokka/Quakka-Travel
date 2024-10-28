@@ -33,6 +33,8 @@ public class QAccommodation extends EntityPathBase<Accommodation> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final StringPath imageurl = createString("imageurl");
+
     public final StringPath name = createString("name");
 
     public final NumberPath<Long> rating = createNumber("rating", Long.class);
