@@ -36,10 +36,11 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
     public HostAccommodationResponseDto createAccommodation(CustomUserDetails customUserDetails, MultipartFile image, AccommodationRequestDto accommodationRequestDto) throws IOException {
 
         User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
-
+        String url = "";
         // image upload
-        String url = s3Uploader.upload(image, "accommodation");
-
+        if(image != null) {
+            url = s3Uploader.upload(image, "accommodation");
+        }
         Accommodation accommodation = new Accommodation(accommodationRequestDto.getName(), accommodationRequestDto.getDescription(), accommodationRequestDto.getAddress(), url, user);
         Accommodation saved = accommodationRepository.save(accommodation);
 
