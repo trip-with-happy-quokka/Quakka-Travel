@@ -5,6 +5,7 @@ import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponRequestDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
+import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
 import com.sparta.quokkatravel.domain.event.entity.Event;
 import com.sparta.quokkatravel.domain.event.repository.EventRepository;
@@ -42,12 +43,13 @@ class CouponServiceTest {
         // Given
         long eventId = 1L;
         Event event = new Event("eventTitle", "eventContent");
+        User user = new User("test1@test.com", "1234", "test" , UserRole.USER );
         ReflectionTestUtils.setField(event, "eventId", eventId);
         Coupon coupon = new Coupon(
                 "name", "content", "EVENT",
-                "1111-1111-1111", 10, 0,
+                "1111-1111-1111", CouponStatus.ISSUED, 10, 0,
                 LocalDate.of(2024, 11, 25), // 2024-11-25
-                LocalDate.of(2024, 12, 25), event);
+                LocalDate.of(2024, 12, 25), event, user);
 
         given(couponRepository.findById(anyLong())).willReturn(Optional.of(coupon));
 
@@ -60,9 +62,6 @@ class CouponServiceTest {
                 LocalDate.of(2024, 11, 25),  // 시작일
                 LocalDate.of(2024, 12, 25)   // 종료일
         );
-
-
-        User user = new User("test1@test.com", "1234", "test", "010-0000-0000", UserRole.ADMIN);
         CustomUserDetails customUserDetails = new CustomUserDetails(user);
 
         // When: 쿠폰 생성 메서드 호출

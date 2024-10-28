@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +27,10 @@ import java.util.List;
 public class CouponController {
 
     private final CouponService couponService;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @PostMapping("/admin/events/{eventId}/coupons")
-    @Operation(summary = "행사 쿠폰 발급", description = "관리자 권한으로 쿠폰을 발행하는 API")
+    @Operation(summary = "행사 쿠폰 발행", description = "관리자 권한으로 쿠폰을 발행하는 API")
     public ResponseEntity<?> createEventCoupon(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long eventId,
@@ -39,7 +41,7 @@ public class CouponController {
     }
 
     @PostMapping("/admin/accommodations/{accommodationId}/coupons")
-    @Operation(summary = "숙소 쿠폰 발급", description = "관리자 권한으로 쿠폰을 발행하는 API")
+    @Operation(summary = "숙소 쿠폰 발행", description = "관리자 권한으로 쿠폰을 발행하는 API")
     public ResponseEntity<?> createAccommodationCoupon(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long accommodationId,

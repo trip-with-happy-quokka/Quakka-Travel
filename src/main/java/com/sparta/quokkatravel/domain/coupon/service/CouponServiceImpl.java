@@ -35,7 +35,7 @@ public class CouponServiceImpl implements CouponService {
     private final AccommodationRepository accommodationRepository;
     private final UserRepository userRepository;
 
-    // 행사 쿠폰 발급 메서드
+    // 행사 쿠폰 발행 메서드
     @Override
     @Transactional
     public CouponResponseDto createEventCoupon(CustomUserDetails customUserDetails, Long eventId, CouponRequestDto couponRequestDto) {
@@ -85,7 +85,7 @@ public class CouponServiceImpl implements CouponService {
         );
     }
 
-    // 숙소 쿠폰 발급 메서드
+    // 숙소 쿠폰 발행 메서드
     @Override
     @Transactional
     public CouponResponseDto createAccommodationCoupon(CustomUserDetails customUserDetails, Long accommodationId, CouponRequestDto couponRequestDto) {
