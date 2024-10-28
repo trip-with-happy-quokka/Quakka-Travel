@@ -33,8 +33,8 @@ public class ChatService {
 
     // 채팅방 생성
     @Transactional
-    public void createChatRoom(ChatRoomDto chatRoomDto, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        User owner = userRepository.findByEmail(userDetails.getEmail())
+    public void createChatRoom(ChatRoomDto chatRoomDto, String email) {
+        User owner = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         ChatRoom chatRoom = new ChatRoom(chatRoomDto.getTitle(), owner);
@@ -48,13 +48,13 @@ public class ChatService {
 
     // 채팅방 참여
     @Transactional
-    public void joinChatRoom(Long chatRoomId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public void joinChatRoom(Long chatRoomId, String email) {
         // 채팅방 찾기
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
 
         // 유저 찾기
-        User user = userRepository.findByEmail(userDetails.getEmail())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
 
@@ -70,11 +70,11 @@ public class ChatService {
     }
 
     // 채팅방 삭제 (방장만 가능)
-    public void deleteChatRoom(Long chatRoomId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public void deleteChatRoom(Long chatRoomId, String email) {
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
-        ChatParticipant participant = chatParticipantRepository.findByChatRoomIdAndUserEmail(chatRoomId, customUserDetails.getEmail())
+        ChatParticipant participant = chatParticipantRepository.findByChatRoomIdAndUserEmail(chatRoomId, email)
                 .orElseThrow(() -> new IllegalArgumentException("참여자를 찾을 수 없습니다."));
 
         if (participant.getUserRole() != UserRole.OWNER) {
@@ -86,11 +86,11 @@ public class ChatService {
     }
 
     // 채팅 메세지 저장
-    public Chatting saveMessage(ChatMessageDto messageDto, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public Chatting saveMessage(ChatMessageDto messageDto, String email) {
 
         ChatRoom chatRoom = chatRoomRepository.findById(messageDto.getChatRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
-        User user = userRepository.findByEmail(customUserDetails.getEmail())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         // 메세지 저장

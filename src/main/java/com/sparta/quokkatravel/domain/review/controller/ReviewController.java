@@ -26,7 +26,7 @@ public class ReviewController {
     @PostMapping
     @Operation(summary = "리뷰 생성", description = "새로운 리뷰를 생성하는 API")
     public ResponseEntity<?> createReview(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody ReviewRequestDto requestDto) {
-        ReviewResponseDto createdReview = reviewService.createReview(customUserDetails, requestDto);
+        ReviewResponseDto createdReview = reviewService.createReview(customUserDetails.getEmail(), requestDto);
         return ResponseEntity.ok(ApiResponse.success("리뷰 생성 성공", createdReview));
     }
 
@@ -35,7 +35,7 @@ public class ReviewController {
     @Operation(summary = "리뷰 수정", description = "기존 리뷰를 수정하는 API")
     public ResponseEntity<ApiResponse<ReviewResponseDto>> updateReview(
             @PathVariable Long reviewId, @AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody ReviewRequestDto requestDto) {
-        ReviewResponseDto responseDto = reviewService.updateReview(reviewId, customUserDetails, requestDto);
+        ReviewResponseDto responseDto = reviewService.updateReview(reviewId, customUserDetails.getEmail(), requestDto);
         return ResponseEntity.ok(ApiResponse.success("리뷰 수정 성공", responseDto));
     }
 
@@ -43,7 +43,7 @@ public class ReviewController {
     @DeleteMapping("/{reviewId}")
     @Operation(summary = "리뷰 삭제", description = "특정 리뷰를 삭제하는 API")
     public ResponseEntity<ApiResponse<Void>> deleteReview(@PathVariable Long reviewId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        reviewService.deleteReview(reviewId, customUserDetails);
+        reviewService.deleteReview(reviewId, customUserDetails.getEmail());
         return ResponseEntity.ok(ApiResponse.success("리뷰 삭제 성공", null));
     }
 
@@ -52,7 +52,7 @@ public class ReviewController {
     @Operation(summary = "특정 숙소 리뷰 조회", description = "특정 숙소에 대한 리뷰 목록을 조회하는 API")
     public ResponseEntity<ApiResponse<Page<ReviewResponseDto>>> getReviewsByAccommodation(
             @PathVariable Long accommodationId, @AuthenticationPrincipal CustomUserDetails customUserDetails, Pageable pageable) {
-        Page<ReviewResponseDto> reviews = reviewService.getReviewsByAccommodation(customUserDetails, accommodationId,  pageable);
+        Page<ReviewResponseDto> reviews = reviewService.getReviewsByAccommodation(customUserDetails.getEmail(), accommodationId,  pageable);
         return ResponseEntity.ok(ApiResponse.success("리뷰 조회 성공", reviews));
     }
 

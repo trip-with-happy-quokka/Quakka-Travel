@@ -8,6 +8,7 @@ import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepo
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.common.exception.UnAuthorizedException;
+import com.sparta.quokkatravel.domain.common.s3.S3Uploader;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,13 +29,20 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
     private final AccommodationRepository accommodationRepository;
     private final AccommodationRepositorySupport accommodationRepositorySupport;
     private final UserRepository userRepository;
+    private final S3Uploader s3Uploader;
 
     @Override
     @Transactional
-    public HostAccommodationResponseDto createAccommodation(CustomUserDetails customUserDetails, AccommodationRequestDto accommodationRequestDto) {
+    public HostAccommodationResponseDto createAccommodation(CustomUserDetails customUserDetails, MultipartFile image, AccommodationRequestDto accommodationRequestDto) throws IOException {
+
         User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
-        Accommodation accommodation = new Accommodation(accommodationRequestDto.getName(), accommodationRequestDto.getDescription(), accommodationRequestDto.getAddress(), user);
+
+        // image upload
+        String url = s3Uploader.upload(image, "accommodation");
+
+        Accommodation accommodation = new Accommodation(accommodationRequestDto.getName(), accommodationRequestDto.getDescription(), accommodationRequestDto.getAddress(), url, user);
         Accommodation saved = accommodationRepository.save(accommodation);
+
         return new HostAccommodationResponseDto(saved);
     }
 

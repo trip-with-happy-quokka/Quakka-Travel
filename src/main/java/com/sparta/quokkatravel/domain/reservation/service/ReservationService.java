@@ -12,16 +12,16 @@ import java.nio.file.AccessDeniedException;
 public interface ReservationService {
 
     // 예약 생성
-    ReservationResponseDto createReservation(CustomUserDetails userDetails, Long roomId, ReservationRequestDto reservationRequestDto);
+    ReservationResponseDto createReservation(String email, Long roomId, ReservationRequestDto reservationRequestDto);
 
 
     // 예약 조회
-    ReservationResponseDto getReservation(CustomUserDetails userDetails, Long id);
-    Page<ReservationResponseDto> getAllReservation(CustomUserDetails userDetails, Pageable pageable);
+    ReservationResponseDto getReservation(String email, Long id);
+    Page<ReservationResponseDto> getAllReservation(String email, Pageable pageable);
 
     // 예약 수정
-    ReservationResponseDto updateReservation(CustomUserDetails userDetails, Long roomId, Long reservationId, ReservationRequestDto reservationRequestDto) throws AccessDeniedException;
+    ReservationResponseDto updateReservation(String email, Long roomId, Long reservationId, ReservationRequestDto reservationRequestDto) throws AccessDeniedException;
 
     // 예약 삭제
-    String cancelReservation(CustomUserDetails userDetails, Long roomId, Long reservationId) throws AccessDeniedException;
+    String cancelReservation(String email, Long roomId, Long reservationId) throws AccessDeniedException;
 }

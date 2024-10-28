@@ -21,7 +21,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Optional;
@@ -52,6 +54,7 @@ public class HostAccommodationServiceTest {
     private CustomUserDetails userDetails;
     private User user;
     private Accommodation accommodation;
+    private MultipartFile image;
 
     @BeforeEach
     void setUp() {
@@ -73,13 +76,13 @@ public class HostAccommodationServiceTest {
     // === createAccommodation 테스트 ===
 
     @Test
-    void createAccommodation_Success() {
+    void createAccommodation_Success() throws IOException {
         // given
         AccommodationRequestDto requestDto = new AccommodationRequestDto("숙소1", "설명1", "주소1");
         when(accommodationRepository.save(any(Accommodation.class))).thenReturn(accommodation);
 
         // when
-        HostAccommodationResponseDto responseDto = hostAccommodationService.createAccommodation(userDetails, requestDto);
+        HostAccommodationResponseDto responseDto = hostAccommodationService.createAccommodation(userDetails, image, requestDto);
 
         // then
         assertNotNull(responseDto);
@@ -95,7 +98,7 @@ public class HostAccommodationServiceTest {
 
         // when & then
         assertThrows(NotFoundException.class, () -> {
-            hostAccommodationService.createAccommodation(userDetails, requestDto);
+            hostAccommodationService.createAccommodation(userDetails, image, requestDto);
         });
         verify(accommodationRepository, never()).save(any(Accommodation.class));
     }

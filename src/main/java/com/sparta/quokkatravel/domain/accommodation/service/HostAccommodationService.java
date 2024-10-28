@@ -5,11 +5,14 @@ import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationRespons
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface HostAccommodationService {
 
     // 생성
-    HostAccommodationResponseDto createAccommodation(CustomUserDetails customUserDetails, AccommodationRequestDto accommodationRequestDto);
+    HostAccommodationResponseDto createAccommodation(CustomUserDetails customUserDetails, MultipartFile image, AccommodationRequestDto accommodationRequestDto) throws IOException;
 
     // 조회
     Page<HostAccommodationResponseDto> getAllAccommodation(CustomUserDetails customUserDetails, Pageable pageable);

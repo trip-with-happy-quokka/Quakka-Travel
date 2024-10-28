@@ -30,7 +30,7 @@ public class ReservationController {
     public ResponseEntity<?> createReservation(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                @PathVariable Long roomId,
                                                @RequestBody ReservationRequestDto reservationRequestDto) {
-        ReservationResponseDto reservationResponseDto = reservationService.createReservation(userDetails, roomId, reservationRequestDto);
+        ReservationResponseDto reservationResponseDto = reservationService.createReservation(userDetails.getEmail(), roomId, reservationRequestDto);
         return ResponseEntity.ok(ApiResponse.created("예약 생성 성공", reservationResponseDto));
     }
 
@@ -39,7 +39,7 @@ public class ReservationController {
     public ResponseEntity<?> getAllReservations(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                 @RequestParam(required = false) Pageable pageable) {
 
-        Page<ReservationResponseDto> reservations = reservationService.getAllReservation(userDetails, pageable);
+        Page<ReservationResponseDto> reservations = reservationService.getAllReservation(userDetails.getEmail(), pageable);
         return ResponseEntity.ok(ApiResponse.success("예약 전체 조회 성공", reservations));
     }
 
@@ -47,7 +47,7 @@ public class ReservationController {
     @GetMapping("/reservations/{reservationId}")
     public ResponseEntity<?> getReservation(@AuthenticationPrincipal CustomUserDetails userDetails,
                                             @PathVariable Long reservationId) {
-        ReservationResponseDto reservationResponseDto = reservationService.getReservation(userDetails, reservationId);
+        ReservationResponseDto reservationResponseDto = reservationService.getReservation(userDetails.getEmail(), reservationId);
         return ResponseEntity.ok(ApiResponse.success("예약 단건 조회 성공", reservationResponseDto));
     }
 
@@ -57,7 +57,7 @@ public class ReservationController {
                                                @PathVariable Long roomId,
                                                @PathVariable Long reservationId,
                                                @RequestBody ReservationRequestDto reservationRequestDto) throws AccessDeniedException {
-        ReservationResponseDto reservationResponseDto = reservationService.updateReservation(userDetails, roomId, reservationId, reservationRequestDto);
+        ReservationResponseDto reservationResponseDto = reservationService.updateReservation(userDetails.getEmail(), roomId, reservationId, reservationRequestDto);
         return ResponseEntity.ok(ApiResponse.success("예약 수정 성공", reservationResponseDto));
     }
 
@@ -67,7 +67,7 @@ public class ReservationController {
                                                @PathVariable Long roomId,
                                                @PathVariable Long reservationId) throws AccessDeniedException {
 
-        String cancelMessage = reservationService.cancelReservation(userDetails, roomId, reservationId);
+        String cancelMessage = reservationService.cancelReservation(userDetails.getEmail(), roomId, reservationId);
         return ResponseEntity.ok(ApiResponse.success("예약 취소 성공", cancelMessage));
     }
 

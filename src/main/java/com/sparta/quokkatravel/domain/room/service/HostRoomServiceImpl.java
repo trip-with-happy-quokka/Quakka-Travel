@@ -30,7 +30,7 @@ public class HostRoomServiceImpl implements HostRoomService {
 
     @Override
     @Transactional
-    public HostRoomResponseDto createRoom(CustomUserDetails userDetails, Long accommodationId, RoomRequestDto roomRequestDto) {
+    public HostRoomResponseDto createRoom(String email, Long accommodationId, RoomRequestDto roomRequestDto) {
         Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("accommodation not found"));
         Room room = new Room(roomRequestDto, accommodation);
         roomRepository.save(room);
@@ -38,9 +38,9 @@ public class HostRoomServiceImpl implements HostRoomService {
     }
 
     @Override
-    public HostRoomResponseDto getRoom(CustomUserDetails customUserDetails, Long accommodationId, Long roomId) {
+    public HostRoomResponseDto getRoom(String email, Long accommodationId, Long roomId) {
         // 유저 조회
-        User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
+        User user = userRepository.findByEmailOrElseThrow(email);
 
         // 유저가 해당 숙소를 소유하고 있는지 확인
         Accommodation accommodation = user.getAccommodations().stream()
@@ -58,10 +58,10 @@ public class HostRoomServiceImpl implements HostRoomService {
     }
 
     @Override
-    public Page<HostRoomResponseDto> getAllRoom(CustomUserDetails customUserDetails, Long accommodationId, Pageable pageable) {
+    public Page<HostRoomResponseDto> getAllRoom(String email, Long accommodationId, Pageable pageable) {
 
         // 유저 조회
-        User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
+        User user = userRepository.findByEmailOrElseThrow(email);
 
         // 유저가 해당 숙소를 소유하고 있는지 확인
         Accommodation accommodation = user.getAccommodations().stream()
@@ -75,8 +75,8 @@ public class HostRoomServiceImpl implements HostRoomService {
 
     @Override
     @Transactional
-    public HostRoomResponseDto updateRoom(CustomUserDetails customUserDetails, Long roomId, RoomRequestDto roomRequestDto) {
-        User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
+    public HostRoomResponseDto updateRoom(String email, Long roomId, RoomRequestDto roomRequestDto) {
+        User user = userRepository.findByEmailOrElseThrow(email);
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room Not Found"));
 
         if(!room.getAccommodation().getUser().equals(user)) {
@@ -90,8 +90,8 @@ public class HostRoomServiceImpl implements HostRoomService {
 
     @Override
     @Transactional
-    public String deleteRoom(CustomUserDetails customUserDetails, Long roomId) {
-        User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
+    public String deleteRoom(String email, Long roomId) {
+        User user = userRepository.findByEmailOrElseThrow(email);
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room Not Found"));
 
         if(!room.getAccommodation().getUser().equals(user)) {
