@@ -5,7 +5,6 @@ import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationRespons
 import com.sparta.quokkatravel.domain.accommodation.service.HostAccommodationService;
 import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
-import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/host")
@@ -29,9 +31,10 @@ public class HostAccommodationController {
     @PostMapping("/accommodations")
     @Operation(summary = "숙소 생성", description = "HOST 유저가 숙소를 생성하는 API")
     public ResponseEntity<?> createAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                 @RequestBody AccommodationRequestDto accommodationRequestDto) {
+                                                 @RequestPart(name = "image", required = false) MultipartFile image,
+                                                 @RequestPart(name = "dto") AccommodationRequestDto accommodationRequestDto) throws IOException {
 
-        HostAccommodationResponseDto hostAccommodationResponseDto = hostAccommodationService.createAccommodation(customUserDetails, accommodationRequestDto);
+        HostAccommodationResponseDto hostAccommodationResponseDto = hostAccommodationService.createAccommodation(customUserDetails, image, accommodationRequestDto);
         return ResponseEntity.ok(ApiResponse.created("숙소 생성 성공", hostAccommodationResponseDto));
     }
 

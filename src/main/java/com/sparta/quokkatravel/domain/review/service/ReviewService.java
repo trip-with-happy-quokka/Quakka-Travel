@@ -25,10 +25,10 @@ public class ReviewService {
 
     // 리뷰 생성
     @Transactional
-    public ReviewResponseDto createReview(CustomUserDetails customUserDetails, ReviewRequestDto requestDto) {
+    public ReviewResponseDto createReview(String email, ReviewRequestDto requestDto) {
         Accommodation accommodation = accommodationRepository.findById(requestDto.getAccommodationId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 숙소가 없습니다."));
-        User user = userRepository.findByEmail(customUserDetails.getEmail())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 없습니다."));
 
         Review review = new Review(accommodation, user, requestDto.getRating(), requestDto.getContent());
@@ -39,13 +39,13 @@ public class ReviewService {
 
     // 특정 숙소의 리뷰 전체 목록 조회
     @Transactional
-    public Page<ReviewResponseDto> getReviewsByAccommodation(CustomUserDetails customUserDetails, Long accommodationId, Pageable pageable) {
+    public Page<ReviewResponseDto> getReviewsByAccommodation(String email, Long accommodationId, Pageable pageable) {
 
         // 숙소가 존재하는지 확인
         if (!accommodationRepository.existsById(accommodationId)) {
             throw new IllegalArgumentException("해당 숙소가 존재하지 않습니다.");
         }
-        User user = userRepository.findByEmail(customUserDetails.getEmail())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 없습니다."));
 
         Page<Review> reviews = reviewRepository.findByAccommodation_Id(accommodationId, pageable);
@@ -59,11 +59,11 @@ public class ReviewService {
 
     // 리뷰 수정
     @Transactional
-    public ReviewResponseDto updateReview(Long reviewId, CustomUserDetails customUserDetails, ReviewRequestDto requestDto) {
+    public ReviewResponseDto updateReview(Long reviewId, String email, ReviewRequestDto requestDto) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 없습니다."));
 
-        if (!review.getUser().getEmail().equals(customUserDetails.getEmail())) {
+        if (!review.getUser().getEmail().equals(email)) {
             throw new IllegalArgumentException("리뷰 수정 권한이 없습니다.");
         }
 
@@ -72,11 +72,11 @@ public class ReviewService {
     }
 
     // 리뷰 삭제
-    public void deleteReview(Long reviewId, CustomUserDetails customUserDetails) {
+    public void deleteReview(Long reviewId, String email) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 없습니다."));
 
-        if (!review.getUser().getEmail().equals(customUserDetails.getEmail())) {
+        if (!review.getUser().getEmail().equals(email)) {
             throw new IllegalArgumentException("리뷰 삭제 권한이 없습니다.");
         }
 

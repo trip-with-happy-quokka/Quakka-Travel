@@ -29,7 +29,7 @@ public class ChatController {
     public ResponseEntity<String> createChatRoom(
             @RequestBody ChatRoomDto chatRoomDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        chatService.createChatRoom(chatRoomDto, customUserDetails);
+        chatService.createChatRoom(chatRoomDto, customUserDetails.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body("채팅방이 생성되었습니다.");
     }
 
@@ -37,7 +37,7 @@ public class ChatController {
     @PostMapping("/rooms/{chatRoomId}/join")
     @Operation(summary = "채팅방 참여", description = "채팅방을 침여하는 API")
     public ResponseEntity<String> joinChatRoom(@PathVariable Long chatRoomId, @AuthenticationPrincipal CustomUserDetails customUserDetails){
-        chatService.joinChatRoom(chatRoomId, customUserDetails);
+        chatService.joinChatRoom(chatRoomId, customUserDetails.getEmail());
         return ResponseEntity.ok("채팅방에 참여했습니다.");
     }
 
@@ -45,7 +45,7 @@ public class ChatController {
     @Operation(summary = "채팅방 삭제", description = "채팅방을 삭제하는 API")
     @DeleteMapping("/chattings/room/{chatRoomId}")
     public void deleteChatRoom(@PathVariable Long chatRoomId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        chatService.deleteChatRoom(chatRoomId, customUserDetails);
+        chatService.deleteChatRoom(chatRoomId, customUserDetails.getEmail());
     }
 
     // STOMP를 통해 채팅 메시지 전송
@@ -57,7 +57,7 @@ public class ChatController {
         headerAccessor.getSessionAttributes().put("username", customUserDetails.getUsername());
 
         // 메시지 저장 및 전송
-        return chatService.saveMessage(chatMessageDTO, customUserDetails);
+        return chatService.saveMessage(chatMessageDTO, customUserDetails.getEmail());
     }
 
     // 메시지 읽음 처리
