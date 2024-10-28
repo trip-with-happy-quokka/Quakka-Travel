@@ -5,7 +5,6 @@ import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationRespons
 import com.sparta.quokkatravel.domain.accommodation.service.HostAccommodationService;
 import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
-import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
