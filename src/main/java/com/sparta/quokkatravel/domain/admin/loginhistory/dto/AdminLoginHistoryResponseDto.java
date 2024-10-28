@@ -2,10 +2,12 @@ package com.sparta.quokkatravel.domain.admin.loginhistory.dto;
 
 import com.sparta.quokkatravel.domain.admin.loginhistory.entity.LoginHistory;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
+@NoArgsConstructor
 public class AdminLoginHistoryResponseDto {
 
     private Long userId;

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class AdminUserActivityService {
 
     private final AdminUserActivityRepository adminUserActivityRepository;
-    private final UserRepository userRepository;  // User 관련 저장소를 추가
+    private final UserRepository userRepository;
 
     public AdminUserActivityService(AdminUserActivityRepository adminUserActivityRepository, UserRepository userRepository) {
         this.adminUserActivityRepository = adminUserActivityRepository;
@@ -39,7 +39,7 @@ public class AdminUserActivityService {
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
         // 상태 업데이트 후 저장
-        user.updateStatus(statusUpdateDto.getStatus());  // User 엔티티에 상태 업데이트 메서드 추가 필요
+        user.updateStatus(statusUpdateDto.getStatus());
         userRepository.save(user);
 
         // 상태 업데이트 활동 기록 추가 (UserActivity 저장)
