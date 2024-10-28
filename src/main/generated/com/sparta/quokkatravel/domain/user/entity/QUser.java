@@ -28,6 +28,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final ListPath<com.sparta.quokkatravel.domain.chat.entity.Chatting, com.sparta.quokkatravel.domain.chat.entity.QChatting> chattings = this.<com.sparta.quokkatravel.domain.chat.entity.Chatting, com.sparta.quokkatravel.domain.chat.entity.QChatting>createList("chattings", com.sparta.quokkatravel.domain.chat.entity.Chatting.class, com.sparta.quokkatravel.domain.chat.entity.QChatting.class, PathInits.DIRECT2);
 
+    public final ListPath<com.sparta.quokkatravel.domain.coupon.entity.Coupon, com.sparta.quokkatravel.domain.coupon.entity.QCoupon> coupons = this.<com.sparta.quokkatravel.domain.coupon.entity.Coupon, com.sparta.quokkatravel.domain.coupon.entity.QCoupon>createList("coupons", com.sparta.quokkatravel.domain.coupon.entity.Coupon.class, com.sparta.quokkatravel.domain.coupon.entity.QCoupon.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
