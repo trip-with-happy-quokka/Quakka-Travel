@@ -9,15 +9,15 @@ import org.springframework.data.domain.Pageable;
 public interface HostRoomService {
 
     // 생성
-    HostRoomResponseDto createRoom(CustomUserDetails userDetails, Long accommodationId, RoomRequestDto roomRequestDto);
+    HostRoomResponseDto createRoom(String email, Long accommodationId, RoomRequestDto roomRequestDto);
 
     // 조회
-    HostRoomResponseDto getRoom(CustomUserDetails customUserDetails, Long accommodationId, Long roomId);
-    Page<HostRoomResponseDto> getAllRoom(CustomUserDetails customUserDetails, Long accommodationId, Pageable pageable);
+    HostRoomResponseDto getRoom(String email, Long accommodationId, Long roomId);
+    Page<HostRoomResponseDto> getAllRoom(String email, Long accommodationId, Pageable pageable);
 
     // 수정
-    HostRoomResponseDto updateRoom(CustomUserDetails customUserDetails, Long roomId, RoomRequestDto roomRequestDto);
+    HostRoomResponseDto updateRoom(String email, Long roomId, RoomRequestDto roomRequestDto);
 
     // 삭제
-    String deleteRoom(CustomUserDetails customUserDetails, Long roomId);
+    String deleteRoom(String email, Long roomId);
 }

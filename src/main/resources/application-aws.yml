@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://database-1.cp88kk68gyld.ap-northeast-2.rds.amazonaws.com:3306/quokka_rds  # AWS RDS 엔드포인트를 사용
+    username: quokka
+    password: quokka1234!
+
+  data:
+    redis:
+      host: <REDIS_ENDPOINT>  # AWS ElastiCache Redis 엔드포인트
+      port: 6379
+
+jwt:
+  secret:
+    key: ${JWT_SECRETKEY}
+
+slack:
+  webhook-url: https://hooks.slack.com/services/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
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}   # 실제 운영 환경의 AWS 액세스 키와 시크릿 키 사용
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: ${AWS_S3_BUCKET}

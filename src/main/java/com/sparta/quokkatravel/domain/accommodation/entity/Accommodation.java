@@ -32,6 +32,8 @@ public class Accommodation extends Timestamped {
     @Column
     private Long rating;
 
+    private String imageurl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -43,10 +45,11 @@ public class Accommodation extends Timestamped {
     private List<Review> reviews;
 
 
-    public Accommodation(String name, String description, String address, User user) {
+    public Accommodation(String name, String description, String address, String url, User user) {
         this.name = name;
         this.description = description;
         this.address = address;
+        this.imageurl = url;
         this.user = user;
     }
 
