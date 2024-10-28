@@ -20,34 +20,42 @@ public class RedisConfig {
     private String redisHost;
     @Value("${spring.data.redis.port}")
     private int redisPort;
+
+    // 레디스 서버와의 연결을 관리하는 객체
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory(redisHost, redisPort); // Lettuce로 변경
-    } // jdbc 보다 lettuce 가 성능이 훨씬 좋아서 이걸 사용
-    // redisHost(로컬호스트값이 밸류로 들어가있음- yml으로 가져다 쓴것), redisPort(6379)
+        return new LettuceConnectionFactory(redisHost, redisPort);
+    }
+
+    // 메세지를 받을 때 지정된 메서드를 호출하여 메세지를 처리
     @Bean
     public MessageListenerAdapter messageListenerAdapter(RedisMessageSubscriber subscriber) {
         return new MessageListenerAdapter(subscriber, "handleMessage");
-    } // 메세지 리스터너를 생성 : 역할: 처리할 리스너를 설정하는 것
+    }
+
+    // 레디스 pub/sub 기능을 사용하여 메세지를 구독하는 리스너들을 관리하는 컨테이너
+    // Pattern Topic: notifications 으로 시작하는 주제의 모든 메세지를 수신
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory, MessageListenerAdapter listenerAdapter) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.addMessageListener(listenerAdapter, new PatternTopic("notifications.*"));
         return container;
-    } // 패턴토픽: 노티피케이션 패턴을 가진 메세지의 주제를 구독하는 것 레디스에서 발행된 메세지를 수신하고 등록된 리스너로 전달 한 것 (등록된 리스너는 슬랙이니까 슬랙으로 처리)
+    }
+
+    // 레디스 서버와의 데이터 저장, 조회, 삭제 등을 처리하는 템플릿: 레디스에 저장할 데이터의 키와 값을 직렬화 할때, 다양한 형식으로 직렬화 할 수 있도록 설정
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
-        // Redis Key와 Value에 대한 Serializer 설정
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
-        // Hash 타입의 경우에도 동일하게 Serializer 설정
         template.setHashKeySerializer(new StringRedisSerializer());
         template.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
         return template;
-    } // 직렬하는 것
+    }
+
+    // key, value 모두 문자열로 직렬화
     @Bean
     public RedisTemplate<String, String> customStringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
@@ -56,8 +64,10 @@ public class RedisConfig {
         template.setValueSerializer(new StringRedisSerializer());
         return template;
     }
+
+    // redisTemplate을 사용하여 메세지 중복 감지 및 처리하는 메서드
     @Bean
     public RedisMessageDuplicator redisMessageDuplicator(@Qualifier("customStringRedisTemplate") RedisTemplate<String, String> customStringRedisTemplate) {
         return new RedisMessageDuplicator(customStringRedisTemplate);
-    } // 메세지 중복 처리를 위해; 메세지 중복에 대해 줄여주는 메서드
+    }
 }

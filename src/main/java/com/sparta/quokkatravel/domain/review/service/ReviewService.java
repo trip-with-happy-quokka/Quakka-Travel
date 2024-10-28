@@ -50,10 +50,10 @@ public class ReviewService {
 
         Page<Review> reviews = reviewRepository.findByAccommodation_Id(accommodationId, pageable);
         return reviews.map(review -> new ReviewResponseDto(
-                        review.getId(),
-                        review.getAccommodation().getId(),
-                        review.getRating(),
-                        review.getContent()
+                review.getId(),
+                review.getAccommodation().getId(),
+                review.getRating(),
+                review.getContent()
         ));
     }
 

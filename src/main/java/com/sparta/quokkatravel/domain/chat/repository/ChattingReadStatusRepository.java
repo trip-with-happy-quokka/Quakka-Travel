@@ -7,7 +7,6 @@ import java.util.Optional;
 
 
 public interface ChattingReadStatusRepository extends JpaRepository<ChattingReadStatus, Long> {
-
-    Optional<ChattingReadStatus> findByChatRoomIdAndMessageIdAndUserId(Long chatRoomId, Long messageId, Long userId);
+    Optional<ChattingReadStatus> findByChatRoomIdAndMessageIdAndUserEmail(Long chatRoomId, Long messageId, String email);
 
 }

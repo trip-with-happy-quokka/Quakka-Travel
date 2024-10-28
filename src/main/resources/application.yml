@@ -23,7 +23,7 @@ spring:
       port: 6379
 
 slack:
-  webhook-url: https://hooks.slack.com/services/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
+  webhook-url: https://hooks.slack.com/services/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
 
 server:
   servlet:

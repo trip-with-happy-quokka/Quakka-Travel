@@ -52,20 +52,22 @@ public class ReservationController {
     }
 
     // 예약 수정
-    @PutMapping("/reservations/{reservationId}")
+    @PutMapping("/rooms/{roomId}/reservations/{reservationId}")
     public ResponseEntity<?> updateReservation(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                               @PathVariable Long roomId,
                                                @PathVariable Long reservationId,
                                                @RequestBody ReservationRequestDto reservationRequestDto) throws AccessDeniedException {
-        ReservationResponseDto reservationResponseDto = reservationService.updateReservation(userDetails, reservationId, reservationRequestDto);
+        ReservationResponseDto reservationResponseDto = reservationService.updateReservation(userDetails, roomId, reservationId, reservationRequestDto);
         return ResponseEntity.ok(ApiResponse.success("예약 수정 성공", reservationResponseDto));
     }
 
     // 예약 취소
-    @DeleteMapping("/reservations/{reservationId}")
+    @DeleteMapping("/rooms/{roomId}/reservations/{reservationId}")
     public ResponseEntity<?> cancelReservation(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                               @PathVariable Long roomId,
                                                @PathVariable Long reservationId) throws AccessDeniedException {
 
-        String cancelMessage = reservationService.cancelReservation(userDetails, reservationId);
+        String cancelMessage = reservationService.cancelReservation(userDetails, roomId, reservationId);
         return ResponseEntity.ok(ApiResponse.success("예약 취소 성공", cancelMessage));
     }
 
