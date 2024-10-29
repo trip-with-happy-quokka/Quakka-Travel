@@ -18,6 +18,9 @@ import java.util.UUID;
 @Entity
 @Getter
 @NoArgsConstructor
+//@Table(indexes = {
+//        @Index(name = "idx_coupon_code_status_active_expired", columnList = "coupon_code, deletedAt, couponStatus")
+//})
 public class Coupon extends Timestamped {
 
     @Id

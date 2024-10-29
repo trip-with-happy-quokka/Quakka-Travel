@@ -14,10 +14,12 @@ import java.util.List;
 @Getter
 public class CustomUserDetails implements UserDetails {
 
+    private final Long userId;
     private final String email;
     private final UserRole userRole;
 
     public CustomUserDetails(User user) {
+        this.userId = user.getId();
         this.email = user.getEmail();
         this.userRole = user.getUserRole();
     }
