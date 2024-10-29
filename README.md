@@ -7,7 +7,7 @@
 
 # ✈️ Quokka Travel
 
-OwnMyWay는 나만의 여행을 계획하고 기록할 수 있는 서비스입니다.
+Quokka Travel로 쿼카와 함께 여행을 계획하고 기록할 수 있는 서비스입니다.
 
 > 여행 숙소 정보를 확인하고, 여행이 시작되면 여행지의 사람들과 **대화**를 나눌 수 있습니다.
 > 여행지의 다양한 이벤트와 함께 행복한 여행을 할 수 있습니다.
@@ -29,8 +29,6 @@ OwnMyWay는 나만의 여행을 계획하고 기록할 수 있는 서비스입�
 3. [Framework](#📚-Framework)
 4. [기술 특장점](#🛠-기술-특장점)
 5. [Challenges & TroubleShooting](#Challenges-and-TroubleShooting)
-6. [라이센스](#라이센스)
-7. [문의](#문의)
 
 ---
 
