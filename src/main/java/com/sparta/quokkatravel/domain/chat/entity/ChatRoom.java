@@ -1,48 +1,50 @@
 package com.sparta.quokkatravel.domain.chat.entity;
 
-import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
-import com.sparta.quokkatravel.domain.user.entity.User;
-import com.sparta.quokkatravel.domain.user.entity.UserRole;
+import com.sparta.quokkatravel.domain.chat.dto.ChatMessage;
+import com.sparta.quokkatravel.domain.chat.service.ChatService;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.net.http.WebSocket;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-@Entity
 @Getter
+@Entity
 @NoArgsConstructor
-public class ChatRoom extends Timestamped {
+public class ChatRoom {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 방 제목
-    @Column(nullable = false)
-    private String title;
+    @Column
+    private String chatRoomName;
 
-    // 방 소유자 (User 객체로 변경)
-    @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner; // ownerId에서 User 객체로 변경
+    @Transient
+    private Set<WebSocketSession> sessions = new HashSet<>();
 
-    // 참여자 리스트 추가
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
-    private List<ChatParticipant> participants = new ArrayList<>();
-
-
-    // 생성자: 채팅방 제목을 받아서 ChatRoom 객체 생성
-    public ChatRoom(String title, User owner) {
-        this.title = title;
-        this.owner = owner;
+    @Builder
+    public ChatRoom(String chatRoomName) {
+        this.chatRoomName = chatRoomName;
     }
+
+    public void handleActions(WebSocketSession session, ChatMessage chatMessage, ChatService chatService) {
+        if (chatMessage.getMessageType() == ChatMessage.MessageType.ENTER) {
+            sessions.add(session);
+            chatMessage.setMessage(chatMessage.getSender() + "님이 입장했습니다.");
+        } else if (chatMessage.getMessageType() == ChatMessage.MessageType.EXIT) {
+            sessions.remove(session);
+            chatMessage.setMessage(chatMessage.getSender() + "님이 퇴장했습니다.");
+        }
+        sendMessage(chatMessage, chatService);
+    }
+
+    public <T> void sendMessage(ChatMessage message, ChatService chatService) {
+        sessions.parallelStream().forEach(session -> chatService.sendMessage(session, message));
+    }
+
 
 }

@@ -1,130 +1,152 @@
 package com.sparta.quokkatravel.domain.chat.service;
 
-import com.sparta.quokkatravel.domain.chat.dto.ChatMessageDto;
-import com.sparta.quokkatravel.domain.chat.dto.ChatRoomDto;
-import com.sparta.quokkatravel.domain.chat.entity.ChatParticipant;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.quokkatravel.domain.chat.dto.ChatMessage;
+import com.sparta.quokkatravel.domain.chat.dto.ChatRoomResponseDto;
+import com.sparta.quokkatravel.domain.chat.entity.ChatHistory;
 import com.sparta.quokkatravel.domain.chat.entity.ChatRoom;
-import com.sparta.quokkatravel.domain.chat.entity.Chatting;
-import com.sparta.quokkatravel.domain.chat.entity.ChattingReadStatus;
-import com.sparta.quokkatravel.domain.chat.repository.ChatParticipantRepository;
+import com.sparta.quokkatravel.domain.chat.repository.ChatMessageRepository;
 import com.sparta.quokkatravel.domain.chat.repository.ChatRoomRepository;
-import com.sparta.quokkatravel.domain.chat.repository.ChattingReadStatusRepository;
-import com.sparta.quokkatravel.domain.chat.repository.ChattingRepository;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.user.entity.User;
-import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 
-@Service
+@Slf4j
 @RequiredArgsConstructor
+@Service
 public class ChatService {
 
-    private final ChattingRepository chattingRepository;
+    private final ObjectMapper objectMapper;
     private final ChatRoomRepository chatRoomRepository;
-    private final ChattingReadStatusRepository chattingReadStatusRepository;
-    private final ChatParticipantRepository chatParticipantRepository;
     private final UserRepository userRepository;
+    private final ChatMessageRepository chatMessageRepository;
+    private Map<String, ChatRoom> chatRooms;
 
-    // 채팅방 생성
-    @Transactional
-    public void createChatRoom(ChatRoomDto chatRoomDto, String email) {
-        User owner = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+    @PostConstruct
+    private void init() {
+        chatRooms = new LinkedHashMap<>();
+    }
 
-        ChatRoom chatRoom = new ChatRoom(chatRoomDto.getTitle(), owner);
+
+    public ChatRoom findRoom(Long chatroomId) {
+        return chatRoomRepository.findById(chatroomId).orElse(null);
+    }
+    public List<ChatRoomResponseDto> findAllRoom() {
+        return chatRoomRepository.findAll().stream().map(ChatRoomResponseDto::new).toList();
+    }
+
+
+    // 오픈 채팅방 생성
+    public ChatRoom createOpenChatRoom(String name) {
+        ChatRoom chatRoom = ChatRoom.builder()
+                .chatRoomName(name)
+                .build();
+
         chatRoomRepository.save(chatRoom);
+        return chatRoom;
+    }
 
-        // 방장 역할 부여
-        ChatParticipant ownerParticipant = new ChatParticipant(chatRoom, owner, UserRole.OWNER);
-        chatParticipantRepository.save(ownerParticipant);
+    // 사용자 입장
+    public void joinChatRoom(String email, Long chatRoomId, WebSocketSession session) {
+        User user = userRepository.findByEmailOrElseThrow(email);
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
+
+        ChatMessage enterMessage = new ChatMessage();
+        enterMessage.setMessageType(ChatMessage.MessageType.ENTER);
+        enterMessage.setSender(user.getNickname());
+        chatRoom.handleActions(session, enterMessage, this);
 
     }
 
-    // 채팅방 참여
-    @Transactional
-    public void joinChatRoom(Long chatRoomId, String email) {
-        // 채팅방 찾기
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+    // 사용자 퇴장
+    public void exitChatRoom(String email, Long chatRoomId, WebSocketSession session) {
+        User user = userRepository.findByEmailOrElseThrow(email);
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
 
-        // 유저 찾기
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        ChatMessage exitMessage = new ChatMessage();
+        exitMessage.setMessageType(ChatMessage.MessageType.EXIT);
+        exitMessage.setSender(user.getNickname());
+        chatRoom.handleActions(session, exitMessage, this);
+        chatRoom.getSessions().remove(session); // 세션 제거
+
+    }
+
+    /*-------------------------------------이 밑으로는 개인 채팅방 관련 메서드입니다.----------------------------------------*/
 
 
-        // 이미 채팅방에 참여하고 있는지 확인
-        boolean isAlreadyParticipant = chatParticipantRepository.findByChatRoomIdAndUserEmail(chatRoom.getId(), user.getEmail()).isPresent();
-        if (isAlreadyParticipant) {
-            throw new IllegalArgumentException("이미 채팅방에 참여하고 있습니다.");
+//    // 개인 채팅방 생성
+//    public ChatRoom createPrivateChatRoom(String email, String name) {
+//        User user = userRepository.findByEmailOrElseThrow(email);
+//
+//        String randomId = UUID.randomUUID().toString();
+//        ChatRoom chatRoom = ChatRoom.builder()
+//                .chatRoomName(name)
+//                .user(User)
+//                .build();
+//
+//        chatRoomRepository.save(chatRoom);
+//        return chatRoom;
+//    }
+//
+//    // 개인 채팅방 삭제
+//    public void deleteChatRoom(String email, String roomId) {
+//        ChatRoom chatRoom = chatRoomRepository.findByRoomId(roomId);
+//
+//        if(!email.equals(chatRoom.getUser().getEmail())) {
+//            throw new RuntimeException("Invalid email");
+//        }
+//
+//        // 모든 세션에 방이 삭제되었다는 메시지를 전송
+//        ChatMessage deleteMessage = new ChatMessage();
+//        deleteMessage.setType(ChatMessage.MessageType.TALK); // TALK 타입을 활용하여 삭제 알림
+//        deleteMessage.setMessage("채팅방이 삭제되었습니다.");
+//        chatRoom.sendMessage(deleteMessage, this);
+//
+//        // 메모리와 DB에서 채팅방 삭제
+//        chatRoomRepository.deleteByRoomId(roomId);
+//
+//    }
+//
+//
+//
+//    // 사용자 초대
+//    public void inviteUsers(String roomId, String inviter, InviteRequestDto inviteRequestDto) {
+//        ChatRoom chatRoom = chatRoomRepository.findByRoomId(roomId);
+//
+//        ChatMessage inviteMessage = new ChatMessage();
+//        inviteMessage.setType(ChatMessage.MessageType.TALK);
+//        inviteMessage.setSender(inviter);
+//        inviteMessage.setMessage(invitee + "님이 초대되었습니다.");
+//        chatRoom.sendMessage(inviteMessage, this);
+//
+//    }
+
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    // 채팅 보내기
+    public <T> void sendMessage(WebSocketSession session, T message) {
+        try {
+            // ChatMessage 객체를 직렬화한 값으로 TextMessage 생성
+            ChatMessage chatMessage = (ChatMessage) message;
+            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
+
+            ChatRoom chatRoom = chatRoomRepository.findById(chatMessage.getRoomId()).orElseThrow();
+            ChatHistory chatHistory = new ChatHistory(chatMessage.getMessageType(), chatMessage.getSender(), chatMessage.getMessage(), chatRoom);
+            chatMessageRepository.save(chatHistory);
+            log.info("message : " + message);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
         }
-
-        // 새로운 참여자 추가 (일반 사용자로 참여)
-        ChatParticipant participant = new ChatParticipant(chatRoom, user, UserRole.USER);
-        chatParticipantRepository.save(participant);
     }
 
-    // 채팅방 삭제 (방장만 가능)
-    public void deleteChatRoom(Long chatRoomId, String email) {
-
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
-        ChatParticipant participant = chatParticipantRepository.findByChatRoomIdAndUserEmail(chatRoomId, email)
-                .orElseThrow(() -> new IllegalArgumentException("참여자를 찾을 수 없습니다."));
-
-        if (participant.getUserRole() != UserRole.OWNER) {
-            throw new IllegalArgumentException("채팅방 삭제는 방장만 할 수 있습니다.");
-        }
-
-        chatRoomRepository.delete(chatRoom);
-
-    }
-
-    // 채팅 메세지 저장
-    public Chatting saveMessage(ChatMessageDto messageDto, String email) {
-
-        ChatRoom chatRoom = chatRoomRepository.findById(messageDto.getChatRoomId())
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-        // 메세지 저장
-        Chatting chatMessage = new Chatting(chatRoom, user, messageDto.getContent());
-        chattingRepository.save(chatMessage);
-
-        // 모든 참여자에게 읽지 않은 상태로 저장
-        List<ChatParticipant> participants = chatParticipantRepository.findByChatRoomId(chatRoom.getId());
-        for (ChatParticipant participant : participants) {
-            // 자기자신 제외도 시켜야됨
-            if (!participant.getUser().getId().equals(user.getId())) {
-                ChattingReadStatus readStatus = new ChattingReadStatus(chatRoom, chatMessage, participant.getUser());
-                chattingReadStatusRepository.save(readStatus);
-            }
-        }
-
-        return chatMessage;
-    }
-
-    // 메세지 읽음 처리
-    public void markMessageAsRead(Long chatRoomId, Long messageId, String email){
-        ChattingReadStatus readStatus = chattingReadStatusRepository
-                .findByChatRoomIdAndMessageIdAndUserEmail(chatRoomId,messageId,email)
-                .orElseThrow(() -> new IllegalArgumentException("읽음 상태를 찾을 수 없습니다?"));
-
-        readStatus.markAsRead(); // 시간 기록
-        chattingReadStatusRepository.save(readStatus);
-    }
-
-    // 특정 채팅방의 모든 메세지 가져오기
-    public List<Chatting> getMessages(Long chatRoomId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
-        return chattingRepository.findByChatRoom(chatRoom);
-    }
 
 }

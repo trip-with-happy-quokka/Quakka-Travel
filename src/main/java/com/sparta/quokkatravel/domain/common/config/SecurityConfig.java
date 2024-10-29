@@ -40,7 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/users", "/api/v1/users/login").permitAll() // 인증 관련 엔드포인트는 모두 접근 가능
                         .requestMatchers("/api/v1/notify/").hasRole("ADMIN")
                         .requestMatchers("/topic/notifications/").permitAll()
-                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/ws/chat/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
                         .requestMatchers("/api/v1/**").permitAll()
                         .anyRequest().authenticated() // 그 외의 모든 요청은 인증 필요
