@@ -13,6 +13,7 @@ public class CouponResponseDto {
     private final Long couponId;
     private final String couponName;
     private final CouponType couponType;
+    private final Integer volume;
     private final String couponCode;
     private final CouponStatus couponStatus;
     private final int discountRate;
@@ -23,10 +24,11 @@ public class CouponResponseDto {
     private final LocalDateTime updatedAt;
 
 
-    public CouponResponseDto(Long couponId, String couponName, CouponType couponType, String couponCode, CouponStatus couponStatus, int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public CouponResponseDto(Long couponId, String couponName, CouponType couponType, Integer volume, String couponCode, CouponStatus couponStatus, int discountRate, int discountAmount, LocalDate validFrom, LocalDate validUntil, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.couponId = couponId;
         this.couponName = couponName;
         this.couponType = couponType;
+        this.volume = volume;
         this.couponCode = couponCode;
         this.couponStatus = couponStatus;
         this.discountRate = discountRate;
