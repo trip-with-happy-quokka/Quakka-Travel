@@ -14,6 +14,9 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
+//@Table(indexes = {
+//        @Index(name = "idx_accommodation_address", columnList = "address")
+//})
 public class Accommodation extends Timestamped {
 
     @Id
