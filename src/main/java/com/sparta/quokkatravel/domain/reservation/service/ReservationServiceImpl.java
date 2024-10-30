@@ -1,17 +1,15 @@
 package com.sparta.quokkatravel.domain.reservation.service;
 
 import com.sparta.quokkatravel.domain.common.exception.InvalidRequestException;
+import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
-import com.sparta.quokkatravel.domain.notification.service.NotificationService;
-import com.sparta.quokkatravel.domain.room.entity.Room;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
-import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
+import com.sparta.quokkatravel.domain.email.service.ReservationEmailSendService;
 import com.sparta.quokkatravel.domain.reservation.dto.ReservationRequestDto;
 import com.sparta.quokkatravel.domain.reservation.dto.ReservationResponseDto;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.reservation.repository.ReservationRepository;
-import com.sparta.quokkatravel.domain.reservation.repository.ReservationRepositorySupport;
+import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.room.repository.RoomRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
@@ -33,7 +31,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final CouponRepository couponRepository;
-    private final NotificationService notificationService;
+    private final ReservationEmailSendService reservationEmailSendService;
 
     // 예약 생성
     @Override
@@ -44,9 +42,9 @@ public class ReservationServiceImpl implements ReservationService {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("room is not found"));
         Coupon coupon = null;
 
-        if(reservationRequestDto.getCouponCode() != null) {
+        if (reservationRequestDto.getCouponCode() != null) {
             coupon = couponRepository.findByCode(reservationRequestDto.getCouponCode()).orElseThrow(() -> new NotFoundException("coupon is not found"));
-            if(!Objects.equals(coupon.getAccommodation(), room.getAccommodation())) {
+            if (!Objects.equals(coupon.getAccommodation(), room.getAccommodation())) {
                 throw new InvalidRequestException("coupon code is incorrect");
             }
         }
@@ -54,7 +52,8 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation reservation = new Reservation(reservationRequestDto.getStartDate(), reservationRequestDto.getEndDate(), reservationRequestDto.getNumberOfGuests(), user, room, coupon);
         reservationRepository.save(reservation);
 
-        notificationService.sendRealTimeNotification(" 예약 생성 완료 ", room.getName().toString() + " 방이 예약되었습니다. ");
+//        slackNotificationService.sendRealTimeNotification(" 예약 생성 완료 ", room.getName().toString() + " 방이 예약되었습니다. ");
+        reservationEmailSendService.sendReservationConfirmation(email, room.getName().toString() + " 방이 예약되었습니다. ");
 
         return new ReservationResponseDto(reservation);
     }
@@ -92,13 +91,13 @@ public class ReservationServiceImpl implements ReservationService {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("room is not found"));
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
 
-        if(!reservation.getUser().equals(user)) {
+        if (!reservation.getUser().equals(user)) {
             throw new AccessDeniedException("You are not the owner of this reservation");
         }
 
-        reservation.update(reservationRequestDto.getStartDate(), reservationRequestDto.getEndDate(), reservationRequestDto.getNumberOfGuests());
+//        reservation.update(reservationRequestDto.getStartDate(), reservationRequestDto.getEndDate(), reservationRequestDto.getNumberOfGuests());
 
-        notificationService.sendRealTimeNotification(" 예약 수정 완료 ", room.getName().toString() + " 방의 예약 정보가 수정되었습니다. ");
+        reservationEmailSendService.sendReservationUpdate(email, room.getName().toString() + " 방의 예약 정보가 수정되었습니다. ");
 
         return new ReservationResponseDto(reservation);
     }
@@ -112,13 +111,14 @@ public class ReservationServiceImpl implements ReservationService {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("room is not found"));
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
 
-        if(!reservation.getUser().equals(user)) {
+        if (!reservation.getUser().equals(user)) {
             throw new AccessDeniedException("You are not the owner of this reservation");
         }
 
         reservationRepository.deleteById(reservationId);
 
-        notificationService.sendRealTimeNotification(" 예약 취소 완료 ", room.getName().toString() + " 방이 취소되었습니다. ");
+//        slackNotificationService.sendRealTimeNotification(" 예약 취소 완료 ", room.getName().toString() + " 방이 취소되었습니다. ");
+        reservationEmailSendService.sendReservationCancellation(email, room.getName().toString() + " 방의 예약이 취소되었습니다. ");
 
         return "Reservation deleted";
     }
