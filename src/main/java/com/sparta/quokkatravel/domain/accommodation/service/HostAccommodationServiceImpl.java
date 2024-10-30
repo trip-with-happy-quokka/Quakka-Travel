@@ -27,7 +27,6 @@ import java.io.IOException;
 public class HostAccommodationServiceImpl implements HostAccommodationService {
 
     private final AccommodationRepository accommodationRepository;
-    private final AccommodationRepositorySupport accommodationRepositorySupport;
     private final UserRepository userRepository;
     private final S3Uploader s3Uploader;
 
