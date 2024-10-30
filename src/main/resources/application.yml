@@ -40,3 +40,12 @@ payment:
     success_url : "http://localhost:8080/api/v1/payments/toss/success"
     fail_url : "http://localhost:8080/api/v1/payments/toss/fail"
 
+management:
+  endpoint:
+    health:
+      show-components: always # health 컴포넌트의 상태 정보만 간략하게 노출
+      #show-details: always 세부사항 볼 때
+  endpoints:
+    web:
+      exposure:
+        include: "*"
