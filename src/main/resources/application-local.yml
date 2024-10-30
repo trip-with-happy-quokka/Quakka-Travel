@@ -23,7 +23,7 @@ spring:
 
 jwt:
   secret:
-    key: ${JWT_SECRETKEY}
+    key: ${JWT_SECRET_KEY}
 
 slack:
   webhook-url: https://hooks.slack.com/services/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
@@ -34,6 +34,6 @@ cloud:
       access-key: ${AWS_ACCESS_KEY}  # 로컬 환경에서는 실제 키 대신 테스트 키를 넣거나 빈 값으로 두기
       secret-key: ${AWS_SECRET_KEY}
     region:
-      static: ap-northeast-2
+      static: ${AWS_REGION}
     s3:
       bucket: ${AWS_S3_BUCKET}
