@@ -1,9 +1,8 @@
 package com.sparta.quokkatravel.domain.common.config;
 
 import com.sparta.quokkatravel.domain.admin.loginhistory.service.AdminLoginHistoryService;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.service.CustomUserDetailsService;
-import com.sparta.quokkatravel.domain.user.entity.User;
+import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -36,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authorizationHeader = request.getHeader("Authorization");
 
-        if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -50,6 +49,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String email = claims.get("email", String.class);
+        UserRole userRole = UserRole.of(claims.get("userRole", String.class));
+        request.setAttribute("email", email);
+        log.info("email:{} ", email);
+        request.setAttribute("userRole", userRole);
+        log.info("userRole:{} ", userRole);
 
         // SecurityContextHolder에 인증 정보 저장
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -59,13 +63,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                // UserDetails가 User 타입인지 확인한 후 기록 남기기
-                if (userDetails instanceof CustomUserDetails) {
-                    User user = ((CustomUserDetails) userDetails).getUser();
-                    String ipAddress = request.getRemoteAddr();
-                    adminLoginHistoryService.saveLoginHistory(user, ipAddress);
-                }
             }
         }
 

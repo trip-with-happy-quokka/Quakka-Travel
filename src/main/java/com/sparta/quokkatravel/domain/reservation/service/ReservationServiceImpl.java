@@ -33,6 +33,8 @@ public class ReservationServiceImpl implements ReservationService {
     private final CouponRepository couponRepository;
     private final ReservationEmailSendService reservationEmailSendService;
 
+
+
     // 예약 생성
     @Override
     @Transactional
@@ -53,7 +55,10 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.save(reservation);
 
 //        slackNotificationService.sendRealTimeNotification(" 예약 생성 완료 ", room.getName().toString() + " 방이 예약되었습니다. ");
+
+        long start = System.currentTimeMillis();
         reservationEmailSendService.sendReservationConfirmation(email, room.getName().toString() + " 방이 예약되었습니다. ");
+        System.out.println(System.currentTimeMillis() - start);
 
         return new ReservationResponseDto(reservation);
     }

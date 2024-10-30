@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -36,13 +35,12 @@ public class JwtUtil {
     }
 
 
-
-    public String createToken(String email, UserRole userRole) {
+    public String createToken(Long id, String email, UserRole userRole) {
         Date date = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
-                        .setSubject(email)
+                        .setSubject(id.toString())
                         .claim("email", email)
                         .claim("userRole", userRole)
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME))

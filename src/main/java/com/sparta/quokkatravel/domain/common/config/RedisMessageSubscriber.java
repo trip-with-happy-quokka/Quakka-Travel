@@ -1,14 +1,11 @@
 package com.sparta.quokkatravel.domain.common.config;
 
-import com.sparta.quokkatravel.domain.notification.service.NotificationService;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import com.sparta.quokkatravel.domain.notification.service.SlackNotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
-import org.springframework.data.redis.connection.Message;
 
 import java.net.InetAddress;
 
@@ -20,12 +17,12 @@ public class RedisMessageSubscriber implements MessageListener {
     String slackWebhookUrl;
 
 
-    private final NotificationService notificationService;
+    private final SlackNotificationService slackNotificationService;
     private final RedisMessageDuplicator deduplicator;
 
 
-    public RedisMessageSubscriber(NotificationService notificationService, RedisMessageDuplicator deduplicator) {
-        this.notificationService = notificationService;
+    public RedisMessageSubscriber(SlackNotificationService slackNotificationService, RedisMessageDuplicator deduplicator) {
+        this.slackNotificationService = slackNotificationService;
         this.deduplicator = deduplicator;
     } // 생성자 주입
 
@@ -40,7 +37,7 @@ public class RedisMessageSubscriber implements MessageListener {
 
             if (deduplicator.isNewMessage(notification)) {
                 log.debug("Slack 알림 전송 시도 중...");
-                notificationService.sendSlackNotification(slackWebhookUrl, notification);
+                slackNotificationService.sendSlackNotification(slackWebhookUrl, notification);
                 log.info("Slack으로 알림 전송 완료: {}", notification);
             } else {
                 log.info("중복 메시지 감지, 무시됨: {}", notification);

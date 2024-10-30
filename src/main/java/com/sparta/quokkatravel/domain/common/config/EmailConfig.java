@@ -11,26 +11,32 @@ import java.util.Properties;
 @Configuration
 public class EmailConfig {
 
-    @Value("mail.host")
+    @Value("${spring.mail.host}")
     private String host;
 
-    @Value("mail.username")
+    @Value("${spring.mail.port}")
+    private int port;
+
+    @Value("${spring.mail.username}")
     private String username;
 
-    @Value("mail.password")
+    @Value("${spring.mail.password}")
     private String password;
 
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(host);
-        mailSender.setPort(587);
+        mailSender.setPort(port);
         mailSender.setUsername(username);
         mailSender.setPassword(password);
 
+
         Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.auth", true);
+        props.put("mail.smtp.starttls.enable", true);
+        props.put("mail.smtp.connectiontimeout", 5000);
+        props.put("mail.smtp.debug", true);
 
         return mailSender;
     }
