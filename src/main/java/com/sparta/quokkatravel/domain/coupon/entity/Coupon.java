@@ -163,4 +163,11 @@ public class Coupon extends Timestamped {
     public void redeemCoupon() {
         this.couponStatus= CouponStatus.REDEEMED;
     }
+
+    public void decreaseVolume() {
+        if (volume <= 0) {
+            throw new IllegalStateException("남은 쿠폰이 없습니다.");
+        }
+        volume--;
+    }
 }

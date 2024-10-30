@@ -147,6 +147,14 @@ public class CouponServiceImpl implements CouponService {
         Coupon coupon = couponRepository.findByCode(couponCodeRequestDto.getCouponCode())
                 .orElseThrow(() -> new NotFoundException("coupon is not found"));
 
+        // 남은 쿠폰이 있는지 확인
+        if (coupon.getVolume() <= 0) {
+            throw new IllegalStateException("남은 쿠폰이 없습니다.");
+        }
+
+        // 쿠폰 발급 (volume 하나 감소)
+        coupon.decreaseVolume();
+
         // 쿠폰 소유자 및 등록일자 등록
         // 쿠폰 사용 가능 상태로 변경
         coupon.registerCoupon(user);
@@ -161,7 +169,9 @@ public class CouponServiceImpl implements CouponService {
         );
     }
 
+    // 쿠폰 사용 메서드
     @Override
+    @Transactional
     public CouponRedeemResponseDto redeemCoupon(String email, Long userId, Long couponId){
 
         // userId 로 User 조회
