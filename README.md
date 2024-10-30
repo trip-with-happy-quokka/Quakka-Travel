@@ -29,9 +29,6 @@ QuokkaTravel은 쿼카와 함께 여행을 다니며 여행지의 사람들과 �
 3. [Framework](#📚-Framework)
 4. [기술 특장점](#🛠-기술-특장점)
 5. [Challenges & TroubleShooting](#Challenges-and-TroubleShooting)
-6. [라이센스](#라이센스)
-7. [문의](#문의)
-
 ---
 
 # 👨‍👨‍👦‍👦 팀 소개
