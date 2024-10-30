@@ -15,6 +15,10 @@ import java.time.temporal.ChronoUnit;
 
 @Entity
 @Getter
+//@Table(indexes = {
+//        @Index(name = "idx_reservation_user", columnList = "user_id"),
+//        @Index(name = "idx_reservation_room", columnList = "room_id")
+//})
 public class Reservation extends Timestamped {
 
     @Id

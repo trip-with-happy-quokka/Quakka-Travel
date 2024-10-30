@@ -1,9 +1,15 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://database-1.cp88kk68gyld.ap-northeast-2.rds.amazonaws.com:3306/quokka_rds  # AWS RDS 엔드포인트를 사용
-    username: quokka
-    password: quokka1234!
+    master:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://13.125.107.26:3306/quokka_travel
+      username: root
+      password: 1234
+    slave:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://13.125.107.26:3307/quokka_travel
+      username: root
+      password: 1234
 
   data:
     redis:
