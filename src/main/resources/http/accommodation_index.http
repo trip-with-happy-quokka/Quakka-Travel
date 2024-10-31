@@ -1,0 +1,44 @@
+PUT http://43.202.0.210:9200/coupon
+Content-Type: application/json
+Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
+
+{
+  "settings": {
+    "analysis": {
+      "tokenizer": {
+        "edge_ngram_tokenizer": {
+          "type": "edge_ngram",
+          "min_gram": 1,
+          "max_gram": 10,
+          "token_chars": ["letter", "digit"]
+        }
+      },
+      "filter": {
+        "lowercase_filter": {
+          "type": "lowercase"
+        }
+      },
+      "analyzer": {
+        "custom_analyzer": {
+          "type": "custom",
+          "tokenizer": "edge_ngram_tokenizer",
+          "filter": [
+            "lowercase_filter"
+          ],
+          "char_filter": [
+            "html_strip"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "name": {
+        "type": "text",
+        "analyzer": "custom_analyzer",
+        "search_analyzer": "whitespace"
+      }
+    }
+  }
+}

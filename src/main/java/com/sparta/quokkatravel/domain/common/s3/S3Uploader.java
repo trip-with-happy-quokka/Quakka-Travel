@@ -39,8 +39,7 @@ public class S3Uploader {
         metadata.setContentLength(multipartFile.getSize());
         metadata.setContentType(multipartFile.getContentType());  // ContentType 설정
 
-        amazonS3.putObject(new PutObjectRequest(bucket, filename, multipartFile.getInputStream(), metadata)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
+        amazonS3.putObject(new PutObjectRequest(bucket, filename, multipartFile.getInputStream(), metadata));
 
         return amazonS3.getUrl(bucket, filename).toString();
     }

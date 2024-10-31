@@ -1,4 +1,4 @@
-package com.sparta.quokkatravel.domain.common.config;
+package com.sparta.quokkatravel.domain.common.redis;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
