@@ -1,6 +1,8 @@
 package com.sparta.quokkatravel.domain.common.config;
 
 
+import com.sparta.quokkatravel.domain.common.redis.RedisMessageDuplicator;
+import com.sparta.quokkatravel.domain.common.redis.RedisMessageSubscriber;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

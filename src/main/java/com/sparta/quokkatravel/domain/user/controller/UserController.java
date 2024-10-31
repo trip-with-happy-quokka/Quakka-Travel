@@ -1,7 +1,6 @@
 package com.sparta.quokkatravel.domain.user.controller;
 
 import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
-import com.sparta.quokkatravel.domain.common.config.JwtUtil;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.user.dto.UserLoginRequestDto;
 import com.sparta.quokkatravel.domain.user.dto.UserSignupRequestDto;
