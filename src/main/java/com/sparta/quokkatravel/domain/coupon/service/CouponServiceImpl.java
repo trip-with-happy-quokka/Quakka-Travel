@@ -14,6 +14,7 @@ import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
+import com.sparta.quokkatravel.domain.email.service.CouponEmailService;
 import com.sparta.quokkatravel.domain.event.entity.Event;
 import com.sparta.quokkatravel.domain.event.repository.EventRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
@@ -34,6 +35,7 @@ public class CouponServiceImpl implements CouponService {
     private final EventRepository eventRepository;
     private final AccommodationRepository accommodationRepository;
     private final UserRepository userRepository;
+    private final CouponEmailService couponEmailService;
 
     // 행사 쿠폰 발급 메서드
     @Override
@@ -147,6 +149,9 @@ public class CouponServiceImpl implements CouponService {
         // 쿠폰 사용 가능 상태로 변경
         coupon.registerCoupon(user);
 
+        // 쿠폰 등록 후 유저에게 이메일 전송
+        couponEmailService.sendCouponRegistrationEmail(user, coupon);
+
         return new CouponCodeResponseDto(
                 coupon.getId(),
                 coupon.getName(),
@@ -168,6 +173,9 @@ public class CouponServiceImpl implements CouponService {
 
         // coupon 상태 => 사용됨으로 변경
         coupon.redeemCoupon();
+
+        // 쿠폰 사용 후 유저에게 이메일 전송
+        couponEmailService.sendCouponRedeemEmail(user, coupon);
 
         return new CouponRedeemResponseDto(
                 coupon.getId(),
@@ -221,6 +229,9 @@ public class CouponServiceImpl implements CouponService {
         // 쿠폰 삭제여부 변경
         coupon.deleteCoupon();
         couponRepository.save(coupon);
+
+        // 쿠폰 삭제 후 유저에게 이메일 전송
+        couponEmailService.sendCouponDeletionEmail(coupon.getOwner(), coupon);
 
         return new CouponDeleteResponseDto(
                 coupon.getId(),
