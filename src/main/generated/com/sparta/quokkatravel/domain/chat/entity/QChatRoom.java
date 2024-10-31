@@ -22,21 +22,13 @@ public class QChatRoom extends EntityPathBase<ChatRoom> {
 
     public static final QChatRoom chatRoom = new QChatRoom("chatRoom");
 
-    public final com.sparta.quokkatravel.domain.common.timestamped.QTimestamped _super = new com.sparta.quokkatravel.domain.common.timestamped.QTimestamped(this);
+    public final SetPath<com.sparta.quokkatravel.domain.user.entity.User, com.sparta.quokkatravel.domain.user.entity.QUser> chatRoomMembers = this.<com.sparta.quokkatravel.domain.user.entity.User, com.sparta.quokkatravel.domain.user.entity.QUser>createSet("chatRoomMembers", com.sparta.quokkatravel.domain.user.entity.User.class, com.sparta.quokkatravel.domain.user.entity.QUser.class, PathInits.DIRECT2);
 
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    public final StringPath id = createString("id");
 
-    public final com.sparta.quokkatravel.domain.user.entity.QUser owner;
-
-    public final ListPath<ChatParticipant, QChatParticipant> participants = this.<ChatParticipant, QChatParticipant>createList("participants", ChatParticipant.class, QChatParticipant.class, PathInits.DIRECT2);
-
-    public final StringPath title = createString("title");
-
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
+    public final QChatMessage lastChatMesg;
 
     public QChatRoom(String variable) {
         this(ChatRoom.class, forVariable(variable), INITS);
@@ -56,7 +48,7 @@ public class QChatRoom extends EntityPathBase<ChatRoom> {
 
     public QChatRoom(Class<? extends ChatRoom> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.owner = inits.isInitialized("owner") ? new com.sparta.quokkatravel.domain.user.entity.QUser(forProperty("owner")) : null;
+        this.lastChatMesg = inits.isInitialized("lastChatMesg") ? new QChatMessage(forProperty("lastChatMesg")) : null;
     }
 
 }
