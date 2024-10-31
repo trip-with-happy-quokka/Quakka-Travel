@@ -11,8 +11,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: quokkatravel1122@gmail.com # 이메일을 전송할 주체의 이메일 주소 (host mail)
-    password: doluhlmxqdowjkka # 해당 계정으로 발급받은 App password
+    username: ${MAIL_USERNAME} # 이메일을 전송할 주체의 이메일 주소 (host mail)
+    password: ${APP_PASSWORD} # 해당 계정으로 발급받은 App password
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
