@@ -56,7 +56,7 @@ public class CouponController {
             @PathVariable Long userId,
             @Valid @RequestBody CouponCodeRequestDto couponCodeRequestDto) {
 
-        CouponCodeResponseDto couponCodeResponseDto = couponService.registerCoupon(customUserDetails.getEmail(), userId, couponCodeRequestDto);
+        CouponCodeResponseDto couponCodeResponseDto = couponService.registerCouponWithLock(customUserDetails.getEmail(), userId, couponCodeRequestDto);
         return ResponseEntity.ok(ApiResponse.created("쿠폰 등록 성공", couponCodeResponseDto));
     }
 
