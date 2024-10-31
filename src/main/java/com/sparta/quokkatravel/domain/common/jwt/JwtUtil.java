@@ -1,4 +1,4 @@
-package com.sparta.quokkatravel.domain.common.config;
+package com.sparta.quokkatravel.domain.common.jwt;
 
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.user.entity.UserRole;
@@ -34,8 +34,6 @@ public class JwtUtil {
         byte[] bytes = Base64.getDecoder().decode(secretKey);
         key = Keys.hmacShaKeyFor(bytes);
     }
-
-
 
     public String createToken(String email, UserRole userRole) {
         Date date = new Date();

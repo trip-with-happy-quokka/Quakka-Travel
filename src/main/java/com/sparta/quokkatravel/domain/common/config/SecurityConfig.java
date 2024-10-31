@@ -1,5 +1,7 @@
 package com.sparta.quokkatravel.domain.common.config;
 
+import com.sparta.quokkatravel.domain.common.jwt.CustomAuthenticationSuccessHandler;
+import com.sparta.quokkatravel.domain.common.jwt.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

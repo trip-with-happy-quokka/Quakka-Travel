@@ -1,0 +1,1 @@
+GET http://43.202.0.210:9200/inde/_search?pretty

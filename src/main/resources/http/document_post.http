@@ -1,0 +1,8 @@
+POST http://43.202.0.210:9200/index5/_doc/1
+Content-Type: application/json
+Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
+
+{
+  "name_partial": "아침 햇살이 아름다운 숲 속 산골마을 펜션",
+  "full_name": "아침 햇살이 아름다운 숲 속 산골마을 펜션"
+}

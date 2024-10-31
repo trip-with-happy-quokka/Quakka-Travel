@@ -1,6 +1,8 @@
 package com.sparta.quokkatravel.domain.common.config;
 
 
+import com.sparta.quokkatravel.domain.common.redis.RedisMessageDuplicator;
+import com.sparta.quokkatravel.domain.common.redis.RedisMessageSubscriber;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;

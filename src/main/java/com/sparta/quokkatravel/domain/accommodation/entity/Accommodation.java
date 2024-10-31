@@ -7,6 +7,9 @@ import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.List;
@@ -14,9 +17,6 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
-//@Table(indexes = {
-//        @Index(name = "idx_accommodation_address", columnList = "address")
-//})
 public class Accommodation extends Timestamped {
 
     @Id
