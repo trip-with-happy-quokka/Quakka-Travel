@@ -1,8 +1,10 @@
 package com.sparta.quokkatravel.domain.common.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -14,21 +16,25 @@ import java.util.Map;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Profile("aws")
+@Slf4j
 @Configuration
 public class DatabaseConfig {
 
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource.master")
     public DataSourceProperties masterDataSourceProperties() {
+        log.info("master datasource properties");
         return new DataSourceProperties();
     }
 
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource.slave")
     public DataSourceProperties slaveDataSourceProperties() {
+        log.info("slave datasource properties");
         return new DataSourceProperties();
     }
 
+    @Primary
     @Bean
     public DataSource dataSource() {
         return new LazyConnectionDataSourceProxy(routingDataSource());
