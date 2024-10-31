@@ -1,4 +1,4 @@
-PUT http://43.202.0.210:9200/accommodations2
+PUT http://43.202.0.210:9200/coupon
 Content-Type: application/json
 Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
 

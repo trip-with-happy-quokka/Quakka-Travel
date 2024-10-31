@@ -1,4 +1,4 @@
-package com.sparta.quokkatravel.domain.common.config;
+package com.sparta.quokkatravel.domain.common.jwt;
 
 import com.sparta.quokkatravel.domain.admin.loginhistory.entity.LoginHistory;
 import com.sparta.quokkatravel.domain.admin.loginhistory.repository.LoginHistoryRepository;

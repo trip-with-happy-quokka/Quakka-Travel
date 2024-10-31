@@ -15,6 +15,8 @@ import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
 import com.sparta.quokkatravel.domain.event.entity.Event;
 import com.sparta.quokkatravel.domain.event.repository.EventRepository;
+import com.sparta.quokkatravel.domain.search.document.CouponDocument;
+import com.sparta.quokkatravel.domain.search.repository.CouponSearchRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,7 @@ public class CouponServiceImpl implements CouponService {
     private final AccommodationRepository accommodationRepository;
     private final UserRepository userRepository;
     private final RedissonClient redissonClient;
+    private final CouponSearchRepository couponSearchRepository;
 
     // 행사 쿠폰 발급 메서드
     @Override
@@ -71,6 +74,8 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 레퍼지토리에 쿠폰 데이터를 저장 (save)
         Coupon savedCoupon = couponRepository.save(newCoupon);
+        CouponDocument couponDocument = new CouponDocument(savedCoupon);
+        couponSearchRepository.save(couponDocument);
 
         // 쿠폰을 CouponResponseDto 로 반환
         return new CouponResponseDto(

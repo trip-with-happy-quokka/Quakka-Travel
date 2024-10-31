@@ -3,8 +3,6 @@ package com.sparta.quokkatravel.domain.search.dto;
 import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Getter
 @NoArgsConstructor

@@ -10,6 +10,5 @@ import java.util.List;
 @EnableElasticsearchRepositories(basePackages = "com/sparta/quokkatravel/domain/search/repository")
 public interface AccommodationSearchRepository extends ElasticsearchRepository<AccommodationDocument, String> {
 
-    Page<AccommodationDocument> findByNameContaining(String keyword, Pageable pageable);
-    Page<AccommodationDocument> findByAddressContaining(String keyword, Pageable pageable);
+    List<AccommodationDocument> findByNameContainingAndAddressAndRating(String name, String address, Long rating);
 }
