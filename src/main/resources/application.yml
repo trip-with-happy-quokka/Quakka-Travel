@@ -39,3 +39,13 @@ payment:
     test_secret_api_key : ${TOSS_PAYMENT_SECRET_KEY}
     success_url : ${TOSS_PAYMENT_SUCCESS_URL}
     fail_url : ${TOSS_PAYMENT_FAIL_URL}
+
+management:
+  endpoint:
+    health:
+      show-components: always # health 컴포넌트의 상태 정보만 간략하게 노출
+      #show-details: always 세부사항 볼 때
+  endpoints:
+    web:
+      exposure:
+        include: "*"

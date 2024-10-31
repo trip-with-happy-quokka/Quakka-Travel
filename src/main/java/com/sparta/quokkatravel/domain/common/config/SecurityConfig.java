@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
                         .requestMatchers("/api/v1/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated() // 그 외의 모든 요청은 인증 필요
                 )
                 .exceptionHandling(e -> e

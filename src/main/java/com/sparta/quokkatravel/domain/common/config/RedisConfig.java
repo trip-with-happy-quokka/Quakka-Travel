@@ -3,6 +3,9 @@ package com.sparta.quokkatravel.domain.common.config;
 
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageDuplicator;
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageSubscriber;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +25,7 @@ public class RedisConfig {
     private String redisHost;
     @Value("${spring.data.redis.port}")
     private int redisPort;
+    private static final String REDISSON_HOST_PREFIX = "redis://";
 
     // 레디스 서버와의 연결을 관리하는 객체
     @Bean
@@ -71,5 +75,12 @@ public class RedisConfig {
     @Bean
     public RedisMessageDuplicator redisMessageDuplicator(@Qualifier("customStringRedisTemplate") RedisTemplate<String, String> customStringRedisTemplate) {
         return new RedisMessageDuplicator(customStringRedisTemplate);
+    }
+
+    @Bean
+    public RedissonClient redissonClient() {
+        Config config = new Config();
+        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + redisHost + ":" + redisPort);
+        return Redisson.create(config);
     }
 }
