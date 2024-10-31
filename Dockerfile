@@ -2,7 +2,7 @@ FROM openjdk:17-oracle
 
 WORKDIR /app
 
-COPY target/app.jar /app/app.jar
+COPY app.jar app.jar
 
 EXPOSE 8080
 
