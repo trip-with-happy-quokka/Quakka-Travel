@@ -150,6 +150,7 @@ public class Coupon extends Timestamped {
     }
 
     public void deleteCoupon() {
+        this.couponStatus = CouponStatus.DELETED;
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();  // 삭제 시점 저장
     }

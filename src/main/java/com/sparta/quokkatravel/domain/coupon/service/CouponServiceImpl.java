@@ -220,6 +220,7 @@ public class CouponServiceImpl implements CouponService {
         // 쿠폰 소유자 및 등록일자 등록
         // 쿠폰 사용 가능 상태로 변경
         coupon.registerCoupon(user);
+        couponRepository.save(coupon);
 
         return new CouponCodeResponseDto(
                 coupon.getId(),
@@ -244,6 +245,7 @@ public class CouponServiceImpl implements CouponService {
 
         // coupon 상태 => 사용됨으로 변경
         coupon.redeemCoupon();
+        couponRepository.save(coupon);
 
         return new CouponRedeemResponseDto(
                 coupon.getId(),
