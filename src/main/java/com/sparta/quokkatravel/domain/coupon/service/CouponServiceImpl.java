@@ -17,6 +17,7 @@ import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
 import com.sparta.quokkatravel.domain.email.service.CouponEmailService;
 import com.sparta.quokkatravel.domain.event.entity.Event;
 import com.sparta.quokkatravel.domain.event.repository.EventRepository;
+import com.sparta.quokkatravel.domain.notification.service.SlackNotificationService;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import com.sun.jdi.request.InvalidRequestStateException;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.sparta.quokkatravel.domain.coupon.entity.QCoupon.coupon;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +39,7 @@ public class CouponServiceImpl implements CouponService {
     private final AccommodationRepository accommodationRepository;
     private final UserRepository userRepository;
     private final CouponEmailService couponEmailService;
+    private final SlackNotificationService slackNotificationService;
 
     // 행사 쿠폰 발급 메서드
     @Override
@@ -68,6 +72,13 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 레퍼지토리에 쿠폰 데이터를 저장 (save)
         Coupon savedCoupon = couponRepository.save(newCoupon);
+
+        // Slack 알림 전송
+        String slackMessage = String.format("새 행사 쿠폰이 생성되었습니다! \n- 코드: %s \n- 이름: %s \n- 할인율: %d%% \n- 유효 기간: %s ~ %s",
+                savedCoupon.getCode(), savedCoupon.getName(), savedCoupon.getDiscountRate(), savedCoupon.getValidFrom(), savedCoupon.getValidUntil());
+        slackNotificationService.sendSlackNotification("https://hooks.slack.com/services/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", slackMessage);
+
+
 
         // 쿠폰을 CouponResponseDto 로 반환
         return new CouponResponseDto(
@@ -116,6 +127,11 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 레퍼지토리에 쿠폰 데이터를 저장 (save)
         Coupon savedCoupon = couponRepository.save(newCoupon);
+
+        // Slack 알림 전송
+        String slackMessage = String.format("새 숙소 쿠폰이 생성되었습니다! \n- 코드: %s \n- 이름: %s \n- 할인율: %d%% \n- 유효 기간: %s ~ %s",
+                savedCoupon.getCode(), savedCoupon.getName(), savedCoupon.getDiscountRate(), savedCoupon.getValidFrom(), savedCoupon.getValidUntil());
+        slackNotificationService.sendSlackNotification("https://hooks.slack.com/services/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", slackMessage);
 
         // 쿠폰을 CouponResponseDto 로 반환
         return new CouponResponseDto(
