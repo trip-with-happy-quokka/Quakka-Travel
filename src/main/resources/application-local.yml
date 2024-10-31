@@ -13,6 +13,15 @@ spring:
       host: localhost
       port: 6379
 
+  elasticsearch:
+    uris: localhost
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: username
+    password: 1234
+
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}
