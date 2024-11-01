@@ -1,8 +1,7 @@
 package com.sparta.quokkatravel.domain.payment.controller;
 
-import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
 import com.sparta.quokkatravel.domain.common.config.TossPaymentConfig;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.payment.dto.PaymentDto;
 import com.sparta.quokkatravel.domain.payment.dto.PaymentFailDto;
 import com.sparta.quokkatravel.domain.payment.dto.PaymentResponseDto;
@@ -12,8 +11,6 @@ import com.sparta.quokkatravel.domain.payment.service.PaymentServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -34,11 +31,12 @@ public class PaymentController {
     }
 
     @PostMapping("/toss")
-    public ResponseEntity<?> requestTossPayment(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody @Valid PaymentDto paymentReqDto) {
+    public ResponseEntity<?> requestTossPayment(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                @RequestParam Long reservationId) {
 
-        PaymentResponseDto paymentResDto = paymentService.requestTossPayment(paymentReqDto.toEntity(), userDetails.getUsername()).toPaymentResponseDto();
-        paymentResDto.setSuccessUrl(paymentReqDto.getYourSuccessUrl() == null ? tossPaymentConfig.getSuccessUrl() : paymentReqDto.getYourSuccessUrl());
-        paymentResDto.setFailUrl(paymentReqDto.getYourFailUrl() == null ? tossPaymentConfig.getFailUrl() : paymentReqDto.getYourFailUrl());
+        PaymentResponseDto paymentResDto = paymentService.requestTossPayment(userDetails.getUsername(), reservationId);
+        paymentResDto.setSuccessUrl(tossPaymentConfig.getSuccessUrl());
+        paymentResDto.setFailUrl(tossPaymentConfig.getFailUrl());
 
         return ResponseEntity.ok().body(paymentResDto);
     }

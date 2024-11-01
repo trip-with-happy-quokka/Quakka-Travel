@@ -8,7 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentResponseDto {
-    private String payType; // 결제 타입 - 카드/현금/포인트
     private Long amount; // 가격 정보
     private String orderName; // 주문명
     private String orderId; // 주문 Id

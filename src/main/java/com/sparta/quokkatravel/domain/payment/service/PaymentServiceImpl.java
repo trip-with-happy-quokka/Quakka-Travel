@@ -2,9 +2,13 @@ package com.sparta.quokkatravel.domain.payment.service;
 
 import ch.qos.logback.core.spi.ErrorCodes;
 import com.sparta.quokkatravel.domain.common.config.TossPaymentConfig;
+import com.sparta.quokkatravel.domain.payment.dto.PaymentResponseDto;
 import com.sparta.quokkatravel.domain.payment.dto.PaymentSuccessDto;
 import com.sparta.quokkatravel.domain.payment.entity.Payment;
 import com.sparta.quokkatravel.domain.payment.repository.PaymentRepository;
+import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
+import com.sparta.quokkatravel.domain.reservation.entity.ReservationStatus;
+import com.sparta.quokkatravel.domain.reservation.repository.ReservationRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import com.sparta.quokkatravel.domain.user.service.UserService;
@@ -22,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Map;
+import java.util.UUID;
 
 
 @Service
@@ -31,16 +36,22 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final TossPaymentConfig tossPaymentConfig;
     private final UserRepository userRepository;
+    private final ReservationRepository reservationRepository;
 
     // 결제 요청 처리 메서드
     // 사용자의 결제정보를 받아서 검증하고 데이터베이스에 결제 내역 저장
-    public Payment requestTossPayment(Payment payment, String userEmail) {
+    public PaymentResponseDto requestTossPayment(String userEmail, Long reservationId) {
         User user = userRepository.findByEmailOrElseThrow(userEmail);
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
+
+        Payment payment = new Payment(user, reservation);
+
         if (payment.getAmount() < 1000) {
             throw new RuntimeException("INVALID_PAYMENT_AMOUNT");
         }
         payment.setUser(user);
-        return paymentRepository.save(payment);
+        Payment savedPayment = paymentRepository.save(payment);
+        return savedPayment.toPaymentResponseDto();
     }
 
     // 결제 승인시 호출되는 메서드
@@ -51,6 +62,9 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentSuccessDto result = requestPaymentAccept(paymentKey, orderId, amount);
         payment.setPaymentKey(paymentKey);
         payment.setPaySuccessYN(true);
+
+        Reservation reservation = payment.getReservation();
+        reservation.updateStatus(ReservationStatus.CONFIRMED);
         return result;
     }
 
@@ -97,6 +111,9 @@ public class PaymentServiceImpl implements PaymentService {
         });
         payment.setPaySuccessYN(false);
         payment.setFailReason(message);
+
+        Reservation reservation = payment.getReservation();
+        reservation.updateStatus(ReservationStatus.CANCELED);
     }
 
 
@@ -113,6 +130,9 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setCancelYN(true);
         payment.setCancelReason(cancelReason);
         paymentRepository.save(payment);
+
+        Reservation reservation = payment.getReservation();
+        reservation.updateStatus(ReservationStatus.REFUNDED);
 
         return response;
     }
