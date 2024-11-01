@@ -1,6 +1,6 @@
 package com.sparta.quokkatravel.domain.event.controller;
 
-import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import com.sparta.quokkatravel.domain.event.dto.request.EventRequestDto;
 import com.sparta.quokkatravel.domain.event.dto.response.EventResponseDto;
 import com.sparta.quokkatravel.domain.event.service.EventService;
