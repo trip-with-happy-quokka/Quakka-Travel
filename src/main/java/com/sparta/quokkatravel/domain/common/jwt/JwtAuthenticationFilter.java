@@ -1,8 +1,6 @@
 package com.sparta.quokkatravel.domain.common.jwt;
 
 import com.sparta.quokkatravel.domain.admin.loginhistory.service.AdminLoginHistoryService;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
-import com.sparta.quokkatravel.domain.common.service.CustomUserDetailsService;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;

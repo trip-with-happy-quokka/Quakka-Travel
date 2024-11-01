@@ -3,7 +3,7 @@ package com.sparta.quokkatravel.domain.admin.useractivity.controller;
 import com.sparta.quokkatravel.domain.admin.useractivity.dto.AdminUserActivityResponseDto;
 import com.sparta.quokkatravel.domain.admin.useractivity.dto.AdminUserStatusUpdateRequestDto;
 import com.sparta.quokkatravel.domain.admin.useractivity.service.AdminUserActivityService;
-import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

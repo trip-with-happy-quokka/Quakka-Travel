@@ -1,7 +1,7 @@
 package com.sparta.quokkatravel.domain.room.entity;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
-import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
+import com.sparta.quokkatravel.domain.common.shared.Timestamped;
 import com.sparta.quokkatravel.domain.room.dto.RoomRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

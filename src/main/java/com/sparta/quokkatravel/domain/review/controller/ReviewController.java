@@ -1,7 +1,7 @@
 package com.sparta.quokkatravel.domain.review.controller;
 
-import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
+import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.review.dto.ReviewRequestDto;
 import com.sparta.quokkatravel.domain.review.dto.ReviewResponseDto;
 import com.sparta.quokkatravel.domain.review.service.ReviewService;

@@ -1,12 +1,12 @@
 package com.sparta.quokkatravel.domain.room.controller;
 
-import com.sparta.quokkatravel.domain.accommodation.dto.GuestAccommodationResponseDto;
-import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import com.sparta.quokkatravel.domain.room.dto.GuestRoomResponseDto;
 import com.sparta.quokkatravel.domain.room.service.GuestRoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +34,7 @@ public class GuestRoomController {
 
     // 객실 단일 조회
     @GetMapping("/accommodations/{accommodationId}/rooms/{roomId}")
+    @Cacheable(value = "Room", key = "#roomId", cacheManager = "cacheManager")
     @Operation(summary = "객실 전체 조회", description = "특정 객실 하나만 조회하는 API")
     public ResponseEntity<?> getAccommodation(@PathVariable(name = "accommodationId") Long accommodationId,
                                               @PathVariable(name = "roomId") Long roomId) {
