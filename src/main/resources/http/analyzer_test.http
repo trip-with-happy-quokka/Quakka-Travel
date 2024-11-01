@@ -1,4 +1,4 @@
-POST http://43.202.0.210:9200/index5/_search
+POST http://43.202.0.210:9200/accommodations2/_search
 Content-Type: application/json
 Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
 

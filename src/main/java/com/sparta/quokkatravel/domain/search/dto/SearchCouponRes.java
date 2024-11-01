@@ -3,11 +3,8 @@ package com.sparta.quokkatravel.domain.search.dto;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponType;
 import com.sparta.quokkatravel.domain.search.document.CouponDocument;
-import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDate;
 
@@ -15,7 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class SearchCouponRes {
 
-    private Long id;
+    private Long couponId;
     private String name;
     private String content;
     private CouponType couponType;
@@ -29,7 +26,7 @@ public class SearchCouponRes {
     private String createdBy;
 
     public SearchCouponRes(CouponDocument couponDocument) {
-        this.id = couponDocument.getId();
+        this.couponId = couponDocument.getCouponId();
         this.name = couponDocument.getName();
         this.content = couponDocument.getContent();
         this.couponType = couponDocument.getCouponType();

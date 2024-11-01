@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 import java.util.List;
 
 @EnableElasticsearchRepositories(basePackages = "com/sparta/quokkatravel/domain/search/repository")
-public interface CouponSearchRepository extends ElasticsearchRepository<CouponDocument, String> {
+public interface CouponSearchRepository extends ElasticsearchRepository<CouponDocument, Long> {
 
     List<CouponDocument> findByNameContainingAndCouponTypeAndCouponStatus(String name, CouponType couponType, CouponStatus couponStatus);
 }

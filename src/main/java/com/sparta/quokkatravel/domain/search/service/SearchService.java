@@ -5,16 +5,17 @@ import com.sparta.quokkatravel.domain.coupon.entity.CouponType;
 import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
 import com.sparta.quokkatravel.domain.search.dto.SearchAccommodationRes;
 import com.sparta.quokkatravel.domain.search.dto.SearchCouponRes;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface SearchService {
 
     // 숙소
-    List<SearchAccommodationRes> searchAccommodations(String name, String address, Long rating);
+    List<AccommodationDocument> searchAccommodations(String name, String address, Long rating) throws IOException;
 
     // 쿠폰
     List<SearchCouponRes> searchCoupons(String name, CouponType couponType, CouponStatus couponStatus);
+
+    void deleteDocuments();
 }

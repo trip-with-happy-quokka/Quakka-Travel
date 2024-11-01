@@ -1,5 +1,6 @@
 package com.sparta.quokkatravel.domain.search.document;
 
+import com.querydsl.core.annotations.QueryEntity;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
@@ -22,11 +23,15 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
+@QueryEntity
 @Document(indexName = "coupon")
 public class CouponDocument {
 
     @Id
-    private Long id;
+    private String id;
+
+    @Field(type = FieldType.Long)
+    private Long couponId;
 
     @Field(type = FieldType.Text, analyzer = "custom_analyzer", searchAnalyzer = "whitespace")
     private String name;
@@ -62,7 +67,7 @@ public class CouponDocument {
     private String createdBy;
 
     public CouponDocument(Coupon coupon) {
-        this.id = coupon.getId();
+        this.couponId = coupon.getId();
         this.name = coupon.getName();
         this.content = coupon.getContent();
         this.couponType = coupon.getCouponType();

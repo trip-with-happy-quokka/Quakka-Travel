@@ -1,43 +1,48 @@
-PUT http://43.202.0.210:9200/coupon
+PUT http://43.202.0.210:9200/index002
 Content-Type: application/json
 Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
 
 {
   "settings": {
     "analysis": {
+      "analyzer": {
+        "mixed_korean_english_analyzer": {
+          "type": "custom",
+          "tokenizer": "whitespace",
+          "char_filter": ["remove_special_chars"],
+          "filter": [
+            "lowercase",
+            "nori_part_of_speech",
+            "stop"
+          ]
+        }
+      },
       "tokenizer": {
-        "edge_ngram_tokenizer": {
-          "type": "edge_ngram",
-          "min_gram": 1,
-          "max_gram": 10,
-          "token_chars": ["letter", "digit"]
+        "nori_tokenizer": {
+          "type": "nori_tokenizer",
+          "decompound_mode": "mixed"
+        }
+      },
+      "char_filter": {
+        "remove_special_chars": {
+          "type": "pattern_replace",
+          "pattern": "[^가-힣a-zA-Z0-9\\s]",
+          "replacement": ""
         }
       },
       "filter": {
-        "lowercase_filter": {
-          "type": "lowercase"
-        }
-      },
-      "analyzer": {
-        "custom_analyzer": {
-          "type": "custom",
-          "tokenizer": "edge_ngram_tokenizer",
-          "filter": [
-            "lowercase_filter"
-          ],
-          "char_filter": [
-            "html_strip"
+        "nori_part_of_speech": {
+          "type": "nori_part_of_speech",
+          "stoptags": ["E", "IC", "J", "MAG", "MM", "SP", "SSC", "SSO", "SC"]
+        },
+        "stop": {
+          "type": "stop",
+          "stopwords": [
+            "_english_",
+            "_korean_",
+            "이", "그", "저", "그리고", "또는", "the", "and", "or"
           ]
         }
-      }
-    }
-  },
-  "mappings": {
-    "properties": {
-      "name": {
-        "type": "text",
-        "analyzer": "custom_analyzer",
-        "search_analyzer": "whitespace"
       }
     }
   }

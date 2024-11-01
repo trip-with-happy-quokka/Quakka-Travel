@@ -1,25 +1,36 @@
 package com.sparta.quokkatravel.domain.search.document;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.querydsl.core.annotations.QueryEntity;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.util.UUID;
+
 @Getter
 @NoArgsConstructor
-@Document(indexName = "accommodations2")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Document(indexName = "index002")
 public class AccommodationDocument {
 
+    private static final Logger log = LoggerFactory.getLogger(AccommodationDocument.class);
     @Id
-    private String id;
+    private String id = UUID.randomUUID().toString();
 
-    @Field(type = FieldType.Text, analyzer = "custom_analyzer", searchAnalyzer = "whitespace")
+    @Field(type = FieldType.Long)
+    private Long accommodationId;
+
+    @Field(type = FieldType.Text, analyzer = "mixed_korean_english_analyzer", searchAnalyzer = "whitespace")
     private String name;
 
-    @Field(type = FieldType.Text, analyzer = "standard", searchAnalyzer = "standard")
+    @Field(type = FieldType.Text, analyzer = "nori_analyzer", searchAnalyzer = "whitespace")
     private String address;
 
     @Field(type = FieldType.Long)
@@ -29,10 +40,13 @@ public class AccommodationDocument {
     private String imageurl;
 
     public AccommodationDocument(Accommodation accommodation) {
+        this.accommodationId = accommodation.getId();
         this.name = accommodation.getName();
         this.address = accommodation.getAddress();
         this.rating = accommodation.getRating();
         this.imageurl = accommodation.getImageurl();
+
+        System.out.println("Accommodation document created: " + this);
     }
 
 }
