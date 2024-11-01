@@ -1,0 +1,2 @@
+POST http://43.202.0.210:9200/index001/_cache/clear
+Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
