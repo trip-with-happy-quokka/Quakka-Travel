@@ -13,7 +13,7 @@ spring:
 
   data:
     redis:
-      host: <REDIS_ENDPOINTd>  # AWS ElastiCache Redis 엔드포인트
+      host: <REDIS_ENDPOINT>  # AWS ElastiCache Redis 엔드포인트
       port: 6379
 
 jwt:
