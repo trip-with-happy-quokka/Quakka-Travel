@@ -3,6 +3,7 @@ package com.sparta.quokkatravel.domain.common.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -34,6 +35,7 @@ public class DatabaseConfig {
         return new LazyConnectionDataSourceProxy(routingDataSource());
     }
 
+    @Primary
     @Bean
     public DataSource routingDataSource() {
         ReplicationRoutingDataSource routingDataSource = new ReplicationRoutingDataSource();
