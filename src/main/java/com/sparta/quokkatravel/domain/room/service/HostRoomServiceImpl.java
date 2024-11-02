@@ -1,10 +1,9 @@
 package com.sparta.quokkatravel.domain.room.service;
 
-import com.sparta.quokkatravel.domain.accommodation.dto.GuestAccommodationResponseDto;
-import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationResponseDto;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.aop.InvalidateAccommodationCache;
+import com.sparta.quokkatravel.domain.common.aop.InvalidateRoomCache;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.room.dto.HostRoomResponseDto;
 import com.sparta.quokkatravel.domain.room.dto.RoomRequestDto;
@@ -75,6 +74,7 @@ public class HostRoomServiceImpl implements HostRoomService {
 
     @Override
     @Transactional
+    @InvalidateRoomCache
     public HostRoomResponseDto updateRoom(String email, Long roomId, RoomRequestDto roomRequestDto) {
         User user = userRepository.findByEmailOrElseThrow(email);
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room Not Found"));
@@ -90,6 +90,7 @@ public class HostRoomServiceImpl implements HostRoomService {
 
     @Override
     @Transactional
+    @InvalidateRoomCache
     public String deleteRoom(String email, Long roomId) {
         User user = userRepository.findByEmailOrElseThrow(email);
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room Not Found"));

@@ -1,7 +1,7 @@
 package com.sparta.quokkatravel.domain.user.entity;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
-import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
+import com.sparta.quokkatravel.domain.common.shared.Timestamped;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.review.entity.Review;

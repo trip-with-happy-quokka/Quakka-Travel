@@ -1,4 +1,4 @@
-package com.sparta.quokkatravel.domain.common.advice;
+package com.sparta.quokkatravel.domain.common.shared;
 
 import lombok.Getter;
 

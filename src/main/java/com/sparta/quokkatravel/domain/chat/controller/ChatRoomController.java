@@ -3,7 +3,7 @@ package com.sparta.quokkatravel.domain.chat.controller;
 import com.sparta.quokkatravel.domain.chat.dto.CreateChatRoomRequestDto;
 import com.sparta.quokkatravel.domain.chat.dto.CreateChatRoomResponse;
 import com.sparta.quokkatravel.domain.chat.service.ChatRoomService;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

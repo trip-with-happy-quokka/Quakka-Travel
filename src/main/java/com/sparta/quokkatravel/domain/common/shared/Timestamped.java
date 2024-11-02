@@ -1,4 +1,4 @@
-package com.sparta.quokkatravel.domain.common.timestamped;
+package com.sparta.quokkatravel.domain.common.shared;
 
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -5,7 +5,7 @@
 //import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 //import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
 //import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepositorySupport;
-//import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+//import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 //import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 //import com.sparta.quokkatravel.domain.common.exception.UnAuthorizedException;
 //import com.sparta.quokkatravel.domain.user.entity.User;

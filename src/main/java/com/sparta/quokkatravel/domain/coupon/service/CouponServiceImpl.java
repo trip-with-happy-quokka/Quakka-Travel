@@ -2,7 +2,6 @@ package com.sparta.quokkatravel.domain.coupon.service;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
-//import com.sparta.quokkatravel.domain.common.distributedLock.annotation.DistributedLock;
 import com.sparta.quokkatravel.domain.common.exception.BadRequestException;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
@@ -16,8 +15,9 @@ import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
 import com.sparta.quokkatravel.domain.event.entity.Event;
 import com.sparta.quokkatravel.domain.event.repository.EventRepository;
-//import com.sparta.quokkatravel.domain.search.document.CouponDocument;
-//import com.sparta.quokkatravel.domain.search.repository.CouponSearchRepository;
+import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
+import com.sparta.quokkatravel.domain.search.document.CouponDocument;
+import com.sparta.quokkatravel.domain.search.repository.CouponSearchRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +43,8 @@ public class CouponServiceImpl implements CouponService {
     private final AccommodationRepository accommodationRepository;
     private final UserRepository userRepository;
     private final RedissonClient redissonClient;
+    private final CouponSearchRepository couponSearchRepository;
     private final int EMPTY = 0;
-//    private final CouponSearchRepository couponSearchRepository;
 
     // 행사 쿠폰 발급 메서드
     @Override
@@ -78,11 +78,12 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 레퍼지토리에 쿠폰 데이터를 저장 (save)
         Coupon savedCoupon = couponRepository.save(newCoupon);
-//        CouponDocument couponDocument = new CouponDocument(savedCoupon);
-//        couponSearchRepository.save(couponDocument);
+        log.info("EventCoupon created: {}", savedCoupon);
 
-        // 쿠폰이 발급 될 때, 수량이 몇개인지 레디스에 넣어주기
-
+        // Accommodation Document Create For ElasticSearch
+        CouponDocument couponDocument = new CouponDocument(savedCoupon);
+        log.info("EventCouponDocument created: {}", couponDocument);
+        couponSearchRepository.save(couponDocument);
 
         // 쿠폰을 CouponResponseDto 로 반환
         return new CouponResponseDto(
@@ -134,6 +135,12 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 레퍼지토리에 쿠폰 데이터를 저장 (save)
         Coupon savedCoupon = couponRepository.save(newCoupon);
+        log.info("AccommodationCoupon created: {}", savedCoupon);
+
+        // Accommodation Document Create For ElasticSearch
+        CouponDocument couponDocument = new CouponDocument(savedCoupon);
+        log.info("AccommodationCouponDocument created: {}", couponDocument);
+        couponSearchRepository.save(couponDocument);
 
         // 쿠폰을 CouponResponseDto 로 반환
         return new CouponResponseDto(
@@ -310,7 +317,13 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 삭제여부 변경
         coupon.deleteCoupon();
+        log.info("Coupon deleted: {}", coupon);
         couponRepository.save(coupon);
+
+        // Accommodation Document Create For ElasticSearch
+        CouponDocument couponDocument = couponSearchRepository.findByCouponIdOrElseThrow(couponId);
+        log.info("CouponDocument deleted: {}", couponDocument);
+        couponSearchRepository.delete(couponDocument);
 
         return new CouponDeleteResponseDto(
                 coupon.getId(),

@@ -1,6 +1,5 @@
-package com.sparta.quokkatravel.domain.common.service;
+package com.sparta.quokkatravel.domain.common.jwt;
 
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

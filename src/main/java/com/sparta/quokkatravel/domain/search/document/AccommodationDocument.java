@@ -1,5 +1,6 @@
 package com.sparta.quokkatravel.domain.search.document;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import jakarta.persistence.Id;
 import lombok.Getter;
@@ -8,18 +9,29 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.util.UUID;
+
 @Getter
 @NoArgsConstructor
-@Document(indexName = "accommodations2")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Document(indexName = "index005")
 public class AccommodationDocument {
 
     @Id
-    private String id;
+    private String id = UUID.randomUUID().toString();
 
-    @Field(type = FieldType.Text, analyzer = "custom_analyzer", searchAnalyzer = "whitespace")
+    @Field(type = FieldType.Long)
+    private Long accommodationId;
+
+    @Field(type = FieldType.Text)
     private String name;
 
-    @Field(type = FieldType.Text, analyzer = "standard", searchAnalyzer = "standard")
+    @Field(type = FieldType.Text)
+    private String koreanPartOfName;
+    @Field(type = FieldType.Text)
+    private String englishPartOfName;
+
+    @Field(type = FieldType.Text)
     private String address;
 
     @Field(type = FieldType.Long)
@@ -28,11 +40,28 @@ public class AccommodationDocument {
     @Field(type = FieldType.Text)
     private String imageurl;
 
+
     public AccommodationDocument(Accommodation accommodation) {
+        this.accommodationId = accommodation.getId();
         this.name = accommodation.getName();
         this.address = accommodation.getAddress();
         this.rating = accommodation.getRating();
         this.imageurl = accommodation.getImageurl();
+        setPartOfName(accommodation.getName());
+    }
+
+    public void update(Accommodation accommodation) {
+        this.name = accommodation.getName();
+        this.address = accommodation.getAddress();
+        this.rating = accommodation.getRating();
+        this.imageurl = accommodation.getImageurl();
+        setPartOfName(accommodation.getName());
+    }
+
+    public void setPartOfName(String name) {
+        LanguageSeparator ls = new LanguageSeparator(name);
+        this.koreanPartOfName = ls.getKoreanPart();
+        this.englishPartOfName = ls.getEnglishPart();
     }
 
 }

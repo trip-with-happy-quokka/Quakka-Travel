@@ -1,16 +1,12 @@
 package com.sparta.quokkatravel.domain.accommodation.entity;
 
-import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
+import com.sparta.quokkatravel.domain.common.shared.Timestamped;
 import com.sparta.quokkatravel.domain.review.entity.Review;
 import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.List;
 

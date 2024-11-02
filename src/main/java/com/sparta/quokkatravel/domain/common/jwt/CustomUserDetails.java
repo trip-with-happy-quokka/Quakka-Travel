@@ -1,4 +1,4 @@
-package com.sparta.quokkatravel.domain.common.dto;
+package com.sparta.quokkatravel.domain.common.jwt;
 
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.entity.UserRole;

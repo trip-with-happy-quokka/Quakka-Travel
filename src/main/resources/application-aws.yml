@@ -13,8 +13,9 @@ spring:
 
   data:
     redis:
-      host: localhost  # AWS ElastiCache Redis 엔드포인트
+      host: ${AWS_DB_IP}  # AWS ElastiCache Redis 엔드포인트
       port: 6379
+      password: 1234
 
   elasticsearch:
     uris: ${AWS_ELASTIC_SEARCH_IP}:9200
@@ -22,6 +23,7 @@ spring:
     username: elastic
     connection-timeout: 1s
     socket-timeout: 30s
+
 
 
 
