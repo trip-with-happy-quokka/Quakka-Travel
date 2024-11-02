@@ -99,14 +99,14 @@ dependencies {
 }
 
 // QueryDSL 관련 설정
-//def querydslDir = "src/main/generated"
-//
-//sourceSets {
-//    main.java.srcDirs += [ querydslDir ]
-//}
-//tasks.withType(JavaCompile) {
-//    options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
-//}
+def querydslDir = "src/main/generated"
+
+sourceSets {
+    main.java.srcDirs += [ querydslDir ]
+}
+tasks.withType(JavaCompile) {
+    options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
+}
 
 clean.doLast {
     file(querydslDir).deleteDir()

@@ -46,6 +46,8 @@ public class SecurityConfig {
                         .requestMatchers("/users/**").permitAll()
                         .requestMatchers("/api/v1/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/payment/**").permitAll()
+                        .requestMatchers("/Payment.html").permitAll()
                         .anyRequest().authenticated() // 그 외의 모든 요청은 인증 필요
                 )
                 .exceptionHandling(e -> e

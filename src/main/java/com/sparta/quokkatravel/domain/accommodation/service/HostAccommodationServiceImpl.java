@@ -4,13 +4,12 @@ import com.sparta.quokkatravel.domain.accommodation.dto.AccommodationRequestDto;
 import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationResponseDto;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
-import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepositorySupport;
 import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.common.exception.UnAuthorizedException;
 import com.sparta.quokkatravel.domain.common.s3.S3Uploader;
-import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
-import com.sparta.quokkatravel.domain.search.repository.AccommodationSearchRepository;
+//import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
+//import com.sparta.quokkatravel.domain.search.repository.AccommodationSearchRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,7 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
     private final AccommodationRepository accommodationRepository;
     private final UserRepository userRepository;
     private final S3Uploader s3Uploader;
-    private final AccommodationSearchRepository accommodationSearchRepository;
+//    private final AccommodationSearchRepository accommodationSearchRepository;
 
     @Override
     @Transactional
@@ -48,9 +47,9 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
         Accommodation accommodation = new Accommodation(accommodationRequestDto.getName(), accommodationRequestDto.getDescription(), accommodationRequestDto.getAddress(), url, user);
         log.info("Accommodation created: {}", accommodation);
         Accommodation saved = accommodationRepository.save(accommodation);
-        AccommodationDocument accommodationDocument = new AccommodationDocument(accommodation);
-        log.info("Document created: {}", accommodationDocument);
-        accommodationSearchRepository.save(accommodationDocument);
+//        AccommodationDocument accommodationDocument = new AccommodationDocument(accommodation);
+//        log.info("Document created: {}", accommodationDocument);
+//        accommodationSearchRepository.save(accommodationDocument);
 
         return new HostAccommodationResponseDto(saved);
     }
