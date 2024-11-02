@@ -18,5 +18,6 @@ public class SearchAccommodationRes {
         this.address = accommodationDocument.getAddress();
         this.rating = accommodationDocument.getRating();
         this.imageurl = accommodationDocument.getImageurl();
+
     }
 }

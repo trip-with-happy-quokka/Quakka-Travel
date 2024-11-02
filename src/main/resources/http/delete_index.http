@@ -1,2 +1,2 @@
-DELETE http://43.202.0.210:9200/index5
+DELETE http://43.202.0.210:9200/index004
 Authorization: Basic ZWxhc3RpYzoxMjM0NTY=

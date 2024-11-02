@@ -2,7 +2,6 @@ package com.sparta.quokkatravel.domain.review.service;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.review.dto.ReviewRequestDto;
 import com.sparta.quokkatravel.domain.review.dto.ReviewResponseDto;
 import com.sparta.quokkatravel.domain.review.entity.Review;

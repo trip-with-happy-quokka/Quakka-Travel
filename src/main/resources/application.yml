@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: aws
+    active: local
 
   jpa:
     show-sql: true
@@ -26,6 +26,7 @@ log:
 logging:
   level:
     root: info
+    org.springframework.cache: DEBUG
 
 springdoc:
   api-docs:

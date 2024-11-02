@@ -15,6 +15,7 @@ import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
 import com.sparta.quokkatravel.domain.event.entity.Event;
 import com.sparta.quokkatravel.domain.event.repository.EventRepository;
+import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
 import com.sparta.quokkatravel.domain.search.document.CouponDocument;
 import com.sparta.quokkatravel.domain.search.repository.CouponSearchRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
@@ -74,8 +75,13 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 레퍼지토리에 쿠폰 데이터를 저장 (save)
         Coupon savedCoupon = couponRepository.save(newCoupon);
+        log.info("EventCoupon created: {}", savedCoupon);
+
+        // Accommodation Document Create For ElasticSearch
         CouponDocument couponDocument = new CouponDocument(savedCoupon);
+        log.info("EventCouponDocument created: {}", couponDocument);
         couponSearchRepository.save(couponDocument);
+
 
         // 쿠폰을 CouponResponseDto 로 반환
         return new CouponResponseDto(
@@ -127,6 +133,12 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 레퍼지토리에 쿠폰 데이터를 저장 (save)
         Coupon savedCoupon = couponRepository.save(newCoupon);
+        log.info("AccommodationCoupon created: {}", savedCoupon);
+
+        // Accommodation Document Create For ElasticSearch
+        CouponDocument couponDocument = new CouponDocument(savedCoupon);
+        log.info("AccommodationCouponDocument created: {}", couponDocument);
+        couponSearchRepository.save(couponDocument);
 
         // 쿠폰을 CouponResponseDto 로 반환
         return new CouponResponseDto(
@@ -304,7 +316,13 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 삭제여부 변경
         coupon.deleteCoupon();
+        log.info("Coupon deleted: {}", coupon);
         couponRepository.save(coupon);
+
+        // Accommodation Document Create For ElasticSearch
+        CouponDocument couponDocument = couponSearchRepository.findByCouponIdOrElseThrow(couponId);
+        log.info("CouponDocument deleted: {}", couponDocument);
+        couponSearchRepository.delete(couponDocument);
 
         return new CouponDeleteResponseDto(
                 coupon.getId(),

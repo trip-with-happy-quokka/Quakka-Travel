@@ -1,5 +1,7 @@
 package com.sparta.quokkatravel.domain.search.document;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.querydsl.core.annotations.QueryEntity;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
@@ -18,18 +20,27 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
-@Document(indexName = "coupon")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Document(indexName = "coupon1")
 public class CouponDocument {
 
     @Id
-    private Long id;
+    private String id = UUID.randomUUID().toString();
 
-    @Field(type = FieldType.Text, analyzer = "custom_analyzer", searchAnalyzer = "whitespace")
+    @Field(type = FieldType.Long)
+    private Long couponId;
+
+    @Field(type = FieldType.Text)
     private String name;
+
+    @Field(type = FieldType.Text)
+    private String koreanPartOfName;
+    @Field(type = FieldType.Text)
+    private String englishPartOfName;
 
     @Field(type = FieldType.Text)
     private String content;
@@ -47,10 +58,10 @@ public class CouponDocument {
     private CouponStatus couponStatus;
 
     @Field(type = FieldType.Date)
-    private LocalDate validFrom;
+    private String validFrom;
 
     @Field(type = FieldType.Date)
-    private LocalDate validUntil;
+    private String validUntil;
 
     @Field(type = FieldType.Text)
     private String accommodation;
@@ -62,18 +73,40 @@ public class CouponDocument {
     private String createdBy;
 
     public CouponDocument(Coupon coupon) {
-        this.id = coupon.getId();
+        this.couponId = coupon.getId();
         this.name = coupon.getName();
         this.content = coupon.getContent();
         this.couponType = coupon.getCouponType();
         this.volume = coupon.getVolume();
         this.code = coupon.getCode();
         this.couponStatus = coupon.getCouponStatus();
-        this.validFrom = coupon.getValidFrom();
-        this.validUntil = coupon.getValidUntil();
-        this.accommodation = new AccommodationDto(coupon.getAccommodation()).getName();
-        this.event = new EventDto(coupon.getEvent()).getName();
+        this.validFrom = coupon.getValidFrom().toString();
+        this.validUntil = coupon.getValidUntil().toString();
+        this.accommodation = (coupon.getAccommodation() != null) ? new AccommodationDto(coupon.getAccommodation()).getName() : null;
+        this.event = (coupon.getEvent() != null) ? new EventDto(coupon.getEvent()).getName() : null;
         this.createdBy = coupon.getCreatedBy().getEmail();
+        setPartOfName(coupon.getName());
+    }
+
+    public void update(Coupon coupon) {
+        this.name = coupon.getName();
+        this.content = coupon.getContent();
+        this.couponType = coupon.getCouponType();
+        this.volume = coupon.getVolume();
+        this.code = coupon.getCode();
+        this.couponStatus = coupon.getCouponStatus();
+        this.validFrom = coupon.getValidFrom().toString();
+        this.validUntil = coupon.getValidUntil().toString();
+        this.accommodation =(coupon.getAccommodation() != null) ? new AccommodationDto(coupon.getAccommodation()).getName() : null;
+        this.event = (coupon.getEvent() != null) ? new EventDto(coupon.getEvent()).getName() : null;
+        this.createdBy = coupon.getCreatedBy().getEmail();
+        setPartOfName(coupon.getName());
+    }
+
+    public void setPartOfName(String name) {
+        LanguageSeparator ls = new LanguageSeparator(name);
+        this.koreanPartOfName = ls.getKoreanPart();
+        this.englishPartOfName = ls.getEnglishPart();
     }
 
 }

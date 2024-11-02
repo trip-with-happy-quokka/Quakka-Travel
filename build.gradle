@@ -81,7 +81,6 @@ dependencies {
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
     // redisson
     implementation 'org.redisson:redisson-spring-boot-starter:3.16.3'
 
@@ -90,6 +89,7 @@ dependencies {
 
     // elasticsearch
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'co.elastic.clients:elasticsearch-java:8.10.2'
 
     // Monitoring
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -99,14 +99,14 @@ dependencies {
 }
 
 // QueryDSL 관련 설정
-//def querydslDir = "src/main/generated"
-//
-//sourceSets {
-//    main.java.srcDirs += [ querydslDir ]
-//}
-//tasks.withType(JavaCompile) {
-//    options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
-//}
+def querydslDir = "src/main/generated"
+
+sourceSets {
+    main.java.srcDirs += [ querydslDir ]
+}
+tasks.withType(JavaCompile) {
+    options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
+}
 
 clean.doLast {
     file(querydslDir).deleteDir()

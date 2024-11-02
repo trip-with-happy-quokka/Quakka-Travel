@@ -1,7 +1,7 @@
 package com.sparta.quokkatravel.domain.coupon.controller;
 
-import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
+import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponRequestDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponCodeResponseDto;
