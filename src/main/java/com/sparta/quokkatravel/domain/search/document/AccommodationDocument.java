@@ -49,4 +49,11 @@ public class AccommodationDocument {
         System.out.println("Accommodation document created: " + this);
     }
 
+    public void update(Accommodation accommodation) {
+        this.name = accommodation.getName();
+        this.address = accommodation.getAddress();
+        this.rating = accommodation.getRating();
+        this.imageurl = accommodation.getImageurl();
+    }
+
 }

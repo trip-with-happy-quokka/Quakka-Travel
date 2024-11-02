@@ -15,8 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/guest")
-@PreAuthorize("hasRole('GUEST') or hasRole('ADMIN')")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Tag(name = "Accommodation", description = "Guest 숙소 관련 컨트롤러")
 public class GuestAccommodationController {

@@ -7,7 +7,6 @@ import com.sparta.quokkatravel.domain.common.elasticsearch.mapper.EntityToDocume
 import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
 import com.sparta.quokkatravel.domain.search.repository.AccommodationSearchRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;

@@ -81,4 +81,18 @@ public class CouponDocument {
         this.createdBy = coupon.getCreatedBy().getEmail();
     }
 
+    public void update(Coupon coupon) {
+        this.name = coupon.getName();
+        this.content = coupon.getContent();
+        this.couponType = coupon.getCouponType();
+        this.volume = coupon.getVolume();
+        this.code = coupon.getCode();
+        this.couponStatus = coupon.getCouponStatus();
+        this.validFrom = coupon.getValidFrom();
+        this.validUntil = coupon.getValidUntil();
+        this.accommodation = new AccommodationDto(coupon.getAccommodation()).getName();
+        this.event = new EventDto(coupon.getEvent()).getName();
+        this.createdBy = coupon.getCreatedBy().getEmail();
+    }
+
 }
