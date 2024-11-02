@@ -4,6 +4,7 @@ import com.sparta.quokkatravel.domain.accommodation.dto.GuestAccommodationRespon
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,8 @@ public class GuestAccommodationServiceImpl implements GuestAccommodationService 
     }
 
     @Override
-    public GuestAccommodationResponseDto getAccommodation(Long accommodationId) {
+    @Cacheable(value = "Accommodation", key = "#accommodationId + '_' + #userId", cacheManager = "cacheManager")
+    public GuestAccommodationResponseDto getAccommodation(Long userId, Long accommodationId) {
         return new GuestAccommodationResponseDto(accommodationRepository.findById(accommodationId)
                 .orElseThrow(() -> new NotFoundException("Accommodation Not Found")));
     }

@@ -1,7 +1,7 @@
 package com.sparta.quokkatravel.domain.reservation.controller;
 
-import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
+import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.reservation.dto.ReservationRequestDto;
 import com.sparta.quokkatravel.domain.reservation.dto.ReservationResponseDto;
 import com.sparta.quokkatravel.domain.reservation.service.ReservationService;

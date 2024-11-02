@@ -1,7 +1,7 @@
 package com.sparta.quokkatravel.domain.coupon.entity;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
-import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
+import com.sparta.quokkatravel.domain.common.shared.Timestamped;
 import com.sparta.quokkatravel.domain.event.entity.Event;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -36,6 +36,10 @@ public class Coupon extends Timestamped {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CouponType couponType;
+
+    @Min(0)
+    @Column(name = "coupon_volume", nullable = false)
+    private Integer volume;
 
     @Column(name = "coupon_code", unique = true, nullable = false)
     private String code;
@@ -84,12 +88,13 @@ public class Coupon extends Timestamped {
     @Column(name = "registered_at")
     private LocalDateTime registeredAt;
 
-    public Coupon(String couponName, String couponContent, String couponType, String couponCode,
-                  CouponStatus couponStatus, int discountRate, int discountAmount,
+    public Coupon(String couponName, String couponContent, String couponType, Integer volume,
+                  String couponCode, CouponStatus couponStatus, int discountRate, int discountAmount,
                   LocalDate validFrom, LocalDate validUntil, Event event, User createdBy) {
         this.name = couponName;
         this.content = couponContent;
         this.couponType = CouponType.valueOf(couponType);
+        this.volume = volume;
         this.code = couponCode;
         this.couponStatus = couponStatus;
         this.discountRate = discountRate;
@@ -100,12 +105,13 @@ public class Coupon extends Timestamped {
         this.createdBy = createdBy;
     }
 
-    public Coupon(String couponName, String couponContent, String couponType, String couponCode,
-                  CouponStatus couponStatus, int discountRate, int discountAmount,
+    public Coupon(String couponName, String couponContent, String couponType, Integer volume,
+                  String couponCode, CouponStatus couponStatus, int discountRate, int discountAmount,
                   LocalDate validFrom, LocalDate validUntil, Accommodation accommodation, User createdBy) {
         this.name = couponName;
         this.content = couponContent;
         this.couponType = CouponType.valueOf(couponType);
+        this.volume = volume;
         this.code = couponCode;
         this.couponStatus = couponStatus;
         this.discountRate = discountRate;
@@ -132,7 +138,8 @@ public class Coupon extends Timestamped {
     }
 
     // 쿠폰 수정 메서드 추가
-    public void updateCoupon(String code, String name, int discountAmount, LocalDate validFrom, LocalDate validUntil, CouponType couponType, String content) {
+    public void updateCoupon(String code, String name, int discountAmount, LocalDate validFrom, LocalDate validUntil,
+                             CouponType couponType, String content) {
         this.code = code;
         this.name = name;
         this.discountAmount = discountAmount;
@@ -143,6 +150,7 @@ public class Coupon extends Timestamped {
     }
 
     public void deleteCoupon() {
+        this.couponStatus = CouponStatus.DELETED;
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();  // 삭제 시점 저장
     }
@@ -155,5 +163,12 @@ public class Coupon extends Timestamped {
 
     public void redeemCoupon() {
         this.couponStatus= CouponStatus.REDEEMED;
+    }
+
+    public void decreaseVolume() {
+        if (volume <= 0) {
+            throw new IllegalStateException("남은 쿠폰이 없습니다.");
+        }
+        volume--;
     }
 }

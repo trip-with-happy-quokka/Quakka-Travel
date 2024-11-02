@@ -26,6 +26,7 @@ log:
 logging:
   level:
     root: info
+    org.springframework.cache: DEBUG
 
 springdoc:
   api-docs:
@@ -35,8 +36,17 @@ springdoc:
 
 payment:
   toss:
-    test_client_api_key : test_ck_DnyRpQWGrNq0JvqNMAA0VKwv1M9E
-    test_secrete_api_key : test_sk_0RnYX2w532z6Mm5Ll1Qg3NeyqApQ
-    success_url : "http://localhost:8080/api/v1/payments/toss/success"
-    fail_url : "http://localhost:8080/api/v1/payments/toss/fail"
+    test_client_api_key : ${TOSS_PAYMENT_CLIENT_KEY}
+    test_secret_api_key : ${TOSS_PAYMENT_SECRET_KEY}
+    success_url : ${TOSS_PAYMENT_SUCCESS_URL}
+    fail_url : ${TOSS_PAYMENT_FAIL_URL}
 
+management:
+  endpoint:
+    health:
+      show-components: always # health 컴포넌트의 상태 정보만 간략하게 노출
+      #show-details: always 세부사항 볼 때
+  endpoints:
+    web:
+      exposure:
+        include: "*"

@@ -2,7 +2,7 @@ package com.sparta.quokkatravel.domain.accommodation.service;
 
 import com.sparta.quokkatravel.domain.accommodation.dto.AccommodationRequestDto;
 import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationResponseDto;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;

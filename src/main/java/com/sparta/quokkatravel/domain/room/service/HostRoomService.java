@@ -1,6 +1,5 @@
 package com.sparta.quokkatravel.domain.room.service;
 
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.room.dto.HostRoomResponseDto;
 import com.sparta.quokkatravel.domain.room.dto.RoomRequestDto;
 import org.springframework.data.domain.Page;
