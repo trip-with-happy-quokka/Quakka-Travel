@@ -1,13 +1,10 @@
-POST http://43.202.0.210:9200/accommodations2/_search
+POST http://43.202.0.210:9200/index005/_analyze
 Content-Type: application/json
 Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
 
 {
-  "query": {
-    "match_phrase_prefix": {
-      "name_partial": "아침 햇살이 아름다운 숲 속 산골마을 펜션"
-    }
-  }
+  "analyzer": "my_analyzer",
+  "text": "안기모씨의 은하수 별나라 펜션이 달린다"
 }
 
 

@@ -3,6 +3,7 @@ package com.sparta.quokkatravel.domain.search.service;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponType;
 import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
+import com.sparta.quokkatravel.domain.search.document.CouponDocument;
 import com.sparta.quokkatravel.domain.search.dto.SearchAccommodationRes;
 import com.sparta.quokkatravel.domain.search.dto.SearchCouponRes;
 
@@ -15,7 +16,7 @@ public interface SearchService {
     List<AccommodationDocument> searchAccommodations(String name, String address, Long rating) throws IOException;
 
     // 쿠폰
-    List<SearchCouponRes> searchCoupons(String name, CouponType couponType, CouponStatus couponStatus);
+    List<CouponDocument> searchCoupons(String name, CouponType couponType, CouponStatus couponStatus) throws IOException;
 
     void deleteDocuments();
 }

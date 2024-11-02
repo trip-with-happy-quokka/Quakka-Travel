@@ -19,8 +19,8 @@ public class SearchCouponRes {
     private Integer volume;
     private String code;
     private CouponStatus couponStatus;
-    private LocalDate validFrom;
-    private LocalDate validUntil;
+    private String validFrom;
+    private String validUntil;
     private String accommodation;
     private String event;
     private String createdBy;

@@ -1,2 +1,2 @@
-GET http://43.202.0.210:9200/accommodations2/_search?pretty
+GET http://43.202.0.210:9200/index003/_search?pretty
 Authorization: Basic ZWxhc3RpYzoxMjM0NTY=

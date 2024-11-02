@@ -1,13 +1,10 @@
 package com.sparta.quokkatravel.domain.search.document;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.querydsl.core.annotations.QueryEntity;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -17,20 +14,24 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Document(indexName = "index002")
+@Document(indexName = "index005")
 public class AccommodationDocument {
 
-    private static final Logger log = LoggerFactory.getLogger(AccommodationDocument.class);
     @Id
     private String id = UUID.randomUUID().toString();
 
     @Field(type = FieldType.Long)
     private Long accommodationId;
 
-    @Field(type = FieldType.Text, analyzer = "mixed_korean_english_analyzer", searchAnalyzer = "whitespace")
+    @Field(type = FieldType.Text)
     private String name;
 
-    @Field(type = FieldType.Text, analyzer = "nori_analyzer", searchAnalyzer = "whitespace")
+    @Field(type = FieldType.Text)
+    private String koreanPartOfName;
+    @Field(type = FieldType.Text)
+    private String englishPartOfName;
+
+    @Field(type = FieldType.Text)
     private String address;
 
     @Field(type = FieldType.Long)
@@ -39,14 +40,14 @@ public class AccommodationDocument {
     @Field(type = FieldType.Text)
     private String imageurl;
 
+
     public AccommodationDocument(Accommodation accommodation) {
         this.accommodationId = accommodation.getId();
         this.name = accommodation.getName();
         this.address = accommodation.getAddress();
         this.rating = accommodation.getRating();
         this.imageurl = accommodation.getImageurl();
-
-        System.out.println("Accommodation document created: " + this);
+        setPartOfName(accommodation.getName());
     }
 
     public void update(Accommodation accommodation) {
@@ -54,6 +55,13 @@ public class AccommodationDocument {
         this.address = accommodation.getAddress();
         this.rating = accommodation.getRating();
         this.imageurl = accommodation.getImageurl();
+        setPartOfName(accommodation.getName());
+    }
+
+    public void setPartOfName(String name) {
+        LanguageSeparator ls = new LanguageSeparator(name);
+        this.koreanPartOfName = ls.getKoreanPart();
+        this.englishPartOfName = ls.getEnglishPart();
     }
 
 }
