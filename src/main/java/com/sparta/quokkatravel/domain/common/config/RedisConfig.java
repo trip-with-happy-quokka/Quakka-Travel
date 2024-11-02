@@ -35,8 +35,8 @@ public class RedisConfig {
     private String redisHost;
     @Value("${spring.data.redis.port}")
     private int redisPort;
-    @Value("${spring.data.redis.password}")
-    private String redisPassword;
+//    @Value("${spring.data.redis.password}")
+//    private String redisPassword;
     private static final String REDISSON_HOST_PREFIX = "redis://";
 
     // 레디스 서버와의 연결을 관리하는 객체
@@ -45,7 +45,7 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(redisHost);
         redisStandaloneConfiguration.setPort(redisPort);
-        redisStandaloneConfiguration.setPassword(redisPassword);
+//        redisStandaloneConfiguration.setPassword(redisPassword);
 
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
@@ -98,8 +98,8 @@ public class RedisConfig {
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress(REDISSON_HOST_PREFIX + redisHost + ":" + redisPort)
-                .setPassword(redisPassword);
+                .setAddress(REDISSON_HOST_PREFIX + redisHost + ":" + redisPort);
+//                .setPassword(redisPassword);
         return Redisson.create(config);
     }
 
