@@ -78,9 +78,10 @@ public class HostRoomController {
     @DeleteMapping("/accommodations/{accommodationId}/rooms/{roomId}")
     @Operation(summary = "객실 삭제", description = "HOST 유저의 특정 객실을 삭제하는 API")
     public ResponseEntity<?> deleteRoom(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                 @PathVariable(name = "accommodationId") Long accommodationId,
                                                  @PathVariable(name = "roomId") Long roomId) {
 
-        String deleteMessage = hostRoomService.deleteRoom(customUserDetails, roomId);
+        String deleteMessage = hostRoomService.deleteRoom(customUserDetails, accommodationId, roomId);
         return ResponseEntity.ok(ApiResponse.success("객실 삭제 성공", deleteMessage));
     }
 }

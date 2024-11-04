@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -24,11 +26,15 @@ public class GuestRoomServiceImpl implements GuestRoomService {
     @Override
     @Cacheable(value = "Room", key = "#roomId + '_' + #userId", cacheManager = "cacheManager")
     public GuestRoomResponseDto getRoom(Long userId, Long accommodationId, Long roomId) {
+
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException("Room Not Found"));
-        if (room.getAccommodation().getId() != accommodationId) {
+
+        if (!Objects.equals(room.getAccommodation().getId(), accommodationId)) {
             throw new NotFoundException("해당 숙소에는 그런 객실이 없습니다.");
         }
+
+
         return new GuestRoomResponseDto(room);
     }
 
