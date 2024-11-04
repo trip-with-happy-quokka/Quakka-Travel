@@ -8,7 +8,6 @@ import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.security.SecurityUtil;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,11 +23,11 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         User roomMaker = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
         User guest = userRepository.findByEmail(chatRoomRequest.getGuestEmail()).orElseThrow(() -> new NotFoundException("User not found"));
 
-        ChatRoom newRoom  = ChatRoom.create();
+        ChatRoom newRoom = ChatRoom.create();
         newRoom.addMembers(roomMaker, guest);
 
         chatRoomRepository.save(newRoom);
 
-        return new CreateChatRoomResponse(roomMaker.getId(),guest.getId(), newRoom.getId());
+        return new CreateChatRoomResponse(roomMaker.getId(), guest.getId(), newRoom.getId().toString());
     }
 }

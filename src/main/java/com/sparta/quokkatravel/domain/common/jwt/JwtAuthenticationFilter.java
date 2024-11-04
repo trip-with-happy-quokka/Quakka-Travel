@@ -2,6 +2,7 @@ package com.sparta.quokkatravel.domain.common.jwt;
 
 import com.sparta.quokkatravel.domain.admin.loginhistory.service.AdminLoginHistoryService;
 import com.sparta.quokkatravel.domain.user.entity.User;
+import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

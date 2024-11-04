@@ -7,9 +7,6 @@ import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
 import com.sparta.quokkatravel.domain.email.service.ReservationEmailService;
-import com.sparta.quokkatravel.domain.notification.service.NotificationService;
-import com.sparta.quokkatravel.domain.room.entity.Room;
-import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.reservation.dto.ReservationRequestDto;
 import com.sparta.quokkatravel.domain.reservation.dto.ReservationResponseDto;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
@@ -104,7 +101,7 @@ public class ReservationServiceImpl implements ReservationService {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("room is not found"));
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
 
-        if(!reservation.getUser().equals(user)) {
+        if (!reservation.getUser().equals(user)) {
             throw new AccessDeniedException("You are not the owner of this reservation");
         }
 

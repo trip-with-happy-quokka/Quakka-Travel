@@ -1,7 +1,6 @@
 package com.sparta.quokkatravel.domain.common.redis;
 
 import com.sparta.quokkatravel.domain.notification.service.SlackNotificationService;
-import com.sparta.quokkatravel.domain.notification.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.Message;
