@@ -22,7 +22,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,7 +38,6 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
     private final UserRepository userRepository;
     private final S3Uploader s3Uploader;
     private final AccommodationSearchRepository accommodationSearchRepository;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional

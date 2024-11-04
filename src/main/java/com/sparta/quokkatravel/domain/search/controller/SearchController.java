@@ -1,14 +1,10 @@
 package com.sparta.quokkatravel.domain.search.controller;
 
 import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
-import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
-import com.sparta.quokkatravel.domain.coupon.entity.CouponType;
 import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
 import com.sparta.quokkatravel.domain.search.document.CouponDocument;
 import com.sparta.quokkatravel.domain.search.dto.SearchAccommodationRequestDto;
-import com.sparta.quokkatravel.domain.search.dto.SearchAccommodationRes;
 import com.sparta.quokkatravel.domain.search.dto.SearchCouponReq;
-import com.sparta.quokkatravel.domain.search.dto.SearchCouponRes;
 import com.sparta.quokkatravel.domain.search.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

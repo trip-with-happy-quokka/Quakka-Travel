@@ -139,6 +139,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public void deleteDocuments() {
         accommodationSearchRepository.deleteAll();
+        couponSearchRepository.deleteAll();
     }
 
 }

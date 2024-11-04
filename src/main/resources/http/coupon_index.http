@@ -57,7 +57,7 @@ Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
       "id": {
         "type": "text"
       },
-      "accommodationId": {
+      "couponId": {
         "type": "long"
       },
       "name": {
