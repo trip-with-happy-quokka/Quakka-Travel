@@ -5,13 +5,12 @@ import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.room.entity.Room;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
 
 @Aspect
 @Slf4j
@@ -25,7 +24,7 @@ public class AccommodationCacheAspect extends AbstractCacheAspect {
         this.accommodationRepository = accommodationRepository;
     }
 
-    @AfterReturning("@annotation(InvalidateAccommodationCache)")
+    @Before("@annotation(InvalidateAccommodationCache)")
     public void evictAccommodationCache(JoinPoint joinPoint) {
         Long accommodationId = extractIdFromArgs(joinPoint);
         if (accommodationId == null) {
@@ -34,7 +33,7 @@ public class AccommodationCacheAspect extends AbstractCacheAspect {
         }
 
         // Accommodation 캐시 삭제
-        evictCacheByPattern("Accommodation::" + accommodationId);
+        evictCacheByPattern("Accommodation::" + accommodationId + "*");
 
         // 만약 삭제 작업일 경우에만 Room 캐시 삭제 수행
         if (isDeleteOperation(joinPoint)) {
@@ -55,7 +54,7 @@ public class AccommodationCacheAspect extends AbstractCacheAspect {
                     .getRooms().stream().map(Room::getId).toList();
 
             for (Long roomId : roomIdList) {
-                evictCacheByPattern("Room::" + roomId);
+                evictCacheByPattern("Room::" + roomId + "*");
             }
         } catch (NotFoundException e) {
             log.error("Failed to retrieve rooms for Accommodation ID: " + accommodationId, e);
