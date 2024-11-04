@@ -78,7 +78,7 @@ public class HostAccommodationController {
                                                  @PathVariable(name = "accommodationId") Long accommodationId) {
 
         String deleteMessage = hostAccommodationService.deleteAccommodation(customUserDetails, accommodationId);
-        return ResponseEntity.ok(ApiResponse.success("숙소 수정 성공", deleteMessage));
+        return ResponseEntity.ok(ApiResponse.success("숙소 삭제 성공", deleteMessage));
     }
 
 }

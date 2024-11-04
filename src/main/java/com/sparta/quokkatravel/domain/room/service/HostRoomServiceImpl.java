@@ -62,7 +62,7 @@ public class HostRoomServiceImpl implements HostRoomService {
         // 유저가 해당 숙소를 소유하고 있는지 확인
         Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("accommodation not found"));
 
-        if(!accommodation.getUser().equals(userDetails.getUser())) {
+        if(!accommodation.getUser().getEmail().equals(userDetails.getEmail())) {
             throw new AccessDeniedException("You do not have permission to access this accommodation");
         }
 

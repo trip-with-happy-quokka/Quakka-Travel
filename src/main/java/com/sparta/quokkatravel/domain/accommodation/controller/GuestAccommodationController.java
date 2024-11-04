@@ -1,6 +1,7 @@
 package com.sparta.quokkatravel.domain.accommodation.controller;
 
 import com.sparta.quokkatravel.domain.accommodation.dto.GuestAccommodationResponseDto;
+import com.sparta.quokkatravel.domain.accommodation.service.GuestAccommodationService;
 import com.sparta.quokkatravel.domain.accommodation.service.GuestAccommodationServiceImpl;
 import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,14 +22,16 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Accommodation", description = "Guest 숙소 관련 컨트롤러")
 public class GuestAccommodationController {
 
-    private final GuestAccommodationServiceImpl guestAccommodationServiceImpl;
+    private final GuestAccommodationService guestAccommodationService;
 
     // 숙소 전체 조회
     @GetMapping("/accommodations")
     @Operation(summary = "숙소 전체 조회", description = "숙소들을 조회하는 API")
-    public ResponseEntity<?> getAllAccommodation(@RequestParam(required = false) Pageable pageable) {
+    public ResponseEntity<?> getAllAccommodation(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                 @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
 
-        Page<GuestAccommodationResponseDto> accommodations = guestAccommodationServiceImpl.getAllAccommodation(pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<GuestAccommodationResponseDto> accommodations = guestAccommodationService.getAllAccommodation(pageable);
         return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", accommodations));
     }
 
@@ -37,7 +41,7 @@ public class GuestAccommodationController {
     public ResponseEntity<?> getAccommodation(@AuthenticationPrincipal CustomUserDetails userDetails,
                                               @PathVariable(name = "accommodationId") Long accommodationId) {
 
-        GuestAccommodationResponseDto guestAccommodationResponseDto = guestAccommodationServiceImpl.getAccommodation(userDetails.getUserId(), accommodationId);
+        GuestAccommodationResponseDto guestAccommodationResponseDto = guestAccommodationService.getAccommodation(userDetails.getUserId(), accommodationId);
         return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", guestAccommodationResponseDto));
     }
 }

@@ -33,6 +33,7 @@ public class Accommodation extends Timestamped {
 
     private String imageurl;
 
+    // LAZY => EAGER
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
