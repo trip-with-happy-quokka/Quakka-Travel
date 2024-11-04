@@ -1,6 +1,8 @@
 package com.sparta.quokkatravel.domain.event.entity;
 
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
+import com.sparta.quokkatravel.domain.event.dto.request.EventRequestDto;
+import com.sun.jdi.request.EventRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,5 +31,10 @@ public class Event {
     public Event(String name, String content) {
         this.name = name;
         this.content = content;
+    }
+
+    public void updateEvent(EventRequestDto eventRequestdto) {
+        this.name = eventRequestdto.getEventName();
+        this.content = eventRequestdto.getEventContent();
     }
 }

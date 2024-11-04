@@ -30,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.System.currentTimeMillis;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -42,6 +44,7 @@ public class CouponServiceImpl implements CouponService {
     private final UserRepository userRepository;
     private final RedissonClient redissonClient;
     private final CouponSearchRepository couponSearchRepository;
+    private final int EMPTY = 0;
 
     // 행사 쿠폰 발급 메서드
     @Override
@@ -81,7 +84,6 @@ public class CouponServiceImpl implements CouponService {
         CouponDocument couponDocument = new CouponDocument(savedCoupon);
         log.info("EventCouponDocument created: {}", couponDocument);
         couponSearchRepository.save(couponDocument);
-
 
         // 쿠폰을 CouponResponseDto 로 반환
         return new CouponResponseDto(
@@ -160,49 +162,28 @@ public class CouponServiceImpl implements CouponService {
     // 쿠폰 등록 메서드 ( 분산락 사용 )
     @Override
     @Transactional
-    public CouponCodeResponseDto registerCouponWithLock(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto){
+    public CouponCodeResponseDto registerCoupon(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto) {
 
+        // -------------------------- 유효성 검사 ------------------------------------------
         // userId 로 User 조회
         User user = userRepository.findByEmailOrElseThrow(email);
 
         // 쿠폰 코드로 쿠폰 찾기
         Coupon coupon = couponRepository.findByCode(couponCodeRequestDto.getCouponCode())
                 .orElseThrow(() -> new NotFoundException("coupon is not found"));
+        // -------------------------------------------------------------------------------
 
-        // 쿠폰 코드
-        String code = couponCodeRequestDto.getCouponCode();
+//            // 동시성 제어
+//            // 쿠폰 발급 (volume 하나 감소)
+//            coupon.decreaseVolume();
+        String key = coupon.getCode() + currentTimeMillis();
 
-        final String lockName = code + ":lock";
-        final RLock lock = redissonClient.getLock(lockName);
-        final String threadName = Thread.currentThread().getName();
+        decreaseVolumeWithLock(key);
 
-        try {
-            if (!lock.tryLock(1,3, TimeUnit.SECONDS)) {
-                throw new IllegalStateException("잠시 후 다시 시도 해주세요.");
-            }
 
-            final int volume = coupon.getVolume();
-            final int EMPTY = 0;
-            // 남은 쿠폰이 있는지 확인
-            if (volume <= EMPTY) {
-                log.info("threadName : {} / Coupons - sold out " , threadName);
-                throw new IllegalStateException("남은 쿠폰 이용권이 없습니다.");
-            }
-
-            log.info("threadName : {} / Available Coupons : {} 개 " , threadName, volume);
-            // 쿠폰 발급 (volume 하나 감소)
-            coupon.decreaseVolume();
             // 쿠폰 소유자 및 등록일자 등록
             // 쿠폰 사용 가능 상태로 변경
             coupon.registerCoupon(user);
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            if (lock != null && lock.isLocked()) {
-                lock.unlock();
-            }
-        }
 
         return new CouponCodeResponseDto(
                 coupon.getId(),
@@ -214,39 +195,57 @@ public class CouponServiceImpl implements CouponService {
         );
     }
 
-    // 쿠폰 등록 메서드
-    @Override
-    @Transactional
-    public CouponCodeResponseDto registerCouponWithoutLock(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto) {
+    public void decreaseVolumeWithLock(final String key) {
+        final String lockName = key + ":lock";
+        final RLock lock = redissonClient.getLock(lockName);
+        final String threadName = Thread.currentThread().getName();
 
-        // email 로 생성자 정보 불러오기
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("해당 유저 조회 불가"));
+        try {
+            if (!lock.tryLock(1, 3, TimeUnit.SECONDS)) {
+                return;
+            }
 
-        // 쿠폰 코드로 쿠폰 찾기
-        Coupon coupon = couponRepository.findByCode(couponCodeRequestDto.getCouponCode())
-                .orElseThrow(() -> new NotFoundException("coupon is not found"));
+            final int quantity = usableCoupon(key);
+            System.out.println("quantity : " + quantity);
+            if (quantity <= EMPTY) {
+                log.info("threadName : {} / 사용 가능 쿠폰 모두 소진", threadName);
+                return;
+            }
 
-        // 남은 쿠폰이 있는지 확인
-        if (coupon.getVolume() <= 0) {
-            throw new IllegalStateException("남은 쿠폰 이용권이 없습니다.");
+            log.info("threadName : {} / 사용 가능 쿠폰 수량 : {}개", threadName, quantity);
+            setUsableCoupon(key, quantity - 1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            if (lock != null && lock.isLocked()) {
+                lock.unlock();
+            }
+        }
+    }
+
+    public void decreaseVolumeWithoutLock(final String key) {
+        final String threadName = Thread.currentThread().getName();
+        final int quantity = usableCoupon(key);
+
+        if (quantity <= EMPTY) {
+            log.info("threadName : {} / 사용 가능 쿠폰 모두 소진", threadName);
+            return;
         }
 
-        // 쿠폰 발급 (volume 하나 감소)
-        coupon.decreaseVolume();
+        log.info("threadName : {} / 사용 가능 쿠폰 수량 : {}개", threadName, quantity);
+        setUsableCoupon(key, quantity - 1);
+    }
 
-        // 쿠폰 소유자 및 등록일자 등록
-        // 쿠폰 사용 가능 상태로 변경
-        coupon.registerCoupon(user);
-        couponRepository.save(coupon);
+    public String keyResolver(String code) {
+        return "COUPON:" + code;
+    }
 
-        return new CouponCodeResponseDto(
-                coupon.getId(),
-                coupon.getName(),
-                coupon.getCode(),
-                coupon.getCouponStatus(),
-                coupon.getValidFrom(),
-                coupon.getValidUntil()
-        );
+    public void setUsableCoupon(String key, int quantity) {
+        redissonClient.getBucket(key).set(quantity);
+    }
+
+    public int usableCoupon(String key) {
+        return (int) redissonClient.getBucket(key).get();
     }
 
     // 쿠폰 사용 메서드

@@ -14,8 +14,7 @@ public interface CouponService {
 
     CouponResponseDto createEventCoupon(String email, Long eventId, CouponRequestDto couponRequestDto);
     CouponResponseDto createAccommodationCoupon(String email, Long accommodationId, CouponRequestDto couponRequestDto);
-    CouponCodeResponseDto registerCouponWithLock(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto);
-    CouponCodeResponseDto registerCouponWithoutLock(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto);
+    CouponCodeResponseDto registerCoupon(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto);
     CouponRedeemResponseDto redeemCoupon(String email, Long userId, Long couponId);
     List<CouponResponseDto> getAllMyCoupons(String email, Long userId);
     CouponDeleteResponseDto deleteCoupon(String email, Long couponId);

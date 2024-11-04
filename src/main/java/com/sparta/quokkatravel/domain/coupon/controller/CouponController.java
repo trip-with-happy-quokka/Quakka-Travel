@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ public class CouponController {
 
     private final CouponService couponService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/events/{eventId}/coupons")
     @Operation(summary = "행사 쿠폰 발급", description = "관리자 권한으로 쿠폰을 발행하는 API")
     public ResponseEntity<?> createEventCoupon(
@@ -56,7 +58,7 @@ public class CouponController {
             @PathVariable Long userId,
             @Valid @RequestBody CouponCodeRequestDto couponCodeRequestDto) {
 
-        CouponCodeResponseDto couponCodeResponseDto = couponService.registerCouponWithLock(customUserDetails.getEmail(), userId, couponCodeRequestDto);
+        CouponCodeResponseDto couponCodeResponseDto = couponService.registerCoupon(customUserDetails.getEmail(), userId, couponCodeRequestDto);
         return ResponseEntity.ok(ApiResponse.created("쿠폰 등록 성공", couponCodeResponseDto));
     }
 
