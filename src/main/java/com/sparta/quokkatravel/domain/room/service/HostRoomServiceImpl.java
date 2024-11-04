@@ -42,7 +42,7 @@ public class HostRoomServiceImpl implements HostRoomService {
     }
 
     @Override
-    public HostRoomResponseDto getRoom(CustomUserDetails userDetails, Long accommodationId, Long roomId) {
+    public HostRoomResponseDto getRoomByHost(CustomUserDetails userDetails, Long accommodationId, Long roomId) {
 
         // 유저가 해당 숙소를 소유하고 있는지 확인
         Accommodation accommodation = accommodationRepository.findById(accommodationId)
@@ -62,7 +62,7 @@ public class HostRoomServiceImpl implements HostRoomService {
     }
 
     @Override
-    public Page<HostRoomResponseDto> getAllRoom(CustomUserDetails userDetails, Long accommodationId, Pageable pageable) {
+    public Page<HostRoomResponseDto> getAllRoomByHost(CustomUserDetails userDetails, Long accommodationId, Pageable pageable) {
 
         // 유저가 해당 숙소를 소유하고 있는지 확인
         Accommodation accommodation = accommodationRepository.findById(accommodationId)
