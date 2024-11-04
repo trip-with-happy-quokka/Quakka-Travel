@@ -1,11 +1,9 @@
 package com.sparta.quokkatravel.domain.reservation.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.room.entity.Room;
-import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
-import com.sparta.quokkatravel.domain.payment.entity.Payment;
+import com.sparta.quokkatravel.domain.common.shared.Timestamped;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -68,6 +66,10 @@ public class Reservation extends Timestamped {
         this.startDate = startDate;
         this.endDate = endDate;
         this.numberOfGuests = numberOfGuests;
+    }
+
+    public void updateStatus(ReservationStatus status) {
+        this.status = status;
     }
 
     public Long calculateTotalPrice(LocalDate startDate, LocalDate endDate, Room room, Coupon coupon) {

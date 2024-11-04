@@ -2,7 +2,6 @@ package com.sparta.quokkatravel.domain.coupon.service;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.exception.BadRequestException;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
@@ -16,15 +15,24 @@ import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
 import com.sparta.quokkatravel.domain.event.entity.Event;
 import com.sparta.quokkatravel.domain.event.repository.EventRepository;
+import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
+import com.sparta.quokkatravel.domain.search.document.CouponDocument;
+import com.sparta.quokkatravel.domain.search.repository.CouponSearchRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
-import com.sun.jdi.request.InvalidRequestStateException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import static java.lang.System.currentTimeMillis;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -34,6 +42,9 @@ public class CouponServiceImpl implements CouponService {
     private final EventRepository eventRepository;
     private final AccommodationRepository accommodationRepository;
     private final UserRepository userRepository;
+    private final RedissonClient redissonClient;
+    private final CouponSearchRepository couponSearchRepository;
+    private final int EMPTY = 0;
 
     // 행사 쿠폰 발급 메서드
     @Override
@@ -54,6 +65,7 @@ public class CouponServiceImpl implements CouponService {
                 couponRequestDto.getCouponName(),
                 couponRequestDto.getCouponContent(),
                 couponRequestDto.getCouponType(),
+                couponRequestDto.getVolume(),
                 newCouponCode,
                 CouponStatus.ISSUED,
                 couponRequestDto.getDiscountRate(),
@@ -66,12 +78,19 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 레퍼지토리에 쿠폰 데이터를 저장 (save)
         Coupon savedCoupon = couponRepository.save(newCoupon);
+        log.info("EventCoupon created: {}", savedCoupon);
+
+        // Accommodation Document Create For ElasticSearch
+        CouponDocument couponDocument = new CouponDocument(savedCoupon);
+        log.info("EventCouponDocument created: {}", couponDocument);
+        couponSearchRepository.save(couponDocument);
 
         // 쿠폰을 CouponResponseDto 로 반환
         return new CouponResponseDto(
                 savedCoupon.getId(),
                 savedCoupon.getName(),
                 savedCoupon.getCouponType(),
+                savedCoupon.getVolume(),
                 newCouponCode,
                 savedCoupon.getCouponStatus(),
                 savedCoupon.getDiscountRate(),
@@ -97,11 +116,13 @@ public class CouponServiceImpl implements CouponService {
         // UUID 로 쿠폰코드 발급
         String newCouponCode = new Coupon().createCouponCode();
 
+
         // RequestDto 데이터를 Coupon 에 전달
         Coupon newCoupon = new Coupon(
                 couponRequestDto.getCouponName(),
                 couponRequestDto.getCouponContent(),
                 couponRequestDto.getCouponType(),
+                couponRequestDto.getVolume(),
                 newCouponCode,
                 CouponStatus.ISSUED,
                 couponRequestDto.getDiscountRate(),
@@ -114,12 +135,19 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 레퍼지토리에 쿠폰 데이터를 저장 (save)
         Coupon savedCoupon = couponRepository.save(newCoupon);
+        log.info("AccommodationCoupon created: {}", savedCoupon);
+
+        // Accommodation Document Create For ElasticSearch
+        CouponDocument couponDocument = new CouponDocument(savedCoupon);
+        log.info("AccommodationCouponDocument created: {}", couponDocument);
+        couponSearchRepository.save(couponDocument);
 
         // 쿠폰을 CouponResponseDto 로 반환
         return new CouponResponseDto(
                 savedCoupon.getId(),
                 savedCoupon.getName(),
                 savedCoupon.getCouponType(),
+                savedCoupon.getVolume(),
                 newCouponCode,
                 savedCoupon.getCouponStatus(),
                 savedCoupon.getDiscountRate(),
@@ -131,21 +159,31 @@ public class CouponServiceImpl implements CouponService {
         );
     }
 
-    // 쿠폰 등록 메서드
+    // 쿠폰 등록 메서드 ( 분산락 사용 )
     @Override
     @Transactional
-    public CouponCodeResponseDto registerCoupon(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto){
+    public CouponCodeResponseDto registerCoupon(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto) {
 
+        // -------------------------- 유효성 검사 ------------------------------------------
         // userId 로 User 조회
         User user = userRepository.findByEmailOrElseThrow(email);
 
         // 쿠폰 코드로 쿠폰 찾기
         Coupon coupon = couponRepository.findByCode(couponCodeRequestDto.getCouponCode())
                 .orElseThrow(() -> new NotFoundException("coupon is not found"));
+        // -------------------------------------------------------------------------------
 
-        // 쿠폰 소유자 및 등록일자 등록
-        // 쿠폰 사용 가능 상태로 변경
-        coupon.registerCoupon(user);
+//            // 동시성 제어
+//            // 쿠폰 발급 (volume 하나 감소)
+//            coupon.decreaseVolume();
+        String key = coupon.getCode() + currentTimeMillis();
+
+        decreaseVolumeWithLock(key);
+
+
+            // 쿠폰 소유자 및 등록일자 등록
+            // 쿠폰 사용 가능 상태로 변경
+            coupon.registerCoupon(user);
 
         return new CouponCodeResponseDto(
                 coupon.getId(),
@@ -157,7 +195,62 @@ public class CouponServiceImpl implements CouponService {
         );
     }
 
+    public void decreaseVolumeWithLock(final String key) {
+        final String lockName = key + ":lock";
+        final RLock lock = redissonClient.getLock(lockName);
+        final String threadName = Thread.currentThread().getName();
+
+        try {
+            if (!lock.tryLock(1, 3, TimeUnit.SECONDS)) {
+                return;
+            }
+
+            final int quantity = usableCoupon(key);
+            System.out.println("quantity : " + quantity);
+            if (quantity <= EMPTY) {
+                log.info("threadName : {} / 사용 가능 쿠폰 모두 소진", threadName);
+                return;
+            }
+
+            log.info("threadName : {} / 사용 가능 쿠폰 수량 : {}개", threadName, quantity);
+            setUsableCoupon(key, quantity - 1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            if (lock != null && lock.isLocked()) {
+                lock.unlock();
+            }
+        }
+    }
+
+    public void decreaseVolumeWithoutLock(final String key) {
+        final String threadName = Thread.currentThread().getName();
+        final int quantity = usableCoupon(key);
+
+        if (quantity <= EMPTY) {
+            log.info("threadName : {} / 사용 가능 쿠폰 모두 소진", threadName);
+            return;
+        }
+
+        log.info("threadName : {} / 사용 가능 쿠폰 수량 : {}개", threadName, quantity);
+        setUsableCoupon(key, quantity - 1);
+    }
+
+    public String keyResolver(String code) {
+        return "COUPON:" + code;
+    }
+
+    public void setUsableCoupon(String key, int quantity) {
+        redissonClient.getBucket(key).set(quantity);
+    }
+
+    public int usableCoupon(String key) {
+        return (int) redissonClient.getBucket(key).get();
+    }
+
+    // 쿠폰 사용 메서드
     @Override
+    @Transactional
     public CouponRedeemResponseDto redeemCoupon(String email, Long userId, Long couponId){
 
         // userId 로 User 조회
@@ -168,6 +261,7 @@ public class CouponServiceImpl implements CouponService {
 
         // coupon 상태 => 사용됨으로 변경
         coupon.redeemCoupon();
+        couponRepository.save(coupon);
 
         return new CouponRedeemResponseDto(
                 coupon.getId(),
@@ -199,6 +293,7 @@ public class CouponServiceImpl implements CouponService {
                 coupon.getId(),
                 coupon.getName(),
                 coupon.getCouponType(),
+                coupon.getVolume(),
                 coupon.getCode(),
                 coupon.getCouponStatus(),
                 coupon.getDiscountRate(),
@@ -220,7 +315,13 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 삭제여부 변경
         coupon.deleteCoupon();
+        log.info("Coupon deleted: {}", coupon);
         couponRepository.save(coupon);
+
+        // Accommodation Document Create For ElasticSearch
+        CouponDocument couponDocument = couponSearchRepository.findByCouponIdOrElseThrow(couponId);
+        log.info("CouponDocument deleted: {}", couponDocument);
+        couponSearchRepository.delete(couponDocument);
 
         return new CouponDeleteResponseDto(
                 coupon.getId(),

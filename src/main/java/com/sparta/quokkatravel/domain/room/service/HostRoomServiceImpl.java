@@ -1,11 +1,11 @@
 package com.sparta.quokkatravel.domain.room.service;
 
-import com.sparta.quokkatravel.domain.accommodation.dto.GuestAccommodationResponseDto;
-import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationResponseDto;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.aop.InvalidateAccommodationCache;
+import com.sparta.quokkatravel.domain.common.aop.InvalidateRoomCache;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
+import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.room.dto.HostRoomResponseDto;
 import com.sparta.quokkatravel.domain.room.dto.RoomRequestDto;
 import com.sparta.quokkatravel.domain.room.entity.Room;
@@ -30,7 +30,7 @@ public class HostRoomServiceImpl implements HostRoomService {
 
     @Override
     @Transactional
-    public HostRoomResponseDto createRoom(String email, Long accommodationId, RoomRequestDto roomRequestDto) {
+    public HostRoomResponseDto createRoom(CustomUserDetails userDetails, Long accommodationId, RoomRequestDto roomRequestDto) {
         Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("accommodation not found"));
         Room room = new Room(roomRequestDto, accommodation);
         roomRepository.save(room);
@@ -38,15 +38,14 @@ public class HostRoomServiceImpl implements HostRoomService {
     }
 
     @Override
-    public HostRoomResponseDto getRoom(String email, Long accommodationId, Long roomId) {
-        // 유저 조회
-        User user = userRepository.findByEmailOrElseThrow(email);
+    public HostRoomResponseDto getRoom(CustomUserDetails userDetails, Long accommodationId, Long roomId) {
 
         // 유저가 해당 숙소를 소유하고 있는지 확인
-        Accommodation accommodation = user.getAccommodations().stream()
-                .filter(acc -> acc.getId().equals(accommodationId))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("You do not own this accommodation"));
+        Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("accommodation not found"));
+
+        if(!accommodation.getUser().equals(userDetails.getUser())) {
+            throw new AccessDeniedException("You do not have permission to access this accommodation");
+        }
 
         // 숙소에 속한 객실(Room) 조회
         Room room = accommodation.getRooms().stream()
@@ -58,16 +57,14 @@ public class HostRoomServiceImpl implements HostRoomService {
     }
 
     @Override
-    public Page<HostRoomResponseDto> getAllRoom(String email, Long accommodationId, Pageable pageable) {
-
-        // 유저 조회
-        User user = userRepository.findByEmailOrElseThrow(email);
+    public Page<HostRoomResponseDto> getAllRoom(CustomUserDetails userDetails, Long accommodationId, Pageable pageable) {
 
         // 유저가 해당 숙소를 소유하고 있는지 확인
-        Accommodation accommodation = user.getAccommodations().stream()
-                .filter(acc -> acc.getId().equals(accommodationId))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("You do not own this accommodation"));
+        Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("accommodation not found"));
+
+        if(!accommodation.getUser().equals(userDetails.getUser())) {
+            throw new AccessDeniedException("You do not have permission to access this accommodation");
+        }
 
         return roomRepository.findByAccommodation(accommodation, pageable)
                 .map(HostRoomResponseDto::new);
@@ -75,8 +72,9 @@ public class HostRoomServiceImpl implements HostRoomService {
 
     @Override
     @Transactional
-    public HostRoomResponseDto updateRoom(String email, Long roomId, RoomRequestDto roomRequestDto) {
-        User user = userRepository.findByEmailOrElseThrow(email);
+    @InvalidateRoomCache
+    public HostRoomResponseDto updateRoom(CustomUserDetails userDetails, Long roomId, RoomRequestDto roomRequestDto) {
+        User user = userDetails.getUser();
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room Not Found"));
 
         if(!room.getAccommodation().getUser().equals(user)) {
@@ -90,8 +88,9 @@ public class HostRoomServiceImpl implements HostRoomService {
 
     @Override
     @Transactional
-    public String deleteRoom(String email, Long roomId) {
-        User user = userRepository.findByEmailOrElseThrow(email);
+    @InvalidateRoomCache
+    public String deleteRoom(CustomUserDetails userDetails, Long roomId) {
+        User user = userDetails.getUser();
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room Not Found"));
 
         if(!room.getAccommodation().getUser().equals(user)) {

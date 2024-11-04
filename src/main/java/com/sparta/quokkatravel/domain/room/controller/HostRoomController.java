@@ -1,17 +1,15 @@
 package com.sparta.quokkatravel.domain.room.controller;
 
-import com.sparta.quokkatravel.domain.accommodation.dto.AccommodationRequestDto;
-import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationResponseDto;
-import com.sparta.quokkatravel.domain.accommodation.service.HostAccommodationService;
-import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
+import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.room.dto.HostRoomResponseDto;
 import com.sparta.quokkatravel.domain.room.dto.RoomRequestDto;
 import com.sparta.quokkatravel.domain.room.service.HostRoomService;
-import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +33,7 @@ public class HostRoomController {
                                                  @PathVariable Long accommodationId,
                                                  @RequestBody RoomRequestDto roomRequestDto) {
 
-        HostRoomResponseDto hostRoomResponseDto = hostRoomService.createRoom(customUserDetails.getEmail(), accommodationId, roomRequestDto);
+        HostRoomResponseDto hostRoomResponseDto = hostRoomService.createRoom(customUserDetails, accommodationId, roomRequestDto);
         return ResponseEntity.ok(ApiResponse.created("객실 생성 성공", hostRoomResponseDto));
     }
 
@@ -46,7 +44,7 @@ public class HostRoomController {
                                                  @PathVariable Long accommodationId,
                                                  @RequestParam(required = false) Pageable pageable) {
 
-        Page<HostRoomResponseDto> rooms = hostRoomService.getAllRoom(customUserDetails.getEmail(), accommodationId, pageable);
+        Page<HostRoomResponseDto> rooms = hostRoomService.getAllRoom(customUserDetails, accommodationId, pageable);
         return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", rooms));
     }
 
@@ -57,28 +55,30 @@ public class HostRoomController {
                                               @PathVariable(name = "accommodationId") Long accommodationId,
                                               @PathVariable(name = "roomId") Long roomId) {
 
-        HostRoomResponseDto hostRoomResponseDto = hostRoomService.getRoom(customUserDetails.getEmail(), accommodationId, roomId);
+        HostRoomResponseDto hostRoomResponseDto = hostRoomService.getRoom(customUserDetails, accommodationId, roomId);
         return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", hostRoomResponseDto));
     }
 
     // 숙소 수정
     @PutMapping("/accommodations/{accommodationId}/rooms/{roomId}")
+    @CachePut(value = "Room", key = "#roomId", cacheManager = "cacheManager")
     @Operation(summary = "숙소 수정", description = "HOST 유저의 특정 숙소를 수정하는 API")
     public ResponseEntity<?> updateAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                  @PathVariable(name = "roomId") Long roomId,
                                                  @RequestBody RoomRequestDto roomRequestDto) {
 
-        HostRoomResponseDto hostRoomResponseDto = hostRoomService.updateRoom(customUserDetails.getEmail(), roomId, roomRequestDto);
+        HostRoomResponseDto hostRoomResponseDto = hostRoomService.updateRoom(customUserDetails, roomId, roomRequestDto);
         return ResponseEntity.ok(ApiResponse.success("숙소 수정 성공", hostRoomResponseDto));
     }
 
     // 숙소 삭제
     @DeleteMapping("/accommodations/{accommodationId}/rooms/{roomId}")
+    @CacheEvict(value = "Room", key = "#roomId", cacheManager = "cacheManager")
     @Operation(summary = "숙소 삭제", description = "HOST 유저의 특정 숙소를 삭제하는 API")
     public ResponseEntity<?> updateAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                  @PathVariable(name = "accommodationId") Long accommodationId) {
 
-        String deleteMessage = hostRoomService.deleteRoom(customUserDetails.getEmail(), accommodationId);
+        String deleteMessage = hostRoomService.deleteRoom(customUserDetails, accommodationId);
         return ResponseEntity.ok(ApiResponse.success("숙소 수정 성공", deleteMessage));
     }
 }

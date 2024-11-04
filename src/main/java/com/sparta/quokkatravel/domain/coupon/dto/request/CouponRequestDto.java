@@ -22,6 +22,10 @@ public class CouponRequestDto {
     @NotBlank(message = "쿠폰 타입을 입력해주세요. ( Accommodation 또는 Event )")
     private String couponType;
 
+    @Min(0)
+    @NotBlank(message = "발행할 쿠폰 수량을 입력해주세요.")
+    private Integer volume;
+
     @Min(value = 0, message = "할인율은 0이상 100이하로 입력해주세요.")
     @Max(value = 100, message = "할인율은 0이상 100이하로 입력해주세요.")
     private int discountRate;

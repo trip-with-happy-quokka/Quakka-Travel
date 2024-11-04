@@ -1,0 +1,120 @@
+PUT http://43.202.0.210:9200/coupon1
+Content-Type: application/json
+Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
+
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_analyzer": {
+          "type": "custom",
+          "tokenizer": "my_nori_tokenizer",
+          "filter": ["nori_posfilter"]
+        },
+        "mixed_korean_english_analyzer": {
+          "type": "custom",
+          "tokenizer": "whitespace",
+          "filter": ["lowercase"]
+        },
+        "nori_analyzer": {
+          "type": "custom",
+          "tokenizer": "nori_tokenizer",
+          "filter": ["lowercase"]
+        },
+        "english_ngram_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "edge_ngram_filter"]
+        }
+      },
+      "tokenizer": {
+        "my_nori_tokenizer": {
+          "type": "nori_tokenizer",
+          "decompound_mode": "mixed"
+        }
+      },
+      "filter": {
+        "edge_ngram_filter": {
+          "type": "edge_ngram",
+          "min_gram": 2,
+          "max_gram": 10
+        },
+        "nori_posfilter": {
+          "type": "nori_part_of_speech",
+          "stoptags": [
+            "E", "IC", "J", "MAG", "MAJ", "MM", "NA", "NR",
+            "SC", "SE", "SF", "SH", "SL", "SN", "SP",
+            "SSC", "SSO", "SY", "UNA", "UNKNOWN",
+            "VA", "VCN", "VCP", "VSV", "VV", "VX",
+            "XPN", "XR", "XSA", "XSN", "XSV"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "text"
+      },
+      "couponId": {
+        "type": "long"
+      },
+      "name": {
+        "type": "text",
+        "analyzer": "mixed_korean_english_analyzer",
+        "fields": {
+          "english_field": {
+            "type": "text",
+            "analyzer": "english_ngram_analyzer"
+          },
+          "korean_field": {
+            "type": "text",
+            "analyzer": "my_analyzer"
+          }
+        }
+      },
+      "koreanPartOfName": {
+        "type": "text",
+        "analyzer": "my_analyzer"
+      },
+      "englishPartOfName": {
+        "type": "text",
+        "analyzer": "english_ngram_analyzer"
+      },
+      "content": {
+        "type": "text",
+        "analyzer": "nori_analyzer"
+      },
+      "couponType": {
+        "type": "keyword"
+      },
+      "volume": {
+        "type": "long"
+      },
+      "code": {
+        "type": "keyword"
+      },
+      "couponStatus": {
+        "type": "keyword"
+      },
+      "validFrom": {
+        "type": "date",
+        "format": "yyyy-MM-dd"
+      },
+      "validUntil": {
+        "type": "date",
+        "format": "yyyy-MM-dd"
+      },
+      "accommodation": {
+        "type": "text"
+      },
+      "event": {
+        "type": "text"
+      },
+      "createdBy": {
+        "type": "text"
+      }
+    }
+  }
+}

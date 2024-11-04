@@ -13,6 +13,9 @@ spring:
       host: localhost
       port: 6379
 
+  elasticsearch:
+    uris: localhost
+
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}

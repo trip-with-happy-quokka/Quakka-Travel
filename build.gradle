@@ -36,14 +36,19 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.5.1.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.1.Final'
 
-    // jackson
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-
     // json
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 
     // WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    // reactor-netty * 필수 외부 STOMP 사용*
+    implementation "org.springframework.boot:spring-boot-starter-reactor-netty"
+    // rabbit
+    implementation "org.springframework.boot:spring-boot-starter-amqp"
+    // rabbit jackson
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.15.1"
+    // jackson2json LocalDateTime handling
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2"
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -76,9 +81,20 @@ dependencies {
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // redisson
+    implementation 'org.redisson:redisson-spring-boot-starter:3.16.3'
 
     // aws
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    // elasticsearch
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'co.elastic.clients:elasticsearch-java:8.10.2'
+
+    // Monitoring
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator' // actuator 추가
+    implementation 'io.micrometer:micrometer-registry-prometheus' // prometheus 추가
 
 }
 

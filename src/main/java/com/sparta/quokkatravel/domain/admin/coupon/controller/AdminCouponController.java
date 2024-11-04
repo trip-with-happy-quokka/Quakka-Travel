@@ -3,7 +3,7 @@ package com.sparta.quokkatravel.domain.admin.coupon.controller;
 import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponCreateRequestDto;
 import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponResponseDto;
 import com.sparta.quokkatravel.domain.admin.coupon.service.AdminCouponService;
-import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

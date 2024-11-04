@@ -1,7 +1,7 @@
 package com.sparta.quokkatravel.domain.coupon.controller;
 
-import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
+import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponRequestDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponCodeResponseDto;
@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ public class CouponController {
 
     private final CouponService couponService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/events/{eventId}/coupons")
     @Operation(summary = "행사 쿠폰 발급", description = "관리자 권한으로 쿠폰을 발행하는 API")
     public ResponseEntity<?> createEventCoupon(

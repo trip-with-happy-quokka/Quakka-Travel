@@ -1,0 +1,10 @@
+POST http://43.202.0.210:9200/index005/_analyze
+Content-Type: application/json
+Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
+
+{
+  "analyzer": "my_analyzer",
+  "text": "안기모씨의 은하수 별나라 펜션이 달린다"
+}
+
+
