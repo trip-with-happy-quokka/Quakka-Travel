@@ -39,11 +39,14 @@ public class HostRoomServiceImpl implements HostRoomService {
 
     @Override
     public HostRoomResponseDto getRoom(CustomUserDetails userDetails, Long accommodationId, Long roomId) {
+        // 이메일로 User 조회
+        User user = userRepository.findByEmailOrElseThrow(userDetails.getEmail());
 
         // 유저가 해당 숙소를 소유하고 있는지 확인
-        Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("accommodation not found"));
+        Accommodation accommodation = accommodationRepository.findById(accommodationId)
+                .orElseThrow(() -> new NotFoundException("accommodation not found"));
 
-        if(!accommodation.getUser().equals(userDetails.getUser())) {
+        if (!accommodation.getUser().equals(user)) {
             throw new AccessDeniedException("You do not have permission to access this accommodation");
         }
 
@@ -58,11 +61,14 @@ public class HostRoomServiceImpl implements HostRoomService {
 
     @Override
     public Page<HostRoomResponseDto> getAllRoom(CustomUserDetails userDetails, Long accommodationId, Pageable pageable) {
+        // 이메일로 User 조회
+        User user = userRepository.findByEmailOrElseThrow(userDetails.getEmail());
 
         // 유저가 해당 숙소를 소유하고 있는지 확인
-        Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("accommodation not found"));
+        Accommodation accommodation = accommodationRepository.findById(accommodationId)
+                .orElseThrow(() -> new NotFoundException("accommodation not found"));
 
-        if(!accommodation.getUser().equals(userDetails.getUser())) {
+        if (!accommodation.getUser().equals(user)) {
             throw new AccessDeniedException("You do not have permission to access this accommodation");
         }
 
@@ -74,14 +80,18 @@ public class HostRoomServiceImpl implements HostRoomService {
     @Transactional
     @InvalidateRoomCache
     public HostRoomResponseDto updateRoom(CustomUserDetails userDetails, Long roomId, RoomRequestDto roomRequestDto) {
-        User user = userDetails.getUser();
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room Not Found"));
+        // 이메일로 User 조회
+        User user = userRepository.findByEmailOrElseThrow(userDetails.getEmail());
 
-        if(!room.getAccommodation().getUser().equals(user)) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new NotFoundException("Room Not Found"));
+
+        if (!room.getAccommodation().getUser().equals(user)) {
             throw new AccessDeniedException("You do not have permission to update this accommodation");
         }
 
-        room.update(roomRequestDto.getName(), roomRequestDto.getDescription(), roomRequestDto.getCapacity(), roomRequestDto.getPricePerOverCapacity(), roomRequestDto.getPricePerNight());
+        room.update(roomRequestDto.getName(), roomRequestDto.getDescription(),
+                roomRequestDto.getCapacity(), roomRequestDto.getPricePerOverCapacity(), roomRequestDto.getPricePerNight());
 
         return new HostRoomResponseDto(room);
     }
@@ -90,12 +100,16 @@ public class HostRoomServiceImpl implements HostRoomService {
     @Transactional
     @InvalidateRoomCache
     public String deleteRoom(CustomUserDetails userDetails, Long roomId) {
-        User user = userDetails.getUser();
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room Not Found"));
+        // 이메일로 User 조회
+        User user = userRepository.findByEmailOrElseThrow(userDetails.getEmail());
 
-        if(!room.getAccommodation().getUser().equals(user)) {
-            throw new AccessDeniedException("You do not have permission to update this accommodation");
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new NotFoundException("Room Not Found"));
+
+        if (!room.getAccommodation().getUser().equals(user)) {
+            throw new AccessDeniedException("You do not have permission to delete this accommodation");
         }
+
         roomRepository.delete(room);
         return "Room Deleted Successfully";
     }
