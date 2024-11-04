@@ -44,7 +44,7 @@ public class CouponRegisterTest {
         String couponkey = coupon.get().createCouponCode() + currentTimeMillis();
 
         // 100 개 카운트 넣어주기
-//        redissonClient.getBucket(couponkey).set(100);
+        redissonClient.getBucket(couponkey).set(100);
 
         List<Thread> threadList = Stream
                 .generate(() -> new Thread(new UsingLockCoupon(couponkey, countDownLatch)))
