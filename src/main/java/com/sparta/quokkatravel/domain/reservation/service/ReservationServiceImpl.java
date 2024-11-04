@@ -13,6 +13,8 @@ import com.sparta.quokkatravel.domain.reservation.repository.ReservationReposito
 import com.sparta.quokkatravel.domain.room.repository.RoomRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final RoomRepository roomRepository;
     private final CouponRepository couponRepository;
     private final NotificationService notificationService;
+    private final MeterRegistry meterRegistry;
 
     // 예약 생성
     @Override
@@ -51,6 +54,14 @@ public class ReservationServiceImpl implements ReservationService {
 
         Reservation reservation = new Reservation(reservationRequestDto.getStartDate(), reservationRequestDto.getEndDate(), reservationRequestDto.getNumberOfGuests(), user, room, coupon);
         reservationRepository.save(reservation);
+
+        // 예약 생성 카운터 증가
+        Counter.builder("reservation.create.count")
+                .tag("class", this.getClass().getName())
+                .tag("method", "createReservation")
+                .description("Counts the number of reservation creations")
+                .register(meterRegistry)
+                .increment();
 
         notificationService.sendRealTimeNotification(" 예약 생성 완료 ", room.getName().toString() + " 방이 예약되었습니다. ");
 
@@ -115,6 +126,14 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         reservationRepository.deleteById(reservationId);
+
+        // 예약 삭제 카운터 증가
+        Counter.builder("reservation.cancel.count")
+                .tag("class", this.getClass().getName())
+                .tag("method", "cancelReservation")
+                .description("Counts the number of reservation cancellations")
+                .register(meterRegistry)
+                .increment();
 
         notificationService.sendRealTimeNotification(" 예약 취소 완료 ", room.getName().toString() + " 방이 취소되었습니다. ");
 
