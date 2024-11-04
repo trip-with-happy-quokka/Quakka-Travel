@@ -4,8 +4,10 @@ import com.sparta.quokkatravel.domain.admin.loginhistory.dto.AdminLoginHistoryRe
 import com.sparta.quokkatravel.domain.admin.loginhistory.entity.LoginHistory;
 import com.sparta.quokkatravel.domain.admin.loginhistory.repository.LoginHistoryRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
+import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,17 +16,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AdminLoginHistoryService {
 
     private final LoginHistoryRepository loginHistoryRepository;
-
-    public AdminLoginHistoryService(LoginHistoryRepository loginHistoryRepository) {
-        this.loginHistoryRepository = loginHistoryRepository;
-    }
+    private final UserRepository userRepository; // 추가
 
     @PersistenceContext
     private EntityManager entityManager; // EntityManager 주입
-
 
     // 모든 로그인 기록 조회
     public List<AdminLoginHistoryResponseDto> getAllLoginHistory() {
@@ -44,11 +43,10 @@ public class AdminLoginHistoryService {
 
     // 새로운 로그인 기록 저장 메서드
     @Transactional
-    public void saveLoginHistory(User user, String ipAddress) {
-        User managedUser = entityManager.find(User.class, user.getId()); // User를 영속성 컨텍스트에서 조회
-        if (managedUser != null) { // 조회가 성공했을 때만 처리
-            LoginHistory loginHistory = new LoginHistory(managedUser, ipAddress, LocalDateTime.now());
-            loginHistoryRepository.save(loginHistory);
-        }
+    public void saveLoginHistory(Long userId, String ipAddress) {
+        User managedUser = userRepository.findById(userId) // userId로 User 조회
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 사용자를 찾을 수 없습니다: " + userId));
+        LoginHistory loginHistory = new LoginHistory(managedUser, ipAddress, LocalDateTime.now());
+        loginHistoryRepository.save(loginHistory); // 조회된 User를 사용하여 로그인 기록 저장
     }
 }
