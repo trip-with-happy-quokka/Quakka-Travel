@@ -8,6 +8,7 @@ import com.sparta.quokkatravel.domain.reservation.service.ReservationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,7 +38,10 @@ public class ReservationController {
     // 에약 전체 조회
     @GetMapping("/reservations")
     public ResponseEntity<?> getAllReservations(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                @RequestParam(required = false) Pageable pageable) {
+                                                @RequestParam(required = false, defaultValue = "0") int pageNo,
+                                                @RequestParam(required = false, defaultValue = "10") int pageSize) {
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
 
         Page<ReservationResponseDto> reservations = reservationService.getAllReservation(userDetails.getEmail(), pageable);
         return ResponseEntity.ok(ApiResponse.success("예약 전체 조회 성공", reservations));
