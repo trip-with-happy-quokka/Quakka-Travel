@@ -14,6 +14,4 @@ public class AccommodationRepositorySupport extends QuerydslRepositorySupport {
         super(Accommodation.class);
         this.queryFactory = queryFactory;
     }
-
-
 }
