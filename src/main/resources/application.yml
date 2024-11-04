@@ -12,6 +12,9 @@ spring:
         format_sql: false
 
 server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
   servlet:
     encoding:
       charset: UTF-8
