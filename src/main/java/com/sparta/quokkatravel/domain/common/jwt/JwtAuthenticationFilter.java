@@ -25,7 +25,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService customUserDetailsService;
-    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler; // 추가된 필드
     private final AdminLoginHistoryService adminLoginHistoryService; // 추가된 필드
 
 
@@ -60,9 +59,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // UserDetails가 User 타입인지 확인한 후 기록 남기기
                 if (userDetails instanceof CustomUserDetails) {
-                    User user = ((CustomUserDetails) userDetails).getUser();
+                    Long userId = ((CustomUserDetails) userDetails).getUserId();
                     String ipAddress = request.getRemoteAddr();
-                    adminLoginHistoryService.saveLoginHistory(user, ipAddress);
+                    adminLoginHistoryService.saveLoginHistory(userId, ipAddress);
                 }
             }
         }
