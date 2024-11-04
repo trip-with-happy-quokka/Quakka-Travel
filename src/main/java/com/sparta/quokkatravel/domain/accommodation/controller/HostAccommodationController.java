@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,8 +45,10 @@ public class HostAccommodationController {
     @GetMapping("/accommodations")
     @Operation(summary = "숙소 전체 조회", description = "HOST 유저의 숙소들을 조회하는 API")
     public ResponseEntity<?> getAllAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                 @RequestParam(required = false) Pageable pageable) {
+                                                 @RequestParam(required = false, defaultValue = "0") int pageNo,
+                                                 @RequestParam(required = false, defaultValue = "10") int pageSize) {
 
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
         Page<HostAccommodationResponseDto> accommodations = hostAccommodationService.getAllAccommodation(customUserDetails, pageable);
         return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", accommodations));
     }

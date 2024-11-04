@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,7 +29,10 @@ public class GuestRoomController {
     @GetMapping("/accommodations/{accommodationId}/rooms")
     @Operation(summary = "객실 전체 조회", description = "객실들을 조회하는 API")
     public ResponseEntity<?> getAllRooms(@PathVariable(name = "accommodationId") Long accomodationId,
-                                         @RequestParam(required = false) Pageable pageable) {
+                                         @RequestParam(required = false, defaultValue = "0") int pageNo,
+                                         @RequestParam(required = false, defaultValue = "10") int pageSize) {
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
 
         Page<GuestRoomResponseDto> rooms = guestRoomService.getAllRoom(accomodationId, pageable);
         return ResponseEntity.ok(ApiResponse.success("객실 조회 성공", rooms));
