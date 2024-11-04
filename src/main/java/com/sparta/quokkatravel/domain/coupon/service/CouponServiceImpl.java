@@ -224,8 +224,6 @@ public class CouponServiceImpl implements CouponService {
     }
 
     public void decreaseVolumeWithoutLock(final String key) {
-
-
         final String threadName = Thread.currentThread().getName();
         final int quantity = usableCoupon(key);
 

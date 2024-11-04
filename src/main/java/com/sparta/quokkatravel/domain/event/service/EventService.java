@@ -10,6 +10,6 @@ public interface EventService {
 
     EventResponseDto createEvent(String email, EventRequestDto eventRequestDto);
     List<EventResponseDto> getAllEvents(String email);
-    EventResponseDto updateEvent(String email, EventRequestDto eventRequestDto);
-    EventResponseDto deleteEvent(String email);
+    EventResponseDto updateEvent(String email, Long eventId, EventRequestDto eventRequestDto);
+    String deleteEvent(String email, Long eventId);
 }

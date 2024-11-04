@@ -1,5 +1,6 @@
 package com.sparta.quokkatravel.domain.event.service;
 
+import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.event.dto.request.EventRequestDto;
 import com.sparta.quokkatravel.domain.event.dto.response.EventResponseDto;
 import com.sparta.quokkatravel.domain.event.entity.Event;
@@ -43,17 +44,40 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventResponseDto> getAllEvents(String email) {
 
+        List<Event> eventList = eventRepository.findAll();
+
+        return eventList.stream().map(event -> new EventResponseDto(
+                event.getId(),
+                event.getName(),
+                event.getContent()
+        )).toList();
     }
 
     @Override
     @Transactional
-    public EventResponseDto updateEvent(String email, EventRequestDto eventRequestDto) {
+    public EventResponseDto updateEvent(String email, Long eventId, EventRequestDto eventRequestDto) {
 
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("해당 이벤트 조회 불가"));
+
+        event.updateEvent(eventRequestDto);
+
+        return new EventResponseDto(
+                event.getId(),
+                event.getName(),
+                event.getContent()
+        );
     }
 
     @Override
     @Transactional
-    public EventResponseDto deleteEvent(String email) {
+    public String deleteEvent(String email, Long eventId) {
 
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("해당 이벤트 조회 불가"));
+
+        eventRepository.delete(event);
+
+        return "Event Deleted";
     }
 }

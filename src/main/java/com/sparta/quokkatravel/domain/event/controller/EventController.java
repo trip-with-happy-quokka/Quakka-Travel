@@ -46,8 +46,23 @@ public class EventController {
     }
 
     @PutMapping("/events/{eventId}")
-    @Oper
+    @Operation(summary = "행사 정보 변경", description = "행사 정보 변경하는 API")
+    public ResponseEntity<?> updateEvent(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long eventId,
+            @Valid @RequestBody EventRequestDto eventRequestDto
+    ) {
+        EventResponseDto eventResponseDto = eventService.updateEvent(customUserDetails.getEmail(), eventId, eventRequestDto);
+        return ResponseEntity.ok(ApiResponse.success("행사 정보 변경 성공", eventResponseDto));
+    }
 
-
-
+    @DeleteMapping("/events/{eventId}")
+    @Operation(summary = "행사 삭제", description = "행사 삭제하는 API")
+    public ResponseEntity<?> deleteEvent(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long eventId
+    ) {
+        String deleteMessage = eventService.deleteEvent(customUserDetails.getEmail(), eventId);
+        return ResponseEntity.ok(ApiResponse.success("행사 삭제 성공", deleteMessage));
+    }
 }
