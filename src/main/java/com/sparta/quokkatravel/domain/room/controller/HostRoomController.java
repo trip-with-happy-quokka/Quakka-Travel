@@ -65,7 +65,6 @@ public class HostRoomController {
 
     // 숙소 내 객실 수정
     @PutMapping("/accommodations/{accommodationId}/rooms/{roomId}")
-    @CachePut(value = "Room", key = "#roomId", cacheManager = "cacheManager")
     @Operation(summary = "객실 수정", description = "HOST 유저의 특정 객실 정보를 수정하는 API")
     public ResponseEntity<?> updateRoom(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                  @PathVariable(name = "roomId") Long roomId,
@@ -77,12 +76,11 @@ public class HostRoomController {
 
     // 숙소 내 객실 삭제
     @DeleteMapping("/accommodations/{accommodationId}/rooms/{roomId}")
-    @CacheEvict(value = "Room", key = "#roomId", cacheManager = "cacheManager")
     @Operation(summary = "객실 삭제", description = "HOST 유저의 특정 객실을 삭제하는 API")
     public ResponseEntity<?> deleteRoom(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                 @PathVariable(name = "accommodationId") Long accommodationId) {
+                                                 @PathVariable(name = "roomId") Long roomId) {
 
-        String deleteMessage = hostRoomService.deleteRoom(customUserDetails, accommodationId);
+        String deleteMessage = hostRoomService.deleteRoom(customUserDetails, roomId);
         return ResponseEntity.ok(ApiResponse.success("객실 삭제 성공", deleteMessage));
     }
 }
