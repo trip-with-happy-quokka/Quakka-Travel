@@ -70,6 +70,16 @@ public class User extends Timestamped {
     public void updateStatus(String status) {
         this.status = status;
     }
+
+
+    // Test Code 작성용 메서드
+    public User(Long userId, String email, String password, String nickname, UserRole userRole) {
+        this.id = userId;
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.userRole = userRole;
+    }
 }
 
 

@@ -8,7 +8,7 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfigurat
 
 @Profile("aws")
 @Configuration
-public class ElasticSearchConfig extends ElasticsearchConfiguration {
+public class AWSElasticSearchConfig extends ElasticsearchConfiguration {
 
     @Value("${spring.elasticsearch.uris}")
     private String elasticsearchUri;
