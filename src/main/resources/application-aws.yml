@@ -3,11 +3,11 @@ spring:
     master:
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: jdbc:mysql://${AWS_DB_IP}:3306/${AWS_DB_NAME} # quokka_travel_m
-      username: root
+      username: ${AWS_DB_USERNAME}
       password: ${AWS_DB_PW}
     slave:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://${AWS_DB_IP}:3307/quokka_travel
+      url: jdbc:mysql://${AWS_DB_IP}:3307/${AWS_DB_NAME}
       username: ${AWS_DB_USERNAME}
       password: ${AWS_DB_PW}
 
