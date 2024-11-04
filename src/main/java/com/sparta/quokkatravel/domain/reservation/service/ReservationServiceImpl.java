@@ -15,13 +15,13 @@ import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.security.access.AccessDeniedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.AccessDeniedException;
 import java.util.Objects;
 
 @Service
@@ -72,12 +72,11 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public ReservationResponseDto getReservation(String email, Long id) {
 
-        User user = userRepository.findByEmailOrElseThrow(email);
+        Reservation reservation = reservationRepository.findById(id).orElseThrow();
 
-        Reservation reservation = user.getReservations().stream()
-                .filter(res -> res.getId().equals(id))
-                .findFirst()
-                .orElseThrow();
+        if(!reservation.getUser().getEmail().equals(email)) {
+            throw new AccessDeniedException("Is not yours");
+        }
 
         return new ReservationResponseDto(reservation);
     }
@@ -97,11 +96,10 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     public ReservationResponseDto updateReservation(String email, Long roomId, Long reservationId, ReservationRequestDto reservationRequestDto) throws AccessDeniedException {
 
-        User user = userRepository.findByEmailOrElseThrow(email);
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("room is not found"));
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
 
-        if(!reservation.getUser().equals(user)) {
+        if(!reservation.getUser().getEmail().equals(email)) {
             throw new AccessDeniedException("You are not the owner of this reservation");
         }
 
@@ -117,11 +115,10 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     public String cancelReservation(String email, Long roomId, Long reservationId) throws AccessDeniedException {
 
-        User user = userRepository.findByEmailOrElseThrow(email);
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("room is not found"));
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
 
-        if(!reservation.getUser().equals(user)) {
+        if(!reservation.getUser().getEmail().equals(email)) {
             throw new AccessDeniedException("You are not the owner of this reservation");
         }
 

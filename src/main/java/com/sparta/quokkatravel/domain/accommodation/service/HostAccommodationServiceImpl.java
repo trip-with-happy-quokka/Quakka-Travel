@@ -73,12 +73,10 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
     @Override
     public HostAccommodationResponseDto getAccommodation(CustomUserDetails customUserDetails, Long accommodationId) {
 
-        User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
-
         Accommodation accommodation = accommodationRepository.findById(accommodationId)
                 .orElseThrow(() -> new NotFoundException("Accommodation Not Found"));
 
-        if (!accommodation.getUser().getId().equals(user.getId())) {
+        if (!accommodation.getUser().getId().equals(customUserDetails.getUserId())) {
             throw new UnAuthorizedException("You do not own this accommodation");
         }
 
@@ -93,7 +91,7 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
         User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
         Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow();
 
-        if(!accommodation.getUser().equals(user)) {
+        if(!accommodation.getUser().getId().equals(customUserDetails.getUserId())) {
             throw new AccessDeniedException("You do not have permission to update this accommodation");
         }
 
@@ -117,13 +115,12 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
         User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
         Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow();
 
-        if(!accommodation.getUser().equals(user)) {
+        if(!accommodation.getUser().getId().equals(customUserDetails.getUserId())) {
             throw new AccessDeniedException("You do not have permission to update this accommodation");
         }
 
         accommodationRepository.delete(accommodation);
         log.info("Accommodation deleted: {}", accommodation);
-
 
         // Accommodation Document Delete For ElasticSearch
         AccommodationDocument accommodationDocument = accommodationSearchRepository.findByAccommodationIdOrElseThrow(accommodationId);
