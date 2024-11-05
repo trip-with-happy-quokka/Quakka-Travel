@@ -14,7 +14,7 @@ spring:
       port: ${AWS_REDIS_PORT}
 
   elasticsearch:
-    uris: localhost
+    uris: localhost:9200
 
 jwt:
   secret:

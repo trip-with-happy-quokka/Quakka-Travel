@@ -18,8 +18,8 @@ public class AdminCouponResponseDto {
     private Integer volume;
     private String couponCode;
     private CouponStatus couponStatus;
-    private int discountRate;
-    private int discountAmount;
+    private Integer discountRate;
+    private Integer discountAmount;
     private LocalDate validFrom;
     private LocalDate validUntil;
     private LocalDateTime createdAt;
@@ -39,5 +39,15 @@ public class AdminCouponResponseDto {
         this.validUntil = coupon.getValidUntil();
         this.createdAt = coupon.getCreatedAt();
         this.updatedAt = coupon.getUpdatedAt();
+    }
+
+    // discountRate가 null일 경우 0 반환
+    public Integer getDiscountRate() {
+        return discountRate != null ? discountRate : 0;
+    }
+
+    // discountAmount가 null일 경우 0 반환
+    public Integer getDiscountAmount() {
+        return discountAmount != null ? discountAmount : 0;
     }
 }
