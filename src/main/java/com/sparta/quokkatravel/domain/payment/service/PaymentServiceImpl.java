@@ -2,6 +2,7 @@ package com.sparta.quokkatravel.domain.payment.service;
 
 import ch.qos.logback.core.spi.ErrorCodes;
 import com.sparta.quokkatravel.domain.common.config.TossPaymentConfig;
+import com.sparta.quokkatravel.domain.payment.dto.ChargingHistoryDto;
 import com.sparta.quokkatravel.domain.payment.dto.PaymentResponseDto;
 import com.sparta.quokkatravel.domain.payment.dto.PaymentSuccessDto;
 import com.sparta.quokkatravel.domain.payment.entity.Payment;
@@ -23,10 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -118,10 +117,14 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     @Transactional
-    public Map cancelPaymentPoint(String userEmail, String paymentKey, String cancelReason) {
-        Payment payment = paymentRepository.findByPaymentKeyAndUser_Email(paymentKey, userEmail).orElseThrow(() -> {
+    public Map cancelPayment(Long userId, String paymentKey, String cancelReason) {
+        Payment payment = paymentRepository.findByPaymentKey(paymentKey).orElseThrow(() -> {
             throw new RuntimeException("PAYMENT_NOT_FOUND");
         });
+
+        if(!payment.getUser().getId().equals(userId)) {
+            throw new RuntimeException("PAYMENT_NOT_FOUND");
+        }
 
         // 결제 취소 요청을 Toss Payments API에 보냄
         Map<String, Object> response = tossPaymentCancel(paymentKey, cancelReason);
@@ -152,14 +155,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     // 결제 내역 조회 메서드
     @Override
-    public Page<Payment> findAllChargingHistories(String username, Pageable pageable) {
-        return paymentRepository.findAllByUser_Email(username,
-                PageRequest.of(
-                        pageable.getPageNumber(),
-                        pageable.getPageSize(),
-                        Sort.Direction.DESC,
-                        "paymentId")
-        );
+    public Page<ChargingHistoryDto> findAllChargingHistories(String username, Pageable pageable) {
+        Page<Payment> page = paymentRepository.findAllByUser_Email(username, PageRequest.of(
+                pageable.getPageNumber(), pageable.getPageSize(), Sort.Direction.DESC, "paymentId"));
+        List<ChargingHistoryDto> dtoList = page.stream()
+                .map(ChargingHistoryDto::new)
+                .collect(Collectors.toList());
+        return new PageImpl<>(dtoList, pageable, page.getTotalElements());
     }
 
     // HTTP 헤더 설정 메서드
