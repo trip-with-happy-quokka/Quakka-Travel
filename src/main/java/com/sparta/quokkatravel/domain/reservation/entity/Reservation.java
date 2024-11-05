@@ -62,10 +62,12 @@ public class Reservation extends Timestamped {
         this.room = room;
     }
 
-    public void update(LocalDate startDate, LocalDate endDate, Long numberOfGuests) {
+    public void update(LocalDate startDate, LocalDate endDate, Long numberOfGuests, Room room, Coupon coupon) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.numberOfGuests = numberOfGuests;
+        this.room = room;
+        this.totalPrice = calculateTotalPrice(startDate, endDate, room, coupon);
     }
 
     public void updateStatus(ReservationStatus status) {
@@ -76,8 +78,8 @@ public class Reservation extends Timestamped {
 
         Long pricePerNight = room.getPricePerNight();
 
-        if(numberOfGuests < room.getCapacity()) {
-            pricePerNight += (room.getCapacity() - numberOfGuests) * room.getPricePerOverCapacity();
+        if(room.getCapacity() < numberOfGuests) {
+            pricePerNight += (numberOfGuests - room.getCapacity()) * room.getPricePerOverCapacity();
         }
 
         Long totalDays =  ChronoUnit.DAYS.between(startDate, endDate) + 1;
