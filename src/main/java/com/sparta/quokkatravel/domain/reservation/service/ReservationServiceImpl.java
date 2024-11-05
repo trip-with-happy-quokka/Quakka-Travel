@@ -96,16 +96,27 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     public ReservationResponseDto updateReservation(String email, Long roomId, Long reservationId, ReservationRequestDto reservationRequestDto) throws AccessDeniedException {
 
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("room is not found"));
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
+        Room room = roomRepository.findById(roomId).orElseThrow();
+        Coupon coupon = null;
+
+        if(reservationRequestDto.getCouponCode() != null) {
+            coupon = couponRepository.findByCode(reservationRequestDto.getCouponCode()).orElseThrow(() -> new NotFoundException("coupon is not found"));
+            if(!Objects.equals(coupon.getAccommodation(), room.getAccommodation())) {
+                throw new InvalidRequestException("coupon code is incorrect");
+            }
+        }
 
         if(!reservation.getUser().getEmail().equals(email)) {
             throw new AccessDeniedException("You are not the owner of this reservation");
         }
+        if(!reservation.getRoom().getId().equals(roomId)) {
+            throw new AccessDeniedException("This room is different this reservation's contents");
+        }
 
-        reservation.update(reservationRequestDto.getStartDate(), reservationRequestDto.getEndDate(), reservationRequestDto.getNumberOfGuests());
+        reservation.update(reservationRequestDto.getStartDate(), reservationRequestDto.getEndDate(), reservationRequestDto.getNumberOfGuests(), room, coupon);
 
-        notificationService.sendRealTimeNotification(" 예약 수정 완료 ", room.getName().toString() + " 방의 예약 정보가 수정되었습니다. ");
+        notificationService.sendRealTimeNotification(" 예약 수정 완료 ", reservation.getRoom().getName() + " 방의 예약 정보가 수정되었습니다. ");
 
         return new ReservationResponseDto(reservation);
     }
@@ -115,11 +126,13 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     public String cancelReservation(String email, Long roomId, Long reservationId) throws AccessDeniedException {
 
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("room is not found"));
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
 
         if(!reservation.getUser().getEmail().equals(email)) {
             throw new AccessDeniedException("You are not the owner of this reservation");
+        }
+        if(!reservation.getRoom().getId().equals(roomId)) {
+            throw new AccessDeniedException("This room is different this reservation's contents");
         }
 
         reservationRepository.deleteById(reservationId);
@@ -132,7 +145,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .register(meterRegistry)
                 .increment();
 
-        notificationService.sendRealTimeNotification(" 예약 취소 완료 ", room.getName().toString() + " 방이 취소되었습니다. ");
+        notificationService.sendRealTimeNotification(" 예약 취소 완료 ", reservation.getRoom().getName() + " 방이 취소되었습니다. ");
 
         return "Reservation deleted";
     }
