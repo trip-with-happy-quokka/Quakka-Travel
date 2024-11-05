@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminCouponCreateRequestDto {
+public class AdminCouponRequestDto {
 
     private String couponCode;
 
