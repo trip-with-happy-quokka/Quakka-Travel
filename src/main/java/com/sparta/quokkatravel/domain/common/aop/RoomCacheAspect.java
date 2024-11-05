@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ public class RoomCacheAspect extends AbstractCacheAspect {
         super(redisTemplate);
     }
 
-    @AfterReturning("@annotation(InvalidateRoomCache)")
+    @Before("@annotation(InvalidateRoomCache)")
     public void evictRoomCache(JoinPoint joinPoint) {
         Long roomId = extractIdFromArgs(joinPoint);
         if (roomId == null) {
@@ -24,6 +25,6 @@ public class RoomCacheAspect extends AbstractCacheAspect {
             return;
         }
 
-        evictCacheByPattern("Room::" + roomId);
+        evictCacheByPattern("Room::" + roomId + "*");
     }
 }
