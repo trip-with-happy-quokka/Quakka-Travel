@@ -39,137 +39,10 @@ import static java.lang.System.currentTimeMillis;
 public class CouponServiceImpl implements CouponService {
 
     private final CouponRepository couponRepository;
-    private final EventRepository eventRepository;
-    private final AccommodationRepository accommodationRepository;
     private final UserRepository userRepository;
     private final RedissonClient redissonClient;
     private final CouponSearchRepository couponSearchRepository;
     private final int EMPTY = 0;
-
-    // 행사 쿠폰 발급 메서드
-    @Override
-    @Transactional
-    public CouponResponseDto createEventCoupon(String email, Long eventId, CouponRequestDto couponRequestDto) {
-
-        // customUserDetails 에서 생성자 정보 불러오기
-        User user = userRepository.findByEmailOrElseThrow(email);
-
-        // eventId 로 event 조회
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("해당 행사 조회 불가"));
-
-        // UUID 로 쿠폰코드 발급
-        String newCouponCode = new Coupon().createCouponCode();
-
-        // 쿠폰 키 생성
-        String couponkey = newCouponCode;
-
-        // 쿠폰 발행 수량만큼 redis 서버에 쿠폰 수량 입력
-        redissonClient.getBucket(couponkey).set(couponRequestDto.getVolume());
-
-        // RequestDto 데이터를 Coupon 에 전달
-        Coupon newCoupon = new Coupon(
-                couponRequestDto.getCouponName(),
-                couponRequestDto.getCouponContent(),
-                couponRequestDto.getCouponType(),
-                couponRequestDto.getVolume(),
-                newCouponCode,
-                CouponStatus.ISSUED,
-                couponRequestDto.getDiscountRate(),
-                couponRequestDto.getDiscountAmount(),
-                couponRequestDto.getValidFrom(),
-                couponRequestDto.getValidUntil(),
-                event,
-                user
-        );
-
-        // 쿠폰 레퍼지토리에 쿠폰 데이터를 저장 (save)
-        Coupon savedCoupon = couponRepository.save(newCoupon);
-        log.info("EventCoupon created: {}", savedCoupon);
-
-        // Accommodation Document Create For ElasticSearch
-        CouponDocument couponDocument = new CouponDocument(savedCoupon);
-        log.info("EventCouponDocument created: {}", couponDocument);
-        couponSearchRepository.save(couponDocument);
-
-        // 쿠폰을 CouponResponseDto 로 반환
-        return new CouponResponseDto(
-                savedCoupon.getId(),
-                savedCoupon.getName(),
-                savedCoupon.getCouponType(),
-                savedCoupon.getVolume(),
-                newCouponCode,
-                savedCoupon.getCouponStatus(),
-                savedCoupon.getDiscountRate(),
-                savedCoupon.getDiscountAmount(),
-                savedCoupon.getValidFrom(),
-                savedCoupon.getValidFrom(),
-                savedCoupon.getCreatedAt(),
-                savedCoupon.getUpdatedAt()
-        );
-    }
-
-    // 숙소 쿠폰 발급 메서드
-    @Override
-    @Transactional
-    public CouponResponseDto createAccommodationCoupon(String email, Long accommodationId, CouponRequestDto couponRequestDto) {
-
-        // customUserDetails 에서 생성자 정보 불러오기
-        User user = userRepository.findByEmailOrElseThrow(email);
-
-        // accommodationId 로 accommodation 조회
-        Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("해당 숙소 조회 불가"));
-
-        // UUID 로 쿠폰코드 발급
-        String newCouponCode = new Coupon().createCouponCode();
-
-        // 쿠폰 키 생성
-        String couponkey = newCouponCode;
-
-        // 쿠폰 발행 수량만큼 redis 서버에 쿠폰 수량 입력
-        redissonClient.getBucket(couponkey).set(couponRequestDto.getVolume());
-
-
-        // RequestDto 데이터를 Coupon 에 전달
-        Coupon newCoupon = new Coupon(
-                couponRequestDto.getCouponName(),
-                couponRequestDto.getCouponContent(),
-                couponRequestDto.getCouponType(),
-                couponRequestDto.getVolume(),
-                newCouponCode,
-                CouponStatus.ISSUED,
-                couponRequestDto.getDiscountRate(),
-                couponRequestDto.getDiscountAmount(),
-                couponRequestDto.getValidFrom(),
-                couponRequestDto.getValidUntil(),
-                accommodation,
-                user
-        );
-
-        // 쿠폰 레퍼지토리에 쿠폰 데이터를 저장 (save)
-        Coupon savedCoupon = couponRepository.save(newCoupon);
-        log.info("AccommodationCoupon created: {}", savedCoupon);
-
-        // Accommodation Document Create For ElasticSearch
-        CouponDocument couponDocument = new CouponDocument(savedCoupon);
-        log.info("AccommodationCouponDocument created: {}", couponDocument);
-        couponSearchRepository.save(couponDocument);
-
-        // 쿠폰을 CouponResponseDto 로 반환
-        return new CouponResponseDto(
-                savedCoupon.getId(),
-                savedCoupon.getName(),
-                savedCoupon.getCouponType(),
-                savedCoupon.getVolume(),
-                newCouponCode,
-                savedCoupon.getCouponStatus(),
-                savedCoupon.getDiscountRate(),
-                savedCoupon.getDiscountAmount(),
-                savedCoupon.getValidFrom(),
-                savedCoupon.getValidUntil(),
-                savedCoupon.getCreatedAt(),
-                savedCoupon.getUpdatedAt()
-        );
-    }
 
     // 쿠폰 등록 메서드 ( 분산락 사용 )
     @Override
@@ -322,6 +195,8 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     public CouponDeleteResponseDto deleteCoupon(String email, Long couponId) {
 
+        // 일단 내가 이 쿠폰 갖고 있는지 확인이 필요함
+
         // couponId 로 해당 쿠폰 조회
         Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new NotFoundException("해당 쿠폰 조회 불가"));
 
@@ -330,7 +205,7 @@ public class CouponServiceImpl implements CouponService {
         log.info("Coupon deleted: {}", coupon);
         couponRepository.save(coupon);
 
-        // Accommodation Document Create For ElasticSearch
+        // CouponDocument Create For ElasticSearch
         CouponDocument couponDocument = couponSearchRepository.findByCouponIdOrElseThrow(couponId);
         log.info("CouponDocument deleted: {}", couponDocument);
         couponSearchRepository.delete(couponDocument);

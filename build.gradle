@@ -96,6 +96,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator' // actuator 추가
     implementation 'io.micrometer:micrometer-registry-prometheus' // prometheus 추가
 
+    // SpringBatch
+    // implementataion 'org.springframework.boot:spring-boot-starter-batch'
+
 }
 
 // QueryDSL 관련 설정
