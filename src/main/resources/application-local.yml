@@ -16,6 +16,16 @@ spring:
   elasticsearch:
     uris: localhost:9200
 
+#  batch:
+#    job:
+#      name:
+#      enabled: false
+#    datasource:
+#      url:
+#      username:
+#      password:
+#      driver-class-name:
+
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}
