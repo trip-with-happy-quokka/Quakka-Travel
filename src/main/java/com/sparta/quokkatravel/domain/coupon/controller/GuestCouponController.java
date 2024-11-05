@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Tag(name = "Coupon", description = "쿠폰 관련 컨트롤러")
-public class CouponController {
+public class GuestCouponController {
 
     private final CouponService couponService;
 

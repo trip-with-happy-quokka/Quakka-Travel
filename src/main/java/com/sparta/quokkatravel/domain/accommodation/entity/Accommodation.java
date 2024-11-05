@@ -61,10 +61,14 @@ public class Accommodation extends Timestamped {
 
     // 리뷰를 바탕으로 한 별점 평균 메서드 필요함
     public void updateRating() {
+        if (reviews == null || reviews.isEmpty()) {
+            rating = 0L;  // 리뷰가 없을 때 rating을 0으로 설정
+            return;
+        }
         int ratingSum = 0;
-        for(Review review: reviews) {
+        for (Review review : reviews) {
             ratingSum += review.getRating();
         }
-        rating = (long) (ratingSum/=reviews.size());
+        rating = (long) (ratingSum / reviews.size());
     }
 }

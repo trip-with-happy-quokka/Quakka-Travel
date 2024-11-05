@@ -2,11 +2,10 @@ package com.sparta.quokkatravel.domain.admin.coupon.service;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
-import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponCreateRequestDto;
+import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponRequestDto;
 import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponResponseDto;
 import com.sparta.quokkatravel.domain.admin.coupon.repository.AdminCouponRepository;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponType;
 import com.sparta.quokkatravel.domain.event.entity.Event;
@@ -15,12 +14,12 @@ import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,15 +29,21 @@ public class AdminCouponService {
     private final AccommodationRepository accommodationRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-
+    private final RedissonClient redissonClient;
 
     // 쿠폰 발급
-    public AdminCouponResponseDto createCoupon(String email, AdminCouponCreateRequestDto couponRequestDto) {
+    public AdminCouponResponseDto createCoupon(String email, AdminCouponRequestDto couponRequestDto) {
 
         User user = userRepository.findByEmailOrElseThrow(email);
 
         // DTO에서 code가 null일 경우 자동으로 UUID로 코드 생성
         String couponCode = couponRequestDto.getCouponCode() != null ? couponRequestDto.getCouponCode() : UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+
+        // 쿠폰 키 생성
+        String couponkey = couponCode;
+
+        // 쿠폰 발행 수량만큼 redis 서버에 쿠폰 수량 입력
+        redissonClient.getBucket(couponkey).set(couponRequestDto.getVolume());
 
         Coupon coupon = new Coupon(
                 couponRequestDto.getCouponName(),             // name 값
@@ -53,7 +58,6 @@ public class AdminCouponService {
                 user
         );
 
-
         if (Objects.equals(CouponType.ACCOMMODATION, couponRequestDto.getCouponType())) {
             // 숙소 조회
             Accommodation accommodation = accommodationRepository.findById(couponRequestDto.getCouponTargetId())
@@ -66,7 +70,6 @@ public class AdminCouponService {
                     .orElseThrow(() -> new NotFoundException("Event is not found"));
             coupon.addEvent(event);
         }
-
 
         Coupon savedCoupon = adminCouponRepository.save(coupon);
 
@@ -90,7 +93,7 @@ public class AdminCouponService {
     }
 
     // 쿠폰 수정
-    public AdminCouponResponseDto updateCoupon(Long couponId, AdminCouponCreateRequestDto couponRequestDto) {
+    public AdminCouponResponseDto updateCoupon(Long couponId, AdminCouponRequestDto couponRequestDto) {
         Coupon coupon = adminCouponRepository.findById(couponId)
                 .orElseThrow(() -> new EntityNotFoundException("쿠폰을 찾을 수 없습니다."));
 

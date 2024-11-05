@@ -27,10 +27,13 @@ public class GuestRoomServiceImpl implements GuestRoomService {
     @Cacheable(value = "Room", key = "#roomId + '_' + #userId", cacheManager = "cacheManager")
     public GuestRoomResponseDto getRoom(Long userId, Long accommodationId, Long roomId) {
 
+        Accommodation accommodation = accommodationRepository.findById(accommodationId)
+                .orElseThrow(() -> new NotFoundException("Accommodation Not Found"));
+
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException("Room Not Found"));
 
-        if (!Objects.equals(room.getAccommodation().getId(), accommodationId)) {
+        if (!Objects.equals(room.getAccommodation().getId(), accommodation.getId())) {
             throw new NotFoundException("해당 숙소에는 그런 객실이 없습니다.");
         }
 

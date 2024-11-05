@@ -1,21 +1,14 @@
 package com.sparta.quokkatravel.domain.coupon.service;
 
-import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
-import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
 import com.sparta.quokkatravel.domain.common.exception.BadRequestException;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
-import com.sparta.quokkatravel.domain.coupon.dto.request.CouponRequestDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponCodeResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponDeleteResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponRedeemResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
-import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
-import com.sparta.quokkatravel.domain.event.entity.Event;
-import com.sparta.quokkatravel.domain.event.repository.EventRepository;
-import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
 import com.sparta.quokkatravel.domain.search.document.CouponDocument;
 import com.sparta.quokkatravel.domain.search.repository.CouponSearchRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
@@ -29,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static java.lang.System.currentTimeMillis;
 
 @Slf4j
 @Service
@@ -49,14 +40,14 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     public CouponCodeResponseDto registerCoupon(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto) {
 
-        // -------------------------- 유효성 검사 ------------------------------------------
+
         // userId 로 User 조회
         User user = userRepository.findByEmailOrElseThrow(email);
 
         // 쿠폰 코드로 쿠폰 찾기
         Coupon coupon = couponRepository.findByCode(couponCodeRequestDto.getCouponCode())
                 .orElseThrow(() -> new NotFoundException("coupon is not found"));
-        // -------------------------------------------------------------------------------
+
 
 //            // 동시성 제어
 //            // 쿠폰 발급 (volume 하나 감소)

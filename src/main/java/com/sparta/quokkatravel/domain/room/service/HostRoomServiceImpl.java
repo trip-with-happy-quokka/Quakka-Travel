@@ -99,10 +99,13 @@ public class HostRoomServiceImpl implements HostRoomService {
     @InvalidateRoomCache
     public String deleteRoom(CustomUserDetails userDetails, Long accommodationId, Long roomId) {
 
+        Accommodation accommodation = accommodationRepository.findById(accommodationId)
+                .orElseThrow(() -> new NotFoundException("Accommodation Not Found"));
+
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException("Room Not Found"));
 
-        if (!room.getAccommodation().getUser().getId().equals(userDetails.getUserId())) {
+        if (!accommodation.getUser().getId().equals(userDetails.getUserId())) {
             throw new AccessDeniedException("You do not have permission to delete this accommodation");
         }
 
