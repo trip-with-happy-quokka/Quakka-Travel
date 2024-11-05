@@ -97,7 +97,7 @@ public class HostRoomServiceImpl implements HostRoomService {
     @Override
     @Transactional
     @InvalidateRoomCache
-    public String deleteRoom(CustomUserDetails userDetails, Long roomId) {
+    public String deleteRoom(CustomUserDetails userDetails, Long accommodationId, Long roomId) {
 
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException("Room Not Found"));

@@ -5,9 +5,6 @@ import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationRespons
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
 import com.sparta.quokkatravel.domain.common.aop.InvalidateAccommodationCache;
-import com.sparta.quokkatravel.domain.common.elasticsearch.entity_event.AccommodationCreatedEvent;
-import com.sparta.quokkatravel.domain.common.elasticsearch.entity_event.AccommodationDeletedEvent;
-import com.sparta.quokkatravel.domain.common.elasticsearch.entity_event.AccommodationUpdatedEvent;
 import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.common.exception.UnAuthorizedException;
@@ -18,7 +15,6 @@ import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
