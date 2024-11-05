@@ -13,6 +13,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class CouponRequestDto {
 
+    private String couponCode;
+
     @NotBlank(message = "쿠폰 명을 입력해주세요.")
     private String couponName;
 
@@ -21,6 +23,9 @@ public class CouponRequestDto {
 
     @NotBlank(message = "쿠폰 타입을 입력해주세요. ( Accommodation 또는 Event )")
     private String couponType;
+
+    @NotBlank(message = "쿠폰 대상을 입력해주세요 ( Accommodation ID 또는 Event ID)")
+    private Long couponTargetId;
 
     @Min(0)
     @NotBlank(message = "발행할 쿠폰 수량을 입력해주세요.")
