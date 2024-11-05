@@ -32,13 +32,21 @@ public class AdminCouponController {
         return ResponseEntity.ok(ApiResponse.success("쿠폰 목록 조회 성공", coupons));
     }
 
+    // 단일 쿠폰 조회 (관리자 전용)
+    @GetMapping("/{couponId}")
+    @Operation(summary = "단일 쿠폰 조회", description = "관리자가 특정 쿠폰의 세부 정보를 조회하는 API")
+    public ResponseEntity<?> getCoupon(@PathVariable Long couponId) {
+        AdminCouponResponseDto coupon = adminCouponService.getCoupon(couponId);
+        return ResponseEntity.ok(ApiResponse.success("쿠폰 조회 성공", coupon));
+    }
+
     // 쿠폰 발급 (관리자 전용)
     @PostMapping
     @Operation(summary = "쿠폰 발급", description = "관리자가 쿠폰을 발급하는 API")
     public ResponseEntity<?> createCoupon(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @RequestBody AdminCouponRequestDto couponRequestDto) {
-        AdminCouponResponseDto coupon = adminCouponService.createCoupon(customUserDetails.getEmail() ,couponRequestDto);
+        AdminCouponResponseDto coupon = adminCouponService.createCoupon(customUserDetails.getEmail(), couponRequestDto);
         return ResponseEntity.ok(ApiResponse.created("쿠폰 발급 성공", coupon));
     }
 

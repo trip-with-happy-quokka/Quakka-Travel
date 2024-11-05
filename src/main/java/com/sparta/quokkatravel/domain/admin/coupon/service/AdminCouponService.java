@@ -6,6 +6,7 @@ import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponRequestDto;
 import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponResponseDto;
 import com.sparta.quokkatravel.domain.admin.coupon.repository.AdminCouponRepository;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
+import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponType;
 import com.sparta.quokkatravel.domain.event.entity.Event;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,13 +33,31 @@ public class AdminCouponService {
     private final UserRepository userRepository;
     private final RedissonClient redissonClient;
 
+    // 할인율과 할인 금액 중 하나는 반드시 0보다 커야 함을 검증하는 메서드(추가)
+    private void validateDiscount(AdminCouponRequestDto couponRequestDto) {
+        Integer discountRate = couponRequestDto.getDiscountRate();
+        int discountAmount = couponRequestDto.getDiscountAmount();
+
+        // 할인율과 할인 금액이 모두 0이거나 null일 경우 예외 발생
+        if ((discountRate == null || discountRate == 0) && discountAmount == 0) {
+            throw new IllegalArgumentException("할인율과 할인 금액 중 하나는 반드시 0보다 커야 합니다.");
+        }
+    }
+
+
     // 쿠폰 발급
     public AdminCouponResponseDto createCoupon(String email, AdminCouponRequestDto couponRequestDto) {
+        validateDiscount(couponRequestDto); // 검증 메서드 호출(추가)
 
         User user = userRepository.findByEmailOrElseThrow(email);
 
-        // DTO에서 code가 null일 경우 자동으로 UUID로 코드 생성
-        String couponCode = couponRequestDto.getCouponCode() != null ? couponRequestDto.getCouponCode() : UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+        // DTO에서 code가 null일 경우 자동으로 UUID로 코드 생성 및 중복 확인
+        String couponCode = couponRequestDto.getCouponCode();
+        if (couponCode == null) {
+            do {
+                couponCode = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+            } while (adminCouponRepository.existsByCode(couponCode));
+        }
 
         // 쿠폰 키 생성
         String couponkey = couponCode;
@@ -94,6 +114,8 @@ public class AdminCouponService {
 
     // 쿠폰 수정
     public AdminCouponResponseDto updateCoupon(Long couponId, AdminCouponRequestDto couponRequestDto) {
+        validateDiscount(couponRequestDto); // 추가)검증 메서드 호출
+
         Coupon coupon = adminCouponRepository.findById(couponId)
                 .orElseThrow(() -> new EntityNotFoundException("쿠폰을 찾을 수 없습니다."));
 
