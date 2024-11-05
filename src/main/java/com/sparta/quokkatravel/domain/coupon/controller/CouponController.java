@@ -40,8 +40,9 @@ public class CouponController {
         return ResponseEntity.ok(ApiResponse.created("행사 쿠폰 발급 성공", couponResponseDto));
     }
 
+    @PreAuthorize("hasRole('HOST')")
     @PostMapping("/admin/accommodations/{accommodationId}/coupons")
-    @Operation(summary = "숙소 쿠폰 발급", description = "관리자 권한으로 쿠폰을 발행하는 API")
+    @Operation(summary = "숙소 쿠폰 발급", description = "호스트 권한으로 쿠폰을 발행하는 API")
     public ResponseEntity<?> createAccommodationCoupon(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long accommodationId,

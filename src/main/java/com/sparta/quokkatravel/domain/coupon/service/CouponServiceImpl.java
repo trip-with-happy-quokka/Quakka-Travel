@@ -60,6 +60,12 @@ public class CouponServiceImpl implements CouponService {
         // UUID 로 쿠폰코드 발급
         String newCouponCode = new Coupon().createCouponCode();
 
+        // 쿠폰 키 생성
+        String couponkey = newCouponCode;
+
+        // 쿠폰 발행 수량만큼 redis 서버에 쿠폰 수량 입력
+        redissonClient.getBucket(couponkey).set(couponRequestDto.getVolume());
+
         // RequestDto 데이터를 Coupon 에 전달
         Coupon newCoupon = new Coupon(
                 couponRequestDto.getCouponName(),
@@ -115,6 +121,12 @@ public class CouponServiceImpl implements CouponService {
 
         // UUID 로 쿠폰코드 발급
         String newCouponCode = new Coupon().createCouponCode();
+
+        // 쿠폰 키 생성
+        String couponkey = newCouponCode;
+
+        // 쿠폰 발행 수량만큼 redis 서버에 쿠폰 수량 입력
+        redissonClient.getBucket(couponkey).set(couponRequestDto.getVolume());
 
 
         // RequestDto 데이터를 Coupon 에 전달
@@ -176,7 +188,7 @@ public class CouponServiceImpl implements CouponService {
 //            // 동시성 제어
 //            // 쿠폰 발급 (volume 하나 감소)
 //            coupon.decreaseVolume();
-        String key = coupon.getCode() + currentTimeMillis();
+        String key = coupon.getCode();
 
         decreaseVolumeWithLock(key);
 
