@@ -50,6 +50,12 @@ dependencies {
     // jackson2json LocalDateTime handling
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2"
 
+    // email authentication
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
