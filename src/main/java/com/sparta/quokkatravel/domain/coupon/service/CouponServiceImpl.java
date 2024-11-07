@@ -13,6 +13,7 @@ import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
+import com.sparta.quokkatravel.domain.email.service.CouponEmailService;
 import com.sparta.quokkatravel.domain.event.entity.Event;
 import com.sparta.quokkatravel.domain.event.repository.EventRepository;
 import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
@@ -42,6 +43,7 @@ public class CouponServiceImpl implements CouponService {
     private final UserRepository userRepository;
     private final RedissonClient redissonClient;
     private final CouponSearchRepository couponSearchRepository;
+    private final CouponEmailService couponEmailService;
     private final int EMPTY = 0;
 
     // 쿠폰 등록 메서드 ( 분산락 사용 )
@@ -66,9 +68,11 @@ public class CouponServiceImpl implements CouponService {
         decreaseVolumeWithLock(key);
 
 
-            // 쿠폰 소유자 및 등록일자 등록
-            // 쿠폰 사용 가능 상태로 변경
-            coupon.registerCoupon(user);
+        // 쿠폰 소유자 및 등록일자 등록
+        // 쿠폰 사용 가능 상태로 변경
+        coupon.registerCoupon(user);
+
+        couponEmailService.sendCouponRegistrationEmail(user, coupon);
 
         return new CouponCodeResponseDto(
                 coupon.getId(),
@@ -148,6 +152,9 @@ public class CouponServiceImpl implements CouponService {
         coupon.redeemCoupon();
         couponRepository.save(coupon);
 
+        // 이메일 전송: 쿠폰 사용 알림
+        couponEmailService.sendCouponRedeemEmail(user, coupon);
+
         return new CouponRedeemResponseDto(
                 coupon.getId(),
                 coupon.getName(),
@@ -204,6 +211,10 @@ public class CouponServiceImpl implements CouponService {
         coupon.deleteCoupon();
         log.info("Coupon deleted: {}", coupon);
         couponRepository.save(coupon);
+
+        // 이메일 전송: 쿠폰 삭제 알림
+        User user = coupon.getOwner();
+        couponEmailService.sendCouponDeletionEmail(user, coupon);
 
         // CouponDocument Create For ElasticSearch
         CouponDocument couponDocument = couponSearchRepository.findByCouponIdOrElseThrow(couponId);

@@ -1,7 +1,6 @@
-package com.sparta.quokkatravel.domain.notification.service.slackNotificationService;
+package com.sparta.quokkatravel.domain.notification.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.quokkatravel.domain.notification.service.SlackNotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
