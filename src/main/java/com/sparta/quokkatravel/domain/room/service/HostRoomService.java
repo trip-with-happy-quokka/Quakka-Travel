@@ -19,5 +19,5 @@ public interface HostRoomService {
     HostRoomResponseDto updateRoom(CustomUserDetails userDetails, Long roomId, RoomRequestDto roomRequestDto);
 
     // 삭제
-    String deleteRoom(CustomUserDetails userDetails, Long roomId);
+    String deleteRoom(CustomUserDetails userDetails, Long accommodationId, Long roomId);
 }

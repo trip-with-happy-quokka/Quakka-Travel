@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +21,6 @@ import java.nio.file.AccessDeniedException;
 
 @RestController
 @RequestMapping("/api/v1/guest")
-@PreAuthorize("hasRole('GUEST') or hasRole('ADMIN')")
 @RequiredArgsConstructor
 @Tag(name = "Reservation", description = "예약 관련 컨트롤러")
 public class ReservationController {
@@ -41,7 +41,10 @@ public class ReservationController {
     // 에약 전체 조회
     @GetMapping("/reservations")
     public ResponseEntity<?> getAllReservations(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                @RequestParam(required = false) Pageable pageable) {
+                                                @RequestParam(required = false, defaultValue = "0") int pageNo,
+                                                @RequestParam(required = false, defaultValue = "10") int pageSize) {
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
 
         Page<ReservationResponseDto> reservations = reservationService.getAllReservation(userDetails.getEmail(), pageable);
         return ResponseEntity.ok(ApiResponse.success("예약 전체 조회 성공", reservations));

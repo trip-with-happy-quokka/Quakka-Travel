@@ -24,5 +24,4 @@ public class AWSElasticSearchConfig extends ElasticsearchConfiguration {
                 .withBasicAuth(elasticsearchUsername, elasticsearchPassword)
                 .build();
     }
-
 }

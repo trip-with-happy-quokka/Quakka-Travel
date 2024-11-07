@@ -2,20 +2,20 @@ spring:
   datasource:
     master:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://${AWS_DB_IP}:3306/quokka_travel # quokka_travel_m
-      username: root
+      url: jdbc:mysql://${AWS_DB_IP}:3306/${AWS_DB_NAME} # quokka_travel_m
+      username: ${AWS_DB_USERNAME}
       password: ${AWS_DB_PW}
     slave:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://${AWS_DB_IP}:3307/quokka_travel
-      username: root
+      url: jdbc:mysql://${AWS_DB_IP}:3307/${AWS_DB_NAME}
+      username: ${AWS_DB_USERNAME}
       password: ${AWS_DB_PW}
 
   data:
     redis:
       host: ${AWS_DB_IP}  # AWS ElastiCache Redis 엔드포인트
-      port: 6379
-#      password: 1234
+      port: ${AWS_REDIS_PORT}
+  #      password: 1234
 
   elasticsearch:
     uris: ${AWS_ELASTIC_SEARCH_IP}:9200
@@ -32,7 +32,7 @@ jwt:
     key: ${JWT_SECRET_KEY}
 
 slack:
-  webhook-url: https://hooks.slack.com/services/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
+  webhook-url: ${SLACK_WEBHOOK_URL}
 
 cloud:
   aws:

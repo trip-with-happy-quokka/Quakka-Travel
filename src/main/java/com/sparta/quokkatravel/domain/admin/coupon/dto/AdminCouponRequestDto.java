@@ -1,17 +1,20 @@
-package com.sparta.quokkatravel.domain.coupon.dto.request;
+package com.sparta.quokkatravel.domain.admin.coupon.dto;
 
+import com.sparta.quokkatravel.domain.coupon.entity.CouponType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
-public class CouponRequestDto {
+public class AdminCouponRequestDto {
 
     private String couponCode;
 
@@ -22,7 +25,7 @@ public class CouponRequestDto {
     private String couponContent;
 
     @NotBlank(message = "쿠폰 타입을 입력해주세요. ( Accommodation 또는 Event )")
-    private String couponType;
+    private CouponType couponType;
 
     @NotBlank(message = "쿠폰 대상을 입력해주세요 ( Accommodation ID 또는 Event ID)")
     private Long couponTargetId;

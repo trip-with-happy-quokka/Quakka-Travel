@@ -2,7 +2,6 @@ package com.sparta.quokkatravel.domain.room.service;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
-import com.sparta.quokkatravel.domain.common.aop.InvalidateAccommodationCache;
 import com.sparta.quokkatravel.domain.common.aop.InvalidateRoomCache;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
@@ -10,7 +9,6 @@ import com.sparta.quokkatravel.domain.room.dto.HostRoomResponseDto;
 import com.sparta.quokkatravel.domain.room.dto.RoomRequestDto;
 import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.room.repository.RoomRepository;
-import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,7 +29,13 @@ public class HostRoomServiceImpl implements HostRoomService {
     @Override
     @Transactional
     public HostRoomResponseDto createRoom(CustomUserDetails userDetails, Long accommodationId, RoomRequestDto roomRequestDto) {
-        Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("accommodation not found"));
+        Accommodation accommodation = accommodationRepository.findById(accommodationId)
+                .orElseThrow(() -> new NotFoundException("accommodation not found"));
+
+        if (!accommodation.getUser().getId().equals(userDetails.getUserId())) {
+            throw new AccessDeniedException("You do not have permission to access this accommodation");
+        }
+
         Room room = new Room(roomRequestDto, accommodation);
         roomRepository.save(room);
         return new HostRoomResponseDto(room);
@@ -41,9 +45,10 @@ public class HostRoomServiceImpl implements HostRoomService {
     public HostRoomResponseDto getRoom(CustomUserDetails userDetails, Long accommodationId, Long roomId) {
 
         // 유저가 해당 숙소를 소유하고 있는지 확인
-        Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("accommodation not found"));
+        Accommodation accommodation = accommodationRepository.findById(accommodationId)
+                .orElseThrow(() -> new NotFoundException("accommodation not found"));
 
-        if(!accommodation.getUser().equals(userDetails.getUser())) {
+        if (!accommodation.getUser().getId().equals(userDetails.getUserId())) {
             throw new AccessDeniedException("You do not have permission to access this accommodation");
         }
 
@@ -60,9 +65,10 @@ public class HostRoomServiceImpl implements HostRoomService {
     public Page<HostRoomResponseDto> getAllRoom(CustomUserDetails userDetails, Long accommodationId, Pageable pageable) {
 
         // 유저가 해당 숙소를 소유하고 있는지 확인
-        Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(() -> new NotFoundException("accommodation not found"));
+        Accommodation accommodation = accommodationRepository.findById(accommodationId)
+                .orElseThrow(() -> new NotFoundException("accommodation not found"));
 
-        if(!accommodation.getUser().equals(userDetails.getUser())) {
+        if (!accommodation.getUser().getId().equals(userDetails.getUserId())) {
             throw new AccessDeniedException("You do not have permission to access this accommodation");
         }
 
@@ -74,14 +80,16 @@ public class HostRoomServiceImpl implements HostRoomService {
     @Transactional
     @InvalidateRoomCache
     public HostRoomResponseDto updateRoom(CustomUserDetails userDetails, Long roomId, RoomRequestDto roomRequestDto) {
-        User user = userDetails.getUser();
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room Not Found"));
 
-        if(!room.getAccommodation().getUser().equals(user)) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new NotFoundException("Room Not Found"));
+
+        if (!room.getAccommodation().getUser().getId().equals(userDetails.getUserId())) {
             throw new AccessDeniedException("You do not have permission to update this accommodation");
         }
 
-        room.update(roomRequestDto.getName(), roomRequestDto.getDescription(), roomRequestDto.getCapacity(), roomRequestDto.getPricePerOverCapacity(), roomRequestDto.getPricePerNight());
+        room.update(roomRequestDto.getName(), roomRequestDto.getDescription(),
+                roomRequestDto.getCapacity(), roomRequestDto.getPricePerOverCapacity(), roomRequestDto.getPricePerNight());
 
         return new HostRoomResponseDto(room);
     }
@@ -89,13 +97,15 @@ public class HostRoomServiceImpl implements HostRoomService {
     @Override
     @Transactional
     @InvalidateRoomCache
-    public String deleteRoom(CustomUserDetails userDetails, Long roomId) {
-        User user = userDetails.getUser();
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room Not Found"));
+    public String deleteRoom(CustomUserDetails userDetails, Long accommodationId, Long roomId) {
 
-        if(!room.getAccommodation().getUser().equals(user)) {
-            throw new AccessDeniedException("You do not have permission to update this accommodation");
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new NotFoundException("Room Not Found"));
+
+        if (!room.getAccommodation().getUser().getId().equals(userDetails.getUserId())) {
+            throw new AccessDeniedException("You do not have permission to delete this accommodation");
         }
+
         roomRepository.delete(room);
         return "Room Deleted Successfully";
     }

@@ -5,9 +5,6 @@ import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationRespons
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
 import com.sparta.quokkatravel.domain.common.aop.InvalidateAccommodationCache;
-import com.sparta.quokkatravel.domain.common.elasticsearch.entity_event.AccommodationCreatedEvent;
-import com.sparta.quokkatravel.domain.common.elasticsearch.entity_event.AccommodationDeletedEvent;
-import com.sparta.quokkatravel.domain.common.elasticsearch.entity_event.AccommodationUpdatedEvent;
 import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.common.exception.UnAuthorizedException;
@@ -18,7 +15,6 @@ import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -73,12 +69,10 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
     @Override
     public HostAccommodationResponseDto getAccommodation(CustomUserDetails customUserDetails, Long accommodationId) {
 
-        User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
-
         Accommodation accommodation = accommodationRepository.findById(accommodationId)
                 .orElseThrow(() -> new NotFoundException("Accommodation Not Found"));
 
-        if (!accommodation.getUser().getId().equals(user.getId())) {
+        if (!accommodation.getUser().getId().equals(customUserDetails.getUserId())) {
             throw new UnAuthorizedException("You do not own this accommodation");
         }
 
@@ -93,7 +87,7 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
         User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
         Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow();
 
-        if(!accommodation.getUser().equals(user)) {
+        if(!accommodation.getUser().getId().equals(customUserDetails.getUserId())) {
             throw new AccessDeniedException("You do not have permission to update this accommodation");
         }
 
@@ -117,13 +111,12 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
         User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
         Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow();
 
-        if(!accommodation.getUser().equals(user)) {
+        if(!accommodation.getUser().getId().equals(customUserDetails.getUserId())) {
             throw new AccessDeniedException("You do not have permission to update this accommodation");
         }
 
         accommodationRepository.delete(accommodation);
         log.info("Accommodation deleted: {}", accommodation);
-
 
         // Accommodation Document Delete For ElasticSearch
         AccommodationDocument accommodationDocument = accommodationSearchRepository.findByAccommodationIdOrElseThrow(accommodationId);

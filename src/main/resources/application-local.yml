@@ -21,17 +21,27 @@ spring:
   data:
     redis:
       host: localhost
-      port: 6379
+      port: ${AWS_REDIS_PORT}
 
   elasticsearch:
-    uris: localhost
+    uris: localhost:9200
+
+#  batch:
+#    job:
+#      name:
+#      enabled: false
+#    datasource:
+#      url:
+#      username:
+#      password:
+#      driver-class-name:
 
 jwt:
   secret:
     key: ${JWT_SECRET_KEY}
 
 slack:
-  webhook-url: https://hooks.slack.com/services/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
+  webhook-url: ${SLACK_WEBHOOK_URL}
 
 cloud:
   aws:
