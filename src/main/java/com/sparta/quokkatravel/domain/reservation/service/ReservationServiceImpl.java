@@ -15,6 +15,9 @@ import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.room.repository.RoomRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.security.access.AccessDeniedException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +25,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.nio.file.AccessDeniedException;
 import java.util.Objects;
+
+
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +41,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final RoomRepository roomRepository;
     private final CouponRepository couponRepository;
     private final ReservationEmailService reservationEmailService;
+    private final MeterRegistry meterRegistry;
 
 
     // 예약 생성
@@ -61,6 +65,14 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation reservation = new Reservation(reservationRequestDto.getStartDate(), reservationRequestDto.getEndDate(), reservationRequestDto.getNumberOfGuests(), user, room, coupon);
         reservationRepository.save(reservation);
 
+        // 예약 생성 카운터 증가
+        Counter.builder("reservation.create.count")
+                .tag("class", this.getClass().getName())
+                .tag("method", "createReservation")
+                .description("Counts the number of reservation creations")
+                .register(meterRegistry)
+                .increment();
+
         // 예약 생성 후 이메일 전송
         reservationEmailService.sendReservationCreationEmail(
                 room.getAccommodation().getUser(), email, user, room.getAccommodation(), room, reservation);
@@ -72,12 +84,11 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public ReservationResponseDto getReservation(String email, Long id) {
 
-        User user = userRepository.findByEmailOrElseThrow(email);
+        Reservation reservation = reservationRepository.findById(id).orElseThrow();
 
-        Reservation reservation = user.getReservations().stream()
-                .filter(res -> res.getId().equals(id))
-                .findFirst()
-                .orElseThrow();
+        if(!reservation.getUser().getEmail().equals(email)) {
+            throw new AccessDeniedException("Is not yours");
+        }
 
         return new ReservationResponseDto(reservation);
     }
@@ -100,12 +111,23 @@ public class ReservationServiceImpl implements ReservationService {
         User user = userRepository.findByEmailOrElseThrow(email);
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("room is not found"));
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
+        Coupon coupon = null;
 
-        if (!reservation.getUser().equals(user)) {
-            throw new AccessDeniedException("You are not the owner of this reservation");
+        if(reservationRequestDto.getCouponCode() != null) {
+            coupon = couponRepository.findByCode(reservationRequestDto.getCouponCode()).orElseThrow(() -> new NotFoundException("coupon is not found"));
+            if(!Objects.equals(coupon.getAccommodation(), room.getAccommodation())) {
+                throw new InvalidRequestException("coupon code is incorrect");
+            }
         }
 
-        reservation.update(reservationRequestDto.getStartDate(), reservationRequestDto.getEndDate(), reservationRequestDto.getNumberOfGuests());
+        if(!reservation.getUser().getEmail().equals(email)) {
+            throw new AccessDeniedException("You are not the owner of this reservation");
+        }
+        if(!reservation.getRoom().getId().equals(roomId)) {
+            throw new AccessDeniedException("This room is different this reservation's contents");
+        }
+
+        reservation.update(reservationRequestDto.getStartDate(), reservationRequestDto.getEndDate(), reservationRequestDto.getNumberOfGuests(), room, coupon);
 
         // 예약 수정 후 이메일 전송
         reservationEmailService.sendReservationUpdateEmail(
@@ -123,11 +145,22 @@ public class ReservationServiceImpl implements ReservationService {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("room is not found"));
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
 
-        if (!reservation.getUser().equals(user)) {
+        if(!reservation.getUser().getEmail().equals(email)) {
             throw new AccessDeniedException("You are not the owner of this reservation");
+        }
+        if(!reservation.getRoom().getId().equals(roomId)) {
+            throw new AccessDeniedException("This room is different this reservation's contents");
         }
 
         reservationRepository.deleteById(reservationId);
+
+        // 예약 삭제 카운터 증가
+        Counter.builder("reservation.cancel.count")
+                .tag("class", this.getClass().getName())
+                .tag("method", "cancelReservation")
+                .description("Counts the number of reservation cancellations")
+                .register(meterRegistry)
+                .increment();
 
         // 예약 취소 후 이메일 전송
         reservationEmailService.sendReservationCancellationEmail(
