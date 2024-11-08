@@ -74,4 +74,11 @@ public class Accommodation extends Timestamped {
         }
         rating = (long) (ratingSum/=reviews.size());
     }
+
+    // 테스트 코드를 위한 생성자 추가
+    public Accommodation(String name, String description, String address) {
+        this.name = name;
+        this.description = description;
+        this.address = address;
+    }
 }

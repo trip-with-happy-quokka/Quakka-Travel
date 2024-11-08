@@ -8,6 +8,16 @@ spring:
     # 1q2w3e4r5t
     password: ${DB_PASSWORD}
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME} # 이메일을 전송할 주체의 이메일 주소 (host mail)
+    password: ${APP_PASSWORD} # 해당 계정으로 발급받은 App password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+
   data:
     redis:
       host: localhost
