@@ -40,7 +40,7 @@ public class RedisConfig {
 
     // 레디스 서버와의 연결을 관리하는 객체
     @Bean
-    public RedisConnectionFactory awsRedisConnectionFactory() {
+    public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(redisHost);
         redisStandaloneConfiguration.setPort(redisPort);
@@ -93,7 +93,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedissonClient awsRedissonClient() {
+    public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
                 .setAddress(REDISSON_HOST_PREFIX + redisHost + ":" + redisPort);
