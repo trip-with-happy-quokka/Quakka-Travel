@@ -56,4 +56,13 @@ public class Room extends Timestamped {
         this.pricePerOverCapacity = pricePerOverCapacity;
         this.pricePerNight = pricePerNight;
     }
+
+    // 테스트 코드를 위한 생성자 추가
+    public Room(String name, String description, Long capacity, Long pricePerOverCapacity, Long pricePerNight) {
+        this.name = name;
+        this.description = description;
+        this.capacity = capacity;
+        this.pricePerOverCapacity = pricePerOverCapacity;
+        this.pricePerNight = pricePerNight;
+    }
 }

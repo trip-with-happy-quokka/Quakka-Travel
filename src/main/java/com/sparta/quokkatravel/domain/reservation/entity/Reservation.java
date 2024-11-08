@@ -1,6 +1,7 @@
 package com.sparta.quokkatravel.domain.reservation.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.common.shared.Timestamped;
@@ -99,5 +100,15 @@ public class Reservation extends Timestamped {
         }
 
         return totalprice;
+    }
+
+    // 테스트 코드를 위한 생성자 추가
+    public Reservation(LocalDate startDate, LocalDate endDate, Long numberOfGuests, User user, Room room) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.numberOfGuests = numberOfGuests;
+        this.totalPrice = calculateTotalPrice(startDate, endDate, room, null); // 쿠폰이 없는 경우
+        this.user = user;
+        this.room = room;
     }
 }
