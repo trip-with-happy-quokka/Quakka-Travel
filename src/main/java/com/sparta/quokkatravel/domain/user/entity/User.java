@@ -6,6 +6,8 @@ import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.review.entity.Review;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +18,8 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User extends Timestamped {
 
     @Id
@@ -62,7 +66,7 @@ public class User extends Timestamped {
         this.userRole = userRole;
     }
 
-    public void deleteAccount(){
+    public void deleteAccount() {
         this.isDelete = true;
     }
 

@@ -6,6 +6,8 @@ import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.common.shared.Timestamped;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -13,6 +15,8 @@ import java.time.temporal.ChronoUnit;
 
 @Entity
 @Getter
+@AllArgsConstructor
+@Builder
 //@Table(indexes = {
 //        @Index(name = "idx_reservation_user", columnList = "user_id"),
 //        @Index(name = "idx_reservation_room", columnList = "room_id")

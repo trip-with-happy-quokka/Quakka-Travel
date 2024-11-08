@@ -2,12 +2,16 @@ package com.sparta.quokkatravel.domain.admin.loginhistory.entity;
 
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@AllArgsConstructor
+@Builder
 @Table(name = "login_history")
 public class LoginHistory {
 
