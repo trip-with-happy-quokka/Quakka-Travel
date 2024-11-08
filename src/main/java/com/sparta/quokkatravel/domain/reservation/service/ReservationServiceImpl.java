@@ -3,6 +3,7 @@ package com.sparta.quokkatravel.domain.reservation.service;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
 import com.sparta.quokkatravel.domain.common.exception.InvalidRequestException;
+import com.sparta.quokkatravel.domain.common.monitoring.MetricService;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
@@ -25,6 +26,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -42,6 +45,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final CouponRepository couponRepository;
     private final ReservationEmailService reservationEmailService;
     private final MeterRegistry meterRegistry;
+    private final MetricService metricService;
 
 
     // 예약 생성
@@ -66,12 +70,10 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.save(reservation);
 
         // 예약 생성 카운터 증가
-        Counter.builder("reservation.create.count")
-                .tag("class", this.getClass().getName())
-                .tag("method", "createReservation")
-                .description("Counts the number of reservation creations")
-                .register(meterRegistry)
-                .increment();
+        metricService.incrementCounter(
+                "reservation.create.count",
+                "Counts the number of reservation creations",
+                Map.of("class", this.getClass().getName(),"method", "createReservation"));
 
         // 예약 생성 후 이메일 전송
         reservationEmailService.sendReservationCreationEmail(
@@ -155,12 +157,10 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.deleteById(reservationId);
 
         // 예약 삭제 카운터 증가
-        Counter.builder("reservation.cancel.count")
-                .tag("class", this.getClass().getName())
-                .tag("method", "cancelReservation")
-                .description("Counts the number of reservation cancellations")
-                .register(meterRegistry)
-                .increment();
+        metricService.incrementCounter(
+                "reservation.cancel.count",
+                "Counts the number of reservation cancel",
+                Map.of("class", this.getClass().getName(),"method", "cancelReservation"));
 
         // 예약 취소 후 이메일 전송
         reservationEmailService.sendReservationCancellationEmail(
@@ -168,4 +168,24 @@ public class ReservationServiceImpl implements ReservationService {
 
         return "Reservation deleted";
     }
+
+
+//    private void incrementCreateReservation() {
+//        Counter.builder("reservation.create.count")
+//                .tag("class", this.getClass().getName())
+//                .tag("method", "createReservation")
+//                .description("Counts the number of reservation creations")
+//                .register(meterRegistry)
+//                .increment();
+//    }
+//
+//    private void incrementCancelReservation() {
+//        Counter.builder("reservation.cancel.count")
+//                .tag("class", this.getClass().getName())
+//                .tag("method", "cancelReservation")
+//                .description("Counts the number of reservation cancellations")
+//                .register(meterRegistry)
+//                .increment();
+//    }
+
 }

@@ -29,7 +29,7 @@ public class ReservationResponseDto {
         this.numberOfGuests = reservation.getNumberOfGuests();
         this.totalPrice = reservation.getTotalPrice();
         this.status = reservation.getStatus();
-        this.reservationDate = reservation.getCreatedAt().toLocalDate();
+        this.reservationDate = reservation.getCreatedAt() != null ? reservation.getCreatedAt().toLocalDate() : LocalDate.now();
         this.user = new UserDto(reservation.getUser());
         this.room = new RoomDto(reservation.getRoom());
     }

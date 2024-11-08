@@ -5,7 +5,6 @@ import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationRespons
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
-import com.sparta.quokkatravel.domain.common.exception.UnAuthorizedException;
 import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.s3.S3Uploader;
 import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
@@ -17,9 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -31,12 +28,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class HostAccommodationServiceTest {
@@ -57,28 +52,32 @@ class HostAccommodationServiceTest {
     private HostAccommodationServiceImpl hostAccommodationService;
 
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private CustomUserDetails customUserDetails;
 
     @Test
     public void 숙소_생성_테스트() throws IOException {
         // given
-        CustomUserDetails userDetails = new CustomUserDetails(new User("host@example.com", "", "", UserRole.HOST));
-        AccommodationRequestDto requestDto = new AccommodationRequestDto("Test Accommodation", "Description", "Seoul");
-        MultipartFile image = Mockito.mock(MultipartFile.class);
+        MultipartFile image = mock(MultipartFile.class);
+        AccommodationRequestDto requestDto = new AccommodationRequestDto("Hotel", "A luxury hotel", "Address");
+        User user = new User("test@a.com", "password", "Test Name", UserRole.HOST);
+        String imageUrl = "http://image.url/accommodation.jpg";
 
-        User user = new User("host@example.com", "", "", UserRole.HOST);
-        String uploadedImageUrl = "https://example.com/image.jpg";
-        Accommodation accommodation = new Accommodation("Test Accommodation", "Description", "Seoul", uploadedImageUrl, user);
+        given(customUserDetails.getEmail()).willReturn(user.getEmail());
+        given(userRepository.findByEmailOrElseThrow(user.getEmail())).willReturn(user);
+        given(s3Uploader.upload(image, "accommodation")).willReturn(imageUrl);
 
-        given(userRepository.findByEmailOrElseThrow(userDetails.getEmail())).willReturn(user);
-        given(s3Uploader.upload(image, "accommodation")).willReturn(uploadedImageUrl);
+        Accommodation accommodation = new Accommodation(requestDto.getName(), requestDto.getDescription(), requestDto.getAddress(), imageUrl, user);
         given(accommodationRepository.save(any(Accommodation.class))).willReturn(accommodation);
 
+        AccommodationDocument accommodationDocument = new AccommodationDocument(accommodation);
+        given(accommodationSearchRepository.save(any(AccommodationDocument.class))).willReturn(accommodationDocument);
+
         // when
-        HostAccommodationResponseDto responseDto = hostAccommodationService.createAccommodation(userDetails, image, requestDto);
+        HostAccommodationResponseDto responseDto = hostAccommodationService.createAccommodation(customUserDetails, image, requestDto);
 
         // then
-        assertEquals("Test Accommodation", responseDto.getName());
+        assertNotNull(responseDto);
+        assertEquals(requestDto.getName(), responseDto.getName());
         verify(accommodationRepository, times(1)).save(any(Accommodation.class));
         verify(accommodationSearchRepository, times(1)).save(any(AccommodationDocument.class));
     }
@@ -112,7 +111,6 @@ class HostAccommodationServiceTest {
         User user = new User(1L, "host@example.com", "", "", UserRole.HOST);
         Accommodation accommodation = new Accommodation("Test Accommodation", "Description", "Seoul", "https://example.com/image.jpg", user);
 
-        given(userRepository.findByEmailOrElseThrow(userDetails.getEmail())).willReturn(user);
         given(accommodationRepository.findById(accommodationId)).willReturn(Optional.of(accommodation));
 
         // when
@@ -129,7 +127,6 @@ class HostAccommodationServiceTest {
         CustomUserDetails userDetails = new CustomUserDetails(new User(1L, "host@example.com", "", "", UserRole.HOST));
         Long accommodationId = 1L;
 
-        given(userRepository.findByEmailOrElseThrow(userDetails.getEmail())).willReturn(new User(1L, "host@example.com", "", "", UserRole.HOST));
         given(accommodationRepository.findById(accommodationId)).willReturn(Optional.empty());
 
         // when & then
@@ -146,7 +143,6 @@ class HostAccommodationServiceTest {
         Accommodation accommodation = new Accommodation("Test Accommodation", "Description", "Seoul", "https://example.com/image.jpg", anotherUser);
         AccommodationRequestDto requestDto = new AccommodationRequestDto("Updated Accommodation", "Updated Description", "Busan");
 
-        given(userRepository.findByEmailOrElseThrow(userDetails.getEmail())).willReturn(new User("host@example.com", "", "", UserRole.HOST));
         given(accommodationRepository.findById(accommodationId)).willReturn(Optional.of(accommodation));
 
         // when & then
@@ -157,9 +153,9 @@ class HostAccommodationServiceTest {
     @Test
     public void 숙소_삭제_테스트() {
         // given
-        CustomUserDetails userDetails = new CustomUserDetails(new User("host@example.com", "", "", UserRole.HOST));
+        CustomUserDetails userDetails = new CustomUserDetails(new User(1L, "host@example.com", "", "", UserRole.HOST));
         Long accommodationId = 1L;
-        User user = new User("host@example.com", "", "", UserRole.HOST);
+        User user = new User(1L, "host@example.com", "", "", UserRole.HOST);
         Accommodation accommodation = new Accommodation("Test Accommodation", "Description", "Seoul", "https://example.com/image.jpg", user);
         AccommodationDocument accommodationDocument = new AccommodationDocument(accommodation);
 
