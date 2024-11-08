@@ -1,6 +1,7 @@
 package com.sparta.quokkatravel.domain.reservation.service;
 
 import com.sparta.quokkatravel.domain.common.exception.InvalidRequestException;
+import com.sparta.quokkatravel.domain.common.monitoring.MetricService;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
 import com.sparta.quokkatravel.domain.notification.service.NotificationService;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -35,6 +37,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final CouponRepository couponRepository;
     private final NotificationService notificationService;
     private final MeterRegistry meterRegistry;
+    private final MetricService metricService;
 
     // 예약 생성
     @Override
@@ -56,12 +59,10 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.save(reservation);
 
         // 예약 생성 카운터 증가
-        Counter.builder("reservation.create.count")
-                .tag("class", this.getClass().getName())
-                .tag("method", "createReservation")
-                .description("Counts the number of reservation creations")
-                .register(meterRegistry)
-                .increment();
+        metricService.incrementCounter(
+                "reservation.create.count",
+                "Counts the number of reservation creations",
+                Map.of("class", this.getClass().getName(),"method", "createReservation"));
 
         notificationService.sendRealTimeNotification(" 예약 생성 완료 ", room.getName().toString() + " 방이 예약되었습니다. ");
 
@@ -138,16 +139,33 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.deleteById(reservationId);
 
         // 예약 삭제 카운터 증가
-        Counter.builder("reservation.cancel.count")
-                .tag("class", this.getClass().getName())
-                .tag("method", "cancelReservation")
-                .description("Counts the number of reservation cancellations")
-                .register(meterRegistry)
-                .increment();
+        metricService.incrementCounter(
+                "reservation.cancel.count",
+                "Counts the number of reservation cancel",
+                Map.of("class", this.getClass().getName(),"method", "cancelReservation"));
 
         notificationService.sendRealTimeNotification(" 예약 취소 완료 ", reservation.getRoom().getName() + " 방이 취소되었습니다. ");
 
         return "Reservation deleted";
     }
+
+
+//    private void incrementCreateReservation() {
+//        Counter.builder("reservation.create.count")
+//                .tag("class", this.getClass().getName())
+//                .tag("method", "createReservation")
+//                .description("Counts the number of reservation creations")
+//                .register(meterRegistry)
+//                .increment();
+//    }
+//
+//    private void incrementCancelReservation() {
+//        Counter.builder("reservation.cancel.count")
+//                .tag("class", this.getClass().getName())
+//                .tag("method", "cancelReservation")
+//                .description("Counts the number of reservation cancellations")
+//                .register(meterRegistry)
+//                .increment();
+//    }
 
 }

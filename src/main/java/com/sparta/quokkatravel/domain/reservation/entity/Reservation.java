@@ -6,13 +6,18 @@ import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.common.shared.Timestamped;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 @Entity
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 //@Table(indexes = {
 //        @Index(name = "idx_reservation_user", columnList = "user_id"),
 //        @Index(name = "idx_reservation_room", columnList = "room_id")
@@ -49,9 +54,6 @@ public class Reservation extends Timestamped {
     @JsonBackReference
     private Room room;
 
-
-
-    public Reservation() {}
 
     public Reservation(LocalDate startDate, LocalDate endDate, Long numberOfGuests, User user, Room room, Coupon coupon) {
         this.startDate = startDate;
