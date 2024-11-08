@@ -18,8 +18,6 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class User extends Timestamped {
 
     @Id

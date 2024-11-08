@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,16 +38,14 @@ class AdminLoginHistoryServiceTest {
     @Test
     void 모든_로그인_기록_조회_테스트() {
         // given
-        User user = User.builder()
-                .id(1L)
-                .nickname("TestUser")
-                .build();
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(user, "nickname", "TestUser");
 
-        LoginHistory loginHistory = LoginHistory.builder()
-                .user(user)
-                .ipAddress("127.0.0.1")
-                .loginTime(LocalDateTime.now())
-                .build();
+        LoginHistory loginHistory = new LoginHistory();
+        ReflectionTestUtils.setField(loginHistory, "user", user);
+        ReflectionTestUtils.setField(loginHistory, "ipAddress", "127.0.0.1");
+        ReflectionTestUtils.setField(loginHistory, "loginTime", LocalDateTime.now());
 
         List<LoginHistory> loginHistories = List.of(loginHistory);
 
@@ -65,16 +64,14 @@ class AdminLoginHistoryServiceTest {
     void 특정_사용자_로그인_기록_조회_테스트() {
         // given
         Long userId = 1L;
-        User user = User.builder()
-                .id(userId)
-                .nickname("TestUser")
-                .build();
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", userId);
+        ReflectionTestUtils.setField(user, "nickname", "TestUser");
 
-        LoginHistory loginHistory = LoginHistory.builder()
-                .user(user)
-                .ipAddress("127.0.0.1")
-                .loginTime(LocalDateTime.now())
-                .build();
+        LoginHistory loginHistory = new LoginHistory();
+        ReflectionTestUtils.setField(loginHistory, "user", user);
+        ReflectionTestUtils.setField(loginHistory, "ipAddress", "127.0.0.1");
+        ReflectionTestUtils.setField(loginHistory, "loginTime", LocalDateTime.now());
 
         List<LoginHistory> loginHistories = List.of(loginHistory);
 
@@ -94,10 +91,9 @@ class AdminLoginHistoryServiceTest {
     void 로그인_기록_저장_테스트() {
         // given
         Long userId = 1L;
-        User user = User.builder()
-                .id(userId)
-                .nickname("TestUser")
-                .build();
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", userId);
+        ReflectionTestUtils.setField(user, "nickname", "TestUser");
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user)); // userRepository에서 유효한 User 반환
 

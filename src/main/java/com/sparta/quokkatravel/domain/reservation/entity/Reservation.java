@@ -16,8 +16,6 @@ import java.time.temporal.ChronoUnit;
 
 @Entity
 @Getter
-@AllArgsConstructor
-@Builder
 //@Table(indexes = {
 //        @Index(name = "idx_reservation_user", columnList = "user_id"),
 //        @Index(name = "idx_reservation_room", columnList = "room_id")

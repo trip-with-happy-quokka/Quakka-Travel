@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,30 +37,27 @@ class AdminReservationServiceTest {
     @Test
     void 모든_예약_목록_조회_테스트() {
         // given
-        User user = User.builder()
-                .id(1L)
-                .email("dummy@example.com")
-                .password("password")
-                .nickname("TestUser")
-                .userRole(UserRole.USER)
-                .build();
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(user, "email", "dummy@example.com");
+        ReflectionTestUtils.setField(user, "password", "password");
+        ReflectionTestUtils.setField(user, "nickname", "TestUser");
+        ReflectionTestUtils.setField(user, "userRole", UserRole.USER);
 
-        Room room = Room.builder()
-                .id(1L)
-                .pricePerNight(100L)
-                .capacity(2L)
-                .build();
+        Room room = new Room();
+        ReflectionTestUtils.setField(room, "id", 1L);
+        ReflectionTestUtils.setField(room, "pricePerNight", 100L);
+        ReflectionTestUtils.setField(room, "capacity", 2L);
 
-        Reservation reservation = Reservation.builder()
-                .id(1L)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(2))
-                .numberOfGuests(2L)
-                .user(user)
-                .room(room)
-                .totalPrice(200L)
-                .status(ReservationStatus.CONFIRMED)
-                .build();
+        Reservation reservation = new Reservation();
+        ReflectionTestUtils.setField(reservation, "id", 1L);
+        ReflectionTestUtils.setField(reservation, "startDate", LocalDate.now());
+        ReflectionTestUtils.setField(reservation, "endDate", LocalDate.now().plusDays(2));
+        ReflectionTestUtils.setField(reservation, "numberOfGuests", 2L);
+        ReflectionTestUtils.setField(reservation, "user", user);
+        ReflectionTestUtils.setField(reservation, "room", room);
+        ReflectionTestUtils.setField(reservation, "totalPrice", 200L);
+        ReflectionTestUtils.setField(reservation, "status", ReservationStatus.CONFIRMED);
 
         List<Reservation> reservations = List.of(reservation);
         given(adminReservationRepository.findAll()).willReturn(reservations);
@@ -77,30 +75,27 @@ class AdminReservationServiceTest {
     void 특정_예약_상세_조회_테스트() {
         // given
         Long reservationId = 1L;
-        User user = User.builder()
-                .id(1L)
-                .email("dummy@example.com")
-                .password("password")
-                .nickname("TestUser")
-                .userRole(UserRole.USER)
-                .build();
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(user, "email", "dummy@example.com");
+        ReflectionTestUtils.setField(user, "password", "password");
+        ReflectionTestUtils.setField(user, "nickname", "TestUser");
+        ReflectionTestUtils.setField(user, "userRole", UserRole.USER);
 
-        Room room = Room.builder()
-                .id(1L)
-                .pricePerNight(100L)
-                .capacity(2L)
-                .build();
+        Room room = new Room();
+        ReflectionTestUtils.setField(room, "id", 1L);
+        ReflectionTestUtils.setField(room, "pricePerNight", 100L);
+        ReflectionTestUtils.setField(room, "capacity", 2L);
 
-        Reservation reservation = Reservation.builder()
-                .id(1L)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(2))
-                .numberOfGuests(2L)
-                .user(user)
-                .room(room)
-                .totalPrice(200L)
-                .status(ReservationStatus.CONFIRMED)
-                .build();
+        Reservation reservation = new Reservation();
+        ReflectionTestUtils.setField(reservation, "id", 1L);
+        ReflectionTestUtils.setField(reservation, "startDate", LocalDate.now());
+        ReflectionTestUtils.setField(reservation, "endDate", LocalDate.now().plusDays(2));
+        ReflectionTestUtils.setField(reservation, "numberOfGuests", 2L);
+        ReflectionTestUtils.setField(reservation, "user", user);
+        ReflectionTestUtils.setField(reservation, "room", room);
+        ReflectionTestUtils.setField(reservation, "totalPrice", 200L);
+        ReflectionTestUtils.setField(reservation, "status", ReservationStatus.CONFIRMED);
 
         given(adminReservationRepository.findById(reservationId)).willReturn(Optional.of(reservation));
 
@@ -130,27 +125,24 @@ class AdminReservationServiceTest {
     void 예약_삭제_테스트() {
         // given
         Long reservationId = 1L;
-        User user = User.builder()
-                .id(1L)
-                .email("dummy@example.com")
-                .password("password")
-                .nickname("TestUser")
-                .userRole(UserRole.USER)
-                .build();
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(user, "email", "dummy@example.com");
+        ReflectionTestUtils.setField(user, "password", "password");
+        ReflectionTestUtils.setField(user, "nickname", "TestUser");
+        ReflectionTestUtils.setField(user, "userRole", UserRole.USER);
 
-        Room room = Room.builder()
-                .id(1L)
-                .pricePerNight(100L)
-                .capacity(2L)
-                .build();
+        Room room = new Room();
+        ReflectionTestUtils.setField(room, "id", 1L);
+        ReflectionTestUtils.setField(room, "pricePerNight", 100L);
+        ReflectionTestUtils.setField(room, "capacity", 2L);
 
-        Reservation reservation = Reservation.builder()
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(2))
-                .numberOfGuests(2L)
-                .user(user)
-                .room(room)
-                .build();
+        Reservation reservation = new Reservation();
+        ReflectionTestUtils.setField(reservation, "startDate", LocalDate.now());
+        ReflectionTestUtils.setField(reservation, "endDate", LocalDate.now().plusDays(2));
+        ReflectionTestUtils.setField(reservation, "numberOfGuests", 2L);
+        ReflectionTestUtils.setField(reservation, "user", user);
+        ReflectionTestUtils.setField(reservation, "room", room);
 
         given(adminReservationRepository.findById(reservationId)).willReturn(Optional.of(reservation));
 

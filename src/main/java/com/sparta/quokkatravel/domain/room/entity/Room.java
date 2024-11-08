@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Room extends Timestamped {
 
     @Id

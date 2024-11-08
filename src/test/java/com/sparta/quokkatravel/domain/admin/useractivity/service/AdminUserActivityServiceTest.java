@@ -14,6 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,26 +36,24 @@ class AdminUserActivityServiceTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    private AdminUserActivityService adminUserActivityService; 
+    private AdminUserActivityService adminUserActivityService;
 
     @Test
     void 특정_사용자_활동_조회_테스트() {
         // given
         Long userId = 1L;
-        User user = User.builder()
-                .id(userId)
-                .email("dummy@example.com")
-                .password("password")
-                .nickname("TestUser")
-                .userRole(UserRole.USER)
-                .build();
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", userId);
+        ReflectionTestUtils.setField(user, "email", "dummy@example.com");
+        ReflectionTestUtils.setField(user, "password", "password");
+        ReflectionTestUtils.setField(user, "nickname", "TestUser");
+        ReflectionTestUtils.setField(user, "userRole", UserRole.USER);
 
-        UserActivity userActivity = UserActivity.builder()
-                .user(user)
-                .activityType("LOGIN")
-                .activityDate(LocalDateTime.now())
-                .description("사용자가 로그인했습니다.")
-                .build();
+        UserActivity userActivity = new UserActivity();
+        ReflectionTestUtils.setField(userActivity, "user", user);
+        ReflectionTestUtils.setField(userActivity, "activityType", "LOGIN");
+        ReflectionTestUtils.setField(userActivity, "activityDate", LocalDateTime.now());
+        ReflectionTestUtils.setField(userActivity, "description", "사용자가 로그인했습니다.");
 
         List<UserActivity> userActivities = List.of(userActivity);
 
@@ -75,14 +74,13 @@ class AdminUserActivityServiceTest {
         // given
         Long userId = 1L;
         AdminUserStatusUpdateRequestDto statusUpdateDto = new AdminUserStatusUpdateRequestDto("ACTIVE");
-        User user = User.builder()
-                .id(userId)
-                .email("dummy@example.com")
-                .password("password")
-                .nickname("TestUser")
-                .userRole(UserRole.USER)
-                .status("INACTIVE")
-                .build();
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", userId);
+        ReflectionTestUtils.setField(user, "email", "dummy@example.com");
+        ReflectionTestUtils.setField(user, "password", "password");
+        ReflectionTestUtils.setField(user, "nickname", "TestUser");
+        ReflectionTestUtils.setField(user, "userRole", UserRole.USER);
+        ReflectionTestUtils.setField(user, "status", "INACTIVE");
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
