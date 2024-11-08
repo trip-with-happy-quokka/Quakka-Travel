@@ -1,6 +1,5 @@
-package com.sparta.quokkatravel.domain.common.aop;
+package com.sparta.quokkatravel.domain.common.cache;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.springframework.data.redis.core.RedisTemplate;
