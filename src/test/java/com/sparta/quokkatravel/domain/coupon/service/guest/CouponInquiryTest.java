@@ -1,9 +1,10 @@
-package com.sparta.quokkatravel.domain.coupon.service;
+package com.sparta.quokkatravel.domain.coupon.service.guest;
 
 import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
+import com.sparta.quokkatravel.domain.coupon.service.CouponServiceImpl;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
@@ -34,10 +35,10 @@ public class CouponInquiryTest {
     @InjectMocks
     private CouponServiceImpl couponService;
 
-    private CustomUserDetails userDetails;
-    private User userGuest1;
-    private Coupon coupon;
-    private List<Coupon> couponList;
+    CustomUserDetails userDetails;
+    User userGuest1;
+    Coupon coupon;
+    List<Coupon> couponList;
 
     @BeforeEach
     void setUp() {
@@ -50,7 +51,7 @@ public class CouponInquiryTest {
     }
 
     @Test
-    public void 내쿠폰_전체조회_성공_테스트() {
+    public void 내쿠폰_전체조회_성공() {
 
         // given
         when(userRepository.findByEmailOrElseThrow(userDetails.getEmail())).thenReturn(userGuest1);

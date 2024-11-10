@@ -81,7 +81,7 @@ public class CouponServiceImpl implements CouponService {
                 return;
             }
 
-            final int quantity = usableCoupon(key);
+            final int quantity = (int) redissonClient.getBucket(key).get();
             System.out.println("quantity : " + quantity);
             if (quantity <= EMPTY) {
                 log.info("threadName : {} / 사용 가능 쿠폰 모두 소진", threadName);
@@ -89,7 +89,7 @@ public class CouponServiceImpl implements CouponService {
             }
 
             log.info("threadName : {} / 사용 가능 쿠폰 수량 : {}개", threadName, quantity);
-            setUsableCoupon(key, quantity - 1);
+            redissonClient.getBucket(key).set(quantity - 1);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -101,7 +101,7 @@ public class CouponServiceImpl implements CouponService {
 
     public void decreaseVolumeWithoutLock(final String key) {
         final String threadName = Thread.currentThread().getName();
-        final int quantity = usableCoupon(key);
+        final int quantity = (int) redissonClient.getBucket(key).get();
 
         if (quantity <= EMPTY) {
             log.info("threadName : {} / 사용 가능 쿠폰 모두 소진", threadName);
@@ -109,19 +109,7 @@ public class CouponServiceImpl implements CouponService {
         }
 
         log.info("threadName : {} / 사용 가능 쿠폰 수량 : {}개", threadName, quantity);
-        setUsableCoupon(key, quantity - 1);
-    }
-
-    public String keyResolver(String code) {
-        return "COUPON:" + code;
-    }
-
-    public void setUsableCoupon(String key, int quantity) {
-        redissonClient.getBucket(key).set(quantity);
-    }
-
-    public int usableCoupon(String key) {
-        return (int) redissonClient.getBucket(key).get();
+        redissonClient.getBucket(key).set(quantity - 1);
     }
 
     // 쿠폰 사용 메서드
