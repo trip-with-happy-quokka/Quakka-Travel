@@ -41,7 +41,7 @@ public class HostAccommodationController {
         return ResponseEntity.ok(ApiResponse.created("숙소 생성 성공", hostAccommodationResponseDto));
     }
 
-    // 숙소 전체 조회
+    // 내 숙소 전체 조회
     @GetMapping("/accommodations")
     @Operation(summary = "숙소 전체 조회", description = "HOST 유저의 숙소들을 조회하는 API")
     public ResponseEntity<?> getAllAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
@@ -81,7 +81,7 @@ public class HostAccommodationController {
                                                  @PathVariable(name = "accommodationId") Long accommodationId) {
 
         String deleteMessage = hostAccommodationService.deleteAccommodation(customUserDetails, accommodationId);
-        return ResponseEntity.ok(ApiResponse.success("숙소 수정 성공", deleteMessage));
+        return ResponseEntity.ok(ApiResponse.success("숙소 삭제 성공", deleteMessage));
     }
 
 }

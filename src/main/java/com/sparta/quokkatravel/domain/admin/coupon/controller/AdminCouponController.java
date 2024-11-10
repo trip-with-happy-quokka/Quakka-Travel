@@ -43,7 +43,8 @@ public class AdminCouponController {
     // 쿠폰 발급 (관리자 전용)
     @PostMapping
     @Operation(summary = "쿠폰 발급", description = "관리자가 쿠폰을 발급하는 API")
-    public ResponseEntity<?> createCoupon(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+    public ResponseEntity<?> createCoupon(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @RequestBody AdminCouponRequestDto couponRequestDto) {
         AdminCouponResponseDto coupon = adminCouponService.createCoupon(customUserDetails.getEmail(), couponRequestDto);
         return ResponseEntity.ok(ApiResponse.created("쿠폰 발급 성공", coupon));

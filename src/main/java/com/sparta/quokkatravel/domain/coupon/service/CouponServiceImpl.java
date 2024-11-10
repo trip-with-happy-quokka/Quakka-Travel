@@ -1,22 +1,15 @@
 package com.sparta.quokkatravel.domain.coupon.service;
 
-import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
-import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
 import com.sparta.quokkatravel.domain.common.exception.BadRequestException;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
-import com.sparta.quokkatravel.domain.coupon.dto.request.CouponRequestDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponCodeResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponDeleteResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponRedeemResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
-import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
 import com.sparta.quokkatravel.domain.email.service.CouponEmailService;
-import com.sparta.quokkatravel.domain.event.entity.Event;
-import com.sparta.quokkatravel.domain.event.repository.EventRepository;
-import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
 import com.sparta.quokkatravel.domain.search.document.CouponDocument;
 import com.sparta.quokkatravel.domain.search.repository.CouponSearchRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
@@ -30,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static java.lang.System.currentTimeMillis;
 
 @Slf4j
 @Service
@@ -51,19 +42,19 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     public CouponCodeResponseDto registerCoupon(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto) {
 
-        // -------------------------- 유효성 검사 ------------------------------------------
+
         // userId 로 User 조회
         User user = userRepository.findByEmailOrElseThrow(email);
 
         // 쿠폰 코드로 쿠폰 찾기
         Coupon coupon = couponRepository.findByCode(couponCodeRequestDto.getCouponCode())
                 .orElseThrow(() -> new NotFoundException("coupon is not found"));
-        // -------------------------------------------------------------------------------
+
 
 //            // 동시성 제어
 //            // 쿠폰 발급 (volume 하나 감소)
 //            coupon.decreaseVolume();
-        String key = coupon.getCode() + currentTimeMillis();
+        String key = coupon.getCode();
 
         decreaseVolumeWithLock(key);
 
@@ -94,7 +85,7 @@ public class CouponServiceImpl implements CouponService {
                 return;
             }
 
-            final int quantity = usableCoupon(key);
+            final int quantity = (int) redissonClient.getBucket(key).get();
             System.out.println("quantity : " + quantity);
             if (quantity <= EMPTY) {
                 log.info("threadName : {} / 사용 가능 쿠폰 모두 소진", threadName);
@@ -102,7 +93,7 @@ public class CouponServiceImpl implements CouponService {
             }
 
             log.info("threadName : {} / 사용 가능 쿠폰 수량 : {}개", threadName, quantity);
-            setUsableCoupon(key, quantity - 1);
+            redissonClient.getBucket(key).set(quantity - 1);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -114,7 +105,7 @@ public class CouponServiceImpl implements CouponService {
 
     public void decreaseVolumeWithoutLock(final String key) {
         final String threadName = Thread.currentThread().getName();
-        final int quantity = usableCoupon(key);
+        final int quantity = (int) redissonClient.getBucket(key).get();
 
         if (quantity <= EMPTY) {
             log.info("threadName : {} / 사용 가능 쿠폰 모두 소진", threadName);
@@ -122,19 +113,7 @@ public class CouponServiceImpl implements CouponService {
         }
 
         log.info("threadName : {} / 사용 가능 쿠폰 수량 : {}개", threadName, quantity);
-        setUsableCoupon(key, quantity - 1);
-    }
-
-    public String keyResolver(String code) {
-        return "COUPON:" + code;
-    }
-
-    public void setUsableCoupon(String key, int quantity) {
-        redissonClient.getBucket(key).set(quantity);
-    }
-
-    public int usableCoupon(String key) {
-        return (int) redissonClient.getBucket(key).get();
+        redissonClient.getBucket(key).set(quantity - 1);
     }
 
     // 쿠폰 사용 메서드
