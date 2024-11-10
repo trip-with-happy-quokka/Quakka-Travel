@@ -2,6 +2,7 @@ package com.sparta.quokkatravel.domain.common.jwt;
 
 import com.sparta.quokkatravel.domain.admin.loginhistory.service.AdminLoginHistoryService;
 import com.sparta.quokkatravel.domain.user.entity.User;
+import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -47,6 +48,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String email = claims.get("email", String.class);
+        UserRole userRole = UserRole.of(claims.get("userRole", String.class));
+        request.setAttribute("email", email);
+        log.info("email:{} ", email);
+        request.setAttribute("userRole", userRole);
+        log.info("userRole:{} ", userRole);
 
         // SecurityContextHolder에 인증 정보 저장
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {

@@ -1,6 +1,5 @@
 package com.sparta.quokkatravel.domain.payment.dto;
 
-import com.sparta.quokkatravel.domain.payment.entity.PayType;
 import com.sparta.quokkatravel.domain.payment.entity.Payment;
 import lombok.*;
 

@@ -5,6 +5,7 @@ import com.sparta.quokkatravel.domain.common.shared.Timestamped;
 import com.sparta.quokkatravel.domain.room.dto.RoomRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -48,6 +49,15 @@ public class Room extends Timestamped {
     }
 
     public void update(String name, String description, Long capacity, Long pricePerOverCapacity, Long pricePerNight) {
+        this.name = name;
+        this.description = description;
+        this.capacity = capacity;
+        this.pricePerOverCapacity = pricePerOverCapacity;
+        this.pricePerNight = pricePerNight;
+    }
+
+    // 테스트 코드를 위한 생성자 추가
+    public Room(String name, String description, Long capacity, Long pricePerOverCapacity, Long pricePerNight) {
         this.name = name;
         this.description = description;
         this.capacity = capacity;

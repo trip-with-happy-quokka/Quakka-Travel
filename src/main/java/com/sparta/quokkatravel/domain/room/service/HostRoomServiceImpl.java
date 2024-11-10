@@ -2,7 +2,7 @@ package com.sparta.quokkatravel.domain.room.service;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
-import com.sparta.quokkatravel.domain.common.aop.InvalidateRoomCache;
+import com.sparta.quokkatravel.domain.common.cache.InvalidateRoomCache;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.room.dto.HostRoomResponseDto;

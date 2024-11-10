@@ -50,6 +50,12 @@ dependencies {
     // jackson2json LocalDateTime handling
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2"
 
+    // email authentication
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -97,7 +103,12 @@ dependencies {
     implementation 'io.micrometer:micrometer-registry-prometheus' // prometheus 추가
 
     // SpringBatch
-    // implementataion 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    // jsoup
+    implementation 'org.jsoup:jsoup:1.18.1'
+
+    // logstash
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.0'
 
 }
 
