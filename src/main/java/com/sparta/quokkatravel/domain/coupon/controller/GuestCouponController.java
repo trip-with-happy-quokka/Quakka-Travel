@@ -1,9 +1,8 @@
 package com.sparta.quokkatravel.domain.coupon.controller;
 
-import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
-import com.sparta.quokkatravel.domain.coupon.dto.request.CouponRequestDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponCodeResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponDeleteResponseDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponRedeemResponseDto;
@@ -13,7 +12,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -24,32 +22,9 @@ import java.util.List;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Tag(name = "Coupon", description = "쿠폰 관련 컨트롤러")
-public class CouponController {
+public class GuestCouponController {
 
     private final CouponService couponService;
-    private final RedisTemplate<String, String> redisTemplate;
-
-    @PostMapping("/admin/events/{eventId}/coupons")
-    @Operation(summary = "행사 쿠폰 발행", description = "관리자 권한으로 쿠폰을 발행하는 API")
-    public ResponseEntity<?> createEventCoupon(
-            @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @PathVariable Long eventId,
-            @Valid @RequestBody CouponRequestDto couponRequestDto) {
-
-        CouponResponseDto couponResponseDto = couponService.createEventCoupon(customUserDetails.getEmail(), eventId, couponRequestDto);
-        return ResponseEntity.ok(ApiResponse.created("행사 쿠폰 발급 성공", couponResponseDto));
-    }
-
-    @PostMapping("/admin/accommodations/{accommodationId}/coupons")
-    @Operation(summary = "숙소 쿠폰 발행", description = "관리자 권한으로 쿠폰을 발행하는 API")
-    public ResponseEntity<?> createAccommodationCoupon(
-            @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @PathVariable Long accommodationId,
-            @Valid @RequestBody CouponRequestDto couponRequestDto) {
-
-        CouponResponseDto couponResponseDto = couponService.createAccommodationCoupon(customUserDetails.getEmail(), accommodationId, couponRequestDto);
-        return ResponseEntity.ok(ApiResponse.created("숙소 쿠폰 발급 성공", couponResponseDto));
-    }
 
     @PutMapping("/users/{userId}/coupons")
     @Operation(summary = "쿠폰 등록", description = "유저가 쿠폰 번호를 등록해서 본인 쿠폰으로 만드는 API")
