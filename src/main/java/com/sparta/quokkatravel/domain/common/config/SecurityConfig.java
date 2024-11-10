@@ -1,5 +1,8 @@
 package com.sparta.quokkatravel.domain.common.config;
 
+import com.sparta.quokkatravel.domain.common.jwt.CustomAuthenticationSuccessHandler;
+import com.sparta.quokkatravel.domain.common.jwt.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,13 +44,16 @@ public class SecurityConfig {
                         .requestMatchers("/topic/notifications/").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
-                        .requestMatchers("/api/v1/guest/**").permitAll()
+                        .requestMatchers("/api/v1/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/payment/**").permitAll()
+                        .requestMatchers("/Payment.html").permitAll()
                         .anyRequest().authenticated() // 그 외의 모든 요청은 인증 필요
                 )
-                .formLogin(form -> form // 로그인 성공 핸들러 추가
-                        .loginPage("/login") // 로그인 페이지 경로 설정(필요시 맞춤 설정 가능)
-                        .successHandler(customAuthenticationSuccessHandler) // 로그인 성공 시 핸들러 등록
-                        .permitAll()
+                .exceptionHandling(e -> e
+                                .authenticationEntryPoint((request, response, authException) -> {
+                                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                                })
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가
                 .build();

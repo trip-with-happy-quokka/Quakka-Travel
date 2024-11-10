@@ -1,0 +1,38 @@
+version: '3.8'  # Docker Compose 버전
+
+services:
+  app:
+    image: davidan94/quokka-0.0.1  # Docker 이미지 이름
+    container_name: quokka-app
+    ports:
+      - "8081:8080"  # 외부에서 접근 가능한 포트 설정 (8081을 8080과 매핑)
+    environment:
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY}
+      AWS_REGION: ${AWS_REGION}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      TOSS_PAYMENT_CLIENT_KEY: ${TOSS_PAYMENT_CLIENT_KEY}
+      TOSS_PAYMENT_SECRET_KEY: ${TOSS_PAYMENT_SECRET_KEY}
+      TOSS_PAYMENT_SUCCESS_URL: ${TOSS_PAYMENT_SUCCESS_URL}
+      TOSS_PAYMENT_FAIL_URL: ${TOSS_PAYMENT_FAIL_URL}
+      SPRING_PROFILES_ACTIVE: aws
+
+  db:
+    image: mysql:8.0
+    container_name: quokka-db
+    ports:
+      - "3306:3306"  # MySQL 기본 포트
+    environment:
+      MYSQL_ROOT_PASSWORD: "1234"
+      MYSQL_DATABASE: ${AWS_DB_NAME}  # 데이터베이스 이름
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql  # MySQL 데이터를 로컬 볼륨에 저장
+
+volumes:
+  db_data:  # MySQL 데이터 저장소

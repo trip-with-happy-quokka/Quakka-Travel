@@ -1,7 +1,7 @@
 package com.sparta.quokkatravel.domain.coupon.entity;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
-import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
+import com.sparta.quokkatravel.domain.common.shared.Timestamped;
 import com.sparta.quokkatravel.domain.event.entity.Event;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -18,6 +18,9 @@ import java.util.UUID;
 @Entity
 @Getter
 @NoArgsConstructor
+//@Table(indexes = {
+//        @Index(name = "idx_coupon_code_status_active_expired", columnList = "coupon_code, deletedAt, couponStatus")
+//})
 public class Coupon extends Timestamped {
 
     @Id
@@ -34,21 +37,25 @@ public class Coupon extends Timestamped {
     @Column(nullable = false)
     private CouponType couponType;
 
+    @Min(0)
+    @Column(name = "coupon_volume", nullable = false)
+    private Integer volume;
+
     @Column(name = "coupon_code", unique = true, nullable = false)
     private String code;
 
     @Enumerated(EnumType.STRING)
     @Column
-    private CouponStatus couponStatus;
+    private CouponStatus couponStatus = CouponStatus.ISSUED;
 
     @Min(0)
     @Max(100)
     @Column(name = "discount_rate")
-    private Integer discountRate;
+    private Integer discountRate = 0;
 
     @Min(0)
     @Column(name = "discount_amount")
-    private Integer discountAmount;
+    private Integer discountAmount = 0;
 
     @Column(name = "valid_from", nullable = false)
     private LocalDate validFrom;
@@ -81,35 +88,18 @@ public class Coupon extends Timestamped {
     @Column(name = "registered_at")
     private LocalDateTime registeredAt;
 
-    public Coupon(String couponName, String couponContent, String couponType, String couponCode,
-                  CouponStatus couponStatus, int discountRate, int discountAmount,
-                  LocalDate validFrom, LocalDate validUntil, Event event, User createdBy) {
+    public Coupon(String couponName, String couponContent, String couponType, Integer volume,
+                  String couponCode, int discountRate, int discountAmount,
+                  LocalDate validFrom, LocalDate validUntil,User createdBy) {
         this.name = couponName;
         this.content = couponContent;
         this.couponType = CouponType.valueOf(couponType);
-        this.code = couponCode;
-        this.couponStatus = couponStatus;
+        this.volume = volume;
+        if(couponCode==null) { this.code = createCouponCode();} else { this.code = couponCode; }
         this.discountRate = discountRate;
         this.discountAmount = discountAmount;
         this.validFrom = validFrom;
         this.validUntil = validUntil;
-        this.event = event;
-        this.createdBy = createdBy;
-    }
-
-    public Coupon(String couponName, String couponContent, String couponType, String couponCode,
-                  CouponStatus couponStatus, int discountRate, int discountAmount,
-                  LocalDate validFrom, LocalDate validUntil, Accommodation accommodation, User createdBy) {
-        this.name = couponName;
-        this.content = couponContent;
-        this.couponType = CouponType.valueOf(couponType);
-        this.code = couponCode;
-        this.couponStatus = couponStatus;
-        this.discountRate = discountRate;
-        this.discountAmount = discountAmount;
-        this.validFrom = validFrom;
-        this.validUntil = validUntil;
-        this.accommodation = accommodation;
         this.createdBy = createdBy;
     }
 
@@ -129,7 +119,8 @@ public class Coupon extends Timestamped {
     }
 
     // 쿠폰 수정 메서드 추가
-    public void updateCoupon(String code, String name, int discountAmount, LocalDate validFrom, LocalDate validUntil, CouponType couponType, String content) {
+    public void updateCoupon(String code, String name, int discountAmount, LocalDate validFrom, LocalDate validUntil,
+                             CouponType couponType, String content) {
         this.code = code;
         this.name = name;
         this.discountAmount = discountAmount;
@@ -140,6 +131,7 @@ public class Coupon extends Timestamped {
     }
 
     public void deleteCoupon() {
+        this.couponStatus = CouponStatus.DELETED;
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();  // 삭제 시점 저장
     }
@@ -153,4 +145,12 @@ public class Coupon extends Timestamped {
     public void redeemCoupon() {
         this.couponStatus= CouponStatus.REDEEMED;
     }
+
+    public void addAccommodation(Accommodation accommodation) {
+        this.accommodation = accommodation;
+    }
+    public void addEvent(Event event) {
+        this.event = event;
+    }
+
 }

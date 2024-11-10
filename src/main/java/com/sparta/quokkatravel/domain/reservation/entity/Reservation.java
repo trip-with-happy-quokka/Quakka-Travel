@@ -1,20 +1,28 @@
 package com.sparta.quokkatravel.domain.reservation.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.room.entity.Room;
-import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
-import com.sparta.quokkatravel.domain.payment.entity.Payment;
+import com.sparta.quokkatravel.domain.common.shared.Timestamped;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 @Entity
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+//@Table(indexes = {
+//        @Index(name = "idx_reservation_user", columnList = "user_id"),
+//        @Index(name = "idx_reservation_room", columnList = "room_id")
+//})
 public class Reservation extends Timestamped {
 
     @Id
@@ -48,9 +56,6 @@ public class Reservation extends Timestamped {
     private Room room;
 
 
-
-    public Reservation() {}
-
     public Reservation(LocalDate startDate, LocalDate endDate, Long numberOfGuests, User user, Room room, Coupon coupon) {
         this.startDate = startDate;
         this.endDate = endDate;
@@ -60,18 +65,24 @@ public class Reservation extends Timestamped {
         this.room = room;
     }
 
-    public void update(LocalDate startDate, LocalDate endDate, Long numberOfGuests) {
+    public void update(LocalDate startDate, LocalDate endDate, Long numberOfGuests, Room room, Coupon coupon) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.numberOfGuests = numberOfGuests;
+        this.room = room;
+        this.totalPrice = calculateTotalPrice(startDate, endDate, room, coupon);
+    }
+
+    public void updateStatus(ReservationStatus status) {
+        this.status = status;
     }
 
     public Long calculateTotalPrice(LocalDate startDate, LocalDate endDate, Room room, Coupon coupon) {
 
         Long pricePerNight = room.getPricePerNight();
 
-        if(numberOfGuests < room.getCapacity()) {
-            pricePerNight += (room.getCapacity() - numberOfGuests) * room.getPricePerOverCapacity();
+        if(room.getCapacity() < numberOfGuests) {
+            pricePerNight += (numberOfGuests - room.getCapacity()) * room.getPricePerOverCapacity();
         }
 
         Long totalDays =  ChronoUnit.DAYS.between(startDate, endDate) + 1;
@@ -87,5 +98,15 @@ public class Reservation extends Timestamped {
         }
 
         return totalprice;
+    }
+
+    // 테스트 코드를 위한 생성자 추가
+    public Reservation(LocalDate startDate, LocalDate endDate, Long numberOfGuests, User user, Room room) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.numberOfGuests = numberOfGuests;
+        this.totalPrice = calculateTotalPrice(startDate, endDate, room, null); // 쿠폰이 없는 경우
+        this.user = user;
+        this.room = room;
     }
 }

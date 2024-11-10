@@ -1,0 +1,13 @@
+POST http://43.202.0.210:9200/index003/_doc/3
+Content-Type: application/json
+Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
+
+{
+  "accommodationId": 1,
+  "name": "Lovely가평",
+  "koreanPartOfName": "가평",
+  "englishPartOfName": "Lovely",
+  "address": "서울 강남구",
+  "rating": 5,
+  "imageurl": "http://example.com/image1.jpg"
+}

@@ -1,6 +1,6 @@
 package com.sparta.quokkatravel.domain.user.service;
 
-import com.sparta.quokkatravel.domain.common.config.JwtUtil;
+import com.sparta.quokkatravel.domain.common.jwt.JwtUtil;
 import com.sparta.quokkatravel.domain.user.dto.UserLoginRequestDto;
 import com.sparta.quokkatravel.domain.user.dto.UserResponseDto;
 import com.sparta.quokkatravel.domain.user.dto.UserSignupRequestDto;
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // JWT 토큰 생성
-        String token = jwtUtil.createToken(user.getEmail(), user.getUserRole());
+        String token = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole());
         return token;
     }
 

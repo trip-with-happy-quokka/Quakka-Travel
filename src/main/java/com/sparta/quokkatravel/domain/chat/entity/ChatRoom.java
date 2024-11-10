@@ -1,48 +1,50 @@
 package com.sparta.quokkatravel.domain.chat.entity;
 
-import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
 import com.sparta.quokkatravel.domain.user.entity.User;
-import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.socket.WebSocketSession;
+import org.springframework.data.annotation.CreatedDate;
 
-import java.net.http.WebSocket;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+@Data
 @Entity
-@Getter
 @NoArgsConstructor
-public class ChatRoom extends Timestamped {
+@AllArgsConstructor
+public class ChatRoom {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    // 방 제목
-    @Column(nullable = false)
-    private String title;
+    //단방향
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "lastChatMesgId")
+    private ChatMessage lastChatMesg;
 
-    // 방 소유자 (User 객체로 변경)
-    @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner; // ownerId에서 User 객체로 변경
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "ChatRoom_Members",
+            joinColumns = @JoinColumn(name = "chatRoomId"),
+            inverseJoinColumns = @JoinColumn(name = "userId"))
+    private Set<User> chatRoomMembers = new HashSet<>();
 
-    // 참여자 리스트 추가
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
-    private List<ChatParticipant> participants = new ArrayList<>();
+    @Column(name = "createdAt", updatable = false)
+    @CreatedDate
+    private LocalDateTime createdAt;
 
+    public static ChatRoom create() {
 
-    // 생성자: 채팅방 제목을 받아서 ChatRoom 객체 생성
-    public ChatRoom(String title, User owner) {
-        this.title = title;
-        this.owner = owner;
+        ChatRoom room = new ChatRoom();
+
+        return room;
     }
 
+    public void addMembers(User roomMaker, User guest) {
+        this.chatRoomMembers.add(roomMaker);
+        this.chatRoomMembers.add(guest);
+    }
 }

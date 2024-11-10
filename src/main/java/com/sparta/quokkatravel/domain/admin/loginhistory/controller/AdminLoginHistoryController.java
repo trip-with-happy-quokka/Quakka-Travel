@@ -2,7 +2,7 @@ package com.sparta.quokkatravel.domain.admin.loginhistory.controller;
 
 import com.sparta.quokkatravel.domain.admin.loginhistory.dto.AdminLoginHistoryResponseDto;
 import com.sparta.quokkatravel.domain.admin.loginhistory.service.AdminLoginHistoryService;
-import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

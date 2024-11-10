@@ -3,12 +3,15 @@ package com.sparta.quokkatravel.domain.accommodation.controller;
 import com.sparta.quokkatravel.domain.accommodation.dto.AccommodationRequestDto;
 import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationResponseDto;
 import com.sparta.quokkatravel.domain.accommodation.service.HostAccommodationService;
-import com.sparta.quokkatravel.domain.common.advice.ApiResponse;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
+import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,12 +41,14 @@ public class HostAccommodationController {
         return ResponseEntity.ok(ApiResponse.created("숙소 생성 성공", hostAccommodationResponseDto));
     }
 
-    // 숙소 전체 조회
+    // 내 숙소 전체 조회
     @GetMapping("/accommodations")
     @Operation(summary = "숙소 전체 조회", description = "HOST 유저의 숙소들을 조회하는 API")
     public ResponseEntity<?> getAllAccommodation(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                 @RequestParam(required = false) Pageable pageable) {
+                                                 @RequestParam(required = false, defaultValue = "0") int pageNo,
+                                                 @RequestParam(required = false, defaultValue = "10") int pageSize) {
 
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
         Page<HostAccommodationResponseDto> accommodations = hostAccommodationService.getAllAccommodation(customUserDetails, pageable);
         return ResponseEntity.ok(ApiResponse.success("숙소 조회 성공", accommodations));
     }
@@ -76,7 +81,7 @@ public class HostAccommodationController {
                                                  @PathVariable(name = "accommodationId") Long accommodationId) {
 
         String deleteMessage = hostAccommodationService.deleteAccommodation(customUserDetails, accommodationId);
-        return ResponseEntity.ok(ApiResponse.success("숙소 수정 성공", deleteMessage));
+        return ResponseEntity.ok(ApiResponse.success("숙소 삭제 성공", deleteMessage));
     }
 
 }

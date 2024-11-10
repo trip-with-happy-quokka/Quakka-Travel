@@ -1,12 +1,14 @@
 package com.sparta.quokkatravel.domain.payment.entity;
 
-import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
+import com.sparta.quokkatravel.domain.common.shared.Timestamped;
 import com.sparta.quokkatravel.domain.payment.dto.PaymentResponseDto;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
+import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.domain.Auditable;
+
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -23,20 +25,26 @@ public class Payment extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id", nullable = false, unique = true)
     private Long paymentId;
-    @Column(nullable = false , name = "pay_type")
-    @Enumerated(EnumType.STRING)
-    private PayType payType;
+
     @Column(nullable = false , name = "pay_amount")
     private Long amount;
+
     @Column(nullable = false , name = "pay_name")
     private String orderName;
+
     @Column(nullable = false , name = "order_id")
     private String orderId;
 
     private boolean paySuccessYN;
+
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
+
     @Column
     private String paymentKey;
     @Column
@@ -44,12 +52,12 @@ public class Payment extends Timestamped {
 
     @Column
     private boolean cancelYN;
+
     @Column
     private String cancelReason;
 
     public PaymentResponseDto toPaymentResponseDto() { // DB에 저장하게 될 결제 관련 정보들
         return PaymentResponseDto.builder()
-                .payType(payType.getDescription())
                 .amount(amount)
                 .orderName(orderName)
                 .orderId(orderId)
@@ -59,5 +67,15 @@ public class Payment extends Timestamped {
                 .cancelYN(cancelYN)
                 .failReason(failReason)
                 .build();
+    }
+
+    public Payment(User user, Reservation reservation) {
+        this.amount = reservation.getTotalPrice();
+        this.orderName = reservation.getId().toString();
+        this.orderId = UUID.randomUUID().toString();
+        this.user = user;
+        this.reservation = reservation;
+        this.paySuccessYN = false;
+
     }
 }

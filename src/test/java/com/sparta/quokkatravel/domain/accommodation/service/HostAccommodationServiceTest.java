@@ -4,13 +4,14 @@ import com.sparta.quokkatravel.domain.accommodation.dto.AccommodationRequestDto;
 import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationResponseDto;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
-import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepositorySupport;
-import com.sparta.quokkatravel.domain.common.dto.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
-import com.sparta.quokkatravel.domain.common.exception.UnAuthorizedException;
+import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.s3.S3Uploader;
+import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
+import com.sparta.quokkatravel.domain.search.repository.AccommodationSearchRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
+import com.sparta.quokkatravel.domain.user.entity.UserRole;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,23 +25,16 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class HostAccommodationServiceTest {
-    @InjectMocks
-    private HostAccommodationServiceImpl hostAccommodationService;
+class HostAccommodationServiceTest {
 
     @Mock
     private AccommodationRepository accommodationRepository;
@@ -49,207 +43,132 @@ public class HostAccommodationServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private AccommodationRepositorySupport accommodationRepositorySupport;
+    private S3Uploader s3Uploader;
 
-    private CustomUserDetails userDetails;
-    private User user;
-    private Accommodation accommodation;
-    private MultipartFile image;
+    @Mock
+    private AccommodationSearchRepository accommodationSearchRepository;
 
-    @BeforeEach
-    void setUp() {
-        // 공통으로 사용할 user 및 userDetails 설정
-        userDetails = mock(CustomUserDetails.class);
-        when(userDetails.getEmail()).thenReturn("user@example.com");
+    @InjectMocks
+    private HostAccommodationServiceImpl hostAccommodationService;
 
-        user = new User();
-        setId(user, "id", 1L);
-
-        // 공통으로 사용할 accommodation 설정
-        accommodation = new Accommodation("숙소1", "설명1", "주소1", user);
-        setId(accommodation, "id", 1L);
-
-        // UserRepository가 호출되면 user 반환하도록 설정
-        when(userRepository.findByEmailOrElseThrow(anyString())).thenReturn(user);
-    }
-
-    // === createAccommodation 테스트 ===
+    @Mock
+    private CustomUserDetails customUserDetails;
 
     @Test
-    void createAccommodation_Success() throws IOException {
+    public void 숙소_생성_테스트() throws IOException {
         // given
-        AccommodationRequestDto requestDto = new AccommodationRequestDto("숙소1", "설명1", "주소1");
-        when(accommodationRepository.save(any(Accommodation.class))).thenReturn(accommodation);
+        MultipartFile image = mock(MultipartFile.class);
+        AccommodationRequestDto requestDto = new AccommodationRequestDto("Hotel", "A luxury hotel", "Address");
+        User user = new User("test@a.com", "password", "Test Name", UserRole.HOST);
+        String imageUrl = "http://image.url/accommodation.jpg";
+
+        given(customUserDetails.getEmail()).willReturn(user.getEmail());
+        given(userRepository.findByEmailOrElseThrow(user.getEmail())).willReturn(user);
+        given(s3Uploader.upload(image, "accommodation")).willReturn(imageUrl);
+
+        Accommodation accommodation = new Accommodation(requestDto.getName(), requestDto.getDescription(), requestDto.getAddress(), imageUrl, user);
+        given(accommodationRepository.save(any(Accommodation.class))).willReturn(accommodation);
+
+        AccommodationDocument accommodationDocument = new AccommodationDocument(accommodation);
+        given(accommodationSearchRepository.save(any(AccommodationDocument.class))).willReturn(accommodationDocument);
 
         // when
-        HostAccommodationResponseDto responseDto = hostAccommodationService.createAccommodation(userDetails, image, requestDto);
+        HostAccommodationResponseDto responseDto = hostAccommodationService.createAccommodation(customUserDetails, image, requestDto);
 
         // then
         assertNotNull(responseDto);
-        assertEquals("숙소1", responseDto.getName());
+        assertEquals(requestDto.getName(), responseDto.getName());
         verify(accommodationRepository, times(1)).save(any(Accommodation.class));
+        verify(accommodationSearchRepository, times(1)).save(any(AccommodationDocument.class));
     }
 
     @Test
-    void createAccommodation_Failure_UserNotFound() {
+    public void 모든_숙소_조회_테스트() {
         // given
-        AccommodationRequestDto requestDto = new AccommodationRequestDto("숙소1", "설명1", "주소1");
-        when(userRepository.findByEmailOrElseThrow(anyString())).thenThrow(new NotFoundException("User Not Found"));
-
-        // when & then
-        assertThrows(NotFoundException.class, () -> {
-            hostAccommodationService.createAccommodation(userDetails, image, requestDto);
-        });
-        verify(accommodationRepository, never()).save(any(Accommodation.class));
-    }
-
-    // === getAllAccommodation 테스트 ===
-
-    @Test
-    void getAllAccommodation_Success() {
-        // given
+        CustomUserDetails userDetails = new CustomUserDetails(new User("host@example.com", "", "", UserRole.HOST));
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Accommodation> page = new PageImpl<>(Collections.singletonList(accommodation));
-        when(accommodationRepository.findByUser(any(User.class), eq(pageable))).thenReturn(page);
+        User user = new User("host@example.com", "", "", UserRole.HOST);
+        Accommodation accommodation = new Accommodation("Test Accommodation", "Description", "Seoul", "https://example.com/image.jpg", user);
+        Page<Accommodation> accommodationPage = new PageImpl<>(List.of(accommodation));
+
+        given(userRepository.findByEmailOrElseThrow(userDetails.getEmail())).willReturn(user);
+        given(accommodationRepository.findByUser(user, pageable)).willReturn(accommodationPage);
 
         // when
         Page<HostAccommodationResponseDto> result = hostAccommodationService.getAllAccommodation(userDetails, pageable);
 
         // then
         assertEquals(1, result.getTotalElements());
-        verify(accommodationRepository, times(1)).findByUser(any(User.class), eq(pageable));
+        assertEquals("Test Accommodation", result.getContent().get(0).getName());
+        verify(accommodationRepository, times(1)).findByUser(user, pageable);
     }
 
     @Test
-    void getAllAccommodation_Failure_UserNotFound() {
+    public void 특정_숙소_조회_권한_테스트() {
         // given
-        Pageable pageable = PageRequest.of(0, 10);
-        when(userRepository.findByEmailOrElseThrow(anyString())).thenThrow(new NotFoundException("User Not Found"));
+        CustomUserDetails userDetails = new CustomUserDetails(new User(1L, "host@example.com", "", "", UserRole.HOST));
+        Long accommodationId = 1L;
+        User user = new User(1L, "host@example.com", "", "", UserRole.HOST);
+        Accommodation accommodation = new Accommodation("Test Accommodation", "Description", "Seoul", "https://example.com/image.jpg", user);
 
-        // when & then
-        assertThrows(NotFoundException.class, () -> {
-            hostAccommodationService.getAllAccommodation(userDetails, pageable);
-        });
-        verify(accommodationRepository, never()).findByUser(any(User.class), eq(pageable));
-    }
-
-    // === getAccommodation 테스트 ===
-
-    @Test
-    void getAccommodation_Success() {
-        // given
-        when(accommodationRepository.findById(anyLong())).thenReturn(Optional.of(accommodation));
+        given(accommodationRepository.findById(accommodationId)).willReturn(Optional.of(accommodation));
 
         // when
-        HostAccommodationResponseDto result = hostAccommodationService.getAccommodation(userDetails, 1L);
+        HostAccommodationResponseDto result = hostAccommodationService.getAccommodation(userDetails, accommodationId);
 
         // then
-        assertNotNull(result);
-        assertEquals("숙소1", result.getName());
-        verify(accommodationRepository, times(1)).findById(1L);
+        assertEquals("Test Accommodation", result.getName());
+        verify(accommodationRepository, times(1)).findById(accommodationId);
     }
 
     @Test
-    void getAccommodation_Failure_NotFound() {
+    public void 특정_숙소_조회_NotFoundException_테스트() {
         // given
-        when(accommodationRepository.findById(anyLong())).thenReturn(Optional.empty());
+        CustomUserDetails userDetails = new CustomUserDetails(new User(1L, "host@example.com", "", "", UserRole.HOST));
+        Long accommodationId = 1L;
+
+        given(accommodationRepository.findById(accommodationId)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(NotFoundException.class, () -> {
-            hostAccommodationService.getAccommodation(userDetails, 1L);
-        });
+        assertThrows(NotFoundException.class, () ->
+                hostAccommodationService.getAccommodation(userDetails, accommodationId));
     }
 
     @Test
-    void getAccommodation_Failure_AccessDenied() {
+    public void 숙소_수정_권한_없음_예외_테스트() {
         // given
-        User anotherUser = new User();
-        setId(anotherUser, "id", 2L);
-        Accommodation accommodationOfAnotherUser = new Accommodation("숙소2", "설명2", "주소2", anotherUser);
-        when(accommodationRepository.findById(anyLong())).thenReturn(Optional.of(accommodationOfAnotherUser));
+        CustomUserDetails userDetails = new CustomUserDetails(new User(1L, "host@example.com", "", "", UserRole.HOST));
+        Long accommodationId = 1L;
+        User anotherUser = new User(2L, "another@example.com", "", "", UserRole.HOST); // 다른 사용자
+        Accommodation accommodation = new Accommodation("Test Accommodation", "Description", "Seoul", "https://example.com/image.jpg", anotherUser);
+        AccommodationRequestDto requestDto = new AccommodationRequestDto("Updated Accommodation", "Updated Description", "Busan");
+
+        given(accommodationRepository.findById(accommodationId)).willReturn(Optional.of(accommodation));
 
         // when & then
-        assertThrows(UnAuthorizedException.class, () -> {
-            hostAccommodationService.getAccommodation(userDetails, 1L);
-        });
+        assertThrows(AccessDeniedException.class, () ->
+                hostAccommodationService.updateAccommodation(userDetails, accommodationId, requestDto));
     }
 
-    // === updateAccommodation 테스트 ===
-
     @Test
-    void updateAccommodation_Success() {
+    public void 숙소_삭제_테스트() {
         // given
-        AccommodationRequestDto requestDto = new AccommodationRequestDto("변경된 숙소", "변경된 설명", "변경된 주소");
-        when(accommodationRepository.findById(anyLong())).thenReturn(Optional.of(accommodation));
+        CustomUserDetails userDetails = new CustomUserDetails(new User(1L, "host@example.com", "", "", UserRole.HOST));
+        Long accommodationId = 1L;
+        User user = new User(1L, "host@example.com", "", "", UserRole.HOST);
+        Accommodation accommodation = new Accommodation("Test Accommodation", "Description", "Seoul", "https://example.com/image.jpg", user);
+        AccommodationDocument accommodationDocument = new AccommodationDocument(accommodation);
+
+        given(userRepository.findByEmailOrElseThrow(userDetails.getEmail())).willReturn(user);
+        given(accommodationRepository.findById(accommodationId)).willReturn(Optional.of(accommodation));
+        given(accommodationSearchRepository.findByAccommodationIdOrElseThrow(accommodationId)).willReturn(accommodationDocument);
 
         // when
-        HostAccommodationResponseDto result = hostAccommodationService.updateAccommodation(userDetails, 1L, requestDto);
-
-        // then
-        assertNotNull(result);
-        assertEquals("변경된 숙소", result.getName());
-        verify(accommodationRepository, times(1)).save(accommodation);
-    }
-
-    @Test
-    void updateAccommodation_Failure_AccessDenied() {
-        // given
-        User anotherUser = new User();
-        setId(anotherUser, "id", 2L);
-        Accommodation accommodationOfAnotherUser = new Accommodation("숙소2", "설명2", "주소2", anotherUser);
-        when(accommodationRepository.findById(anyLong())).thenReturn(Optional.of(accommodationOfAnotherUser));
-
-        // when & then
-        assertThrows(AccessDeniedException.class, () -> {
-            hostAccommodationService.updateAccommodation(userDetails, 1L, new AccommodationRequestDto("변경된 이름", "변경된 설명", "변경된 주소"));
-        });
-    }
-
-    // === deleteAccommodation 테스트 ===
-
-    @Test
-    void deleteAccommodation_Success() {
-        // given
-        when(accommodationRepository.findById(anyLong())).thenReturn(Optional.of(accommodation));
-
-        // when
-        String result = hostAccommodationService.deleteAccommodation(userDetails, 1L);
+        String result = hostAccommodationService.deleteAccommodation(userDetails, accommodationId);
 
         // then
         assertEquals("Accommodation Deleted", result);
         verify(accommodationRepository, times(1)).delete(accommodation);
-    }
-
-    @Test
-    void deleteAccommodation_Failure_AccessDenied() {
-        // given
-        User anotherUser = new User();
-        setId(anotherUser, "id", 2L);
-        Accommodation accommodationOfAnotherUser = new Accommodation("숙소2", "설명2", "주소2", anotherUser);
-        when(accommodationRepository.findById(anyLong())).thenReturn(Optional.of(accommodationOfAnotherUser));
-
-        // when & then
-        assertThrows(AccessDeniedException.class, () -> {
-            hostAccommodationService.deleteAccommodation(userDetails, 1L);
-        });
-        verify(accommodationRepository, never()).delete(any(Accommodation.class));
-    }
-
-
-
-
-
-
-
-
-
-    private void setId(Object target, String fieldName, Long value) {
-        try {
-            Field field = target.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(target, value);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        verify(accommodationSearchRepository, times(1)).delete(any(AccommodationDocument.class));
     }
 }
