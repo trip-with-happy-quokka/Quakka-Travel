@@ -11,6 +11,7 @@ import com.sparta.quokkatravel.domain.coupon.dto.response.CouponRedeemResponseDt
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
+import com.sparta.quokkatravel.domain.coupon.util.CouponLockUtil;
 import com.sparta.quokkatravel.domain.email.service.CouponEmailService;
 import com.sparta.quokkatravel.domain.search.document.CouponDocument;
 import com.sparta.quokkatravel.domain.search.repository.CouponSearchRepository;
@@ -37,6 +38,7 @@ public class CouponServiceImpl implements CouponService {
     private final RedissonClient redissonClient;
     private final CouponSearchRepository couponSearchRepository;
     private final CouponEmailService couponEmailService;
+    private final CouponLockUtil couponLockUtil;
     private final int EMPTY = 0;
 
     // 쿠폰 등록 메서드 ( 분산락 사용 )
@@ -90,7 +92,7 @@ public class CouponServiceImpl implements CouponService {
 //            coupon.decreaseVolume();
         String key = coupon.getCode();
 
-        decreaseVolumeWithLock(key);
+        CouponLockUtil.decreaseVolumeWithLock(redissonClient, key);
 
 
         // 쿠폰 소유자 및 등록일자 등록
@@ -107,47 +109,6 @@ public class CouponServiceImpl implements CouponService {
                 coupon.getValidFrom(),
                 coupon.getValidUntil()
         );
-    }
-
-    public void decreaseVolumeWithLock(final String key) {
-        final String lockName = key + ":lock";
-        final RLock lock = redissonClient.getLock(lockName);
-        final String threadName = Thread.currentThread().getName();
-
-        try {
-            if (!lock.tryLock(1, 3, TimeUnit.SECONDS)) {
-                return;
-            }
-
-            final int quantity = (int) redissonClient.getBucket(key).get();
-            System.out.println("quantity : " + quantity);
-            if (quantity <= EMPTY) {
-                log.info("threadName : {} / 사용 가능 쿠폰 모두 소진", threadName);
-                return;
-            }
-
-            log.info("threadName : {} / 사용 가능 쿠폰 수량 : {}개", threadName, quantity);
-            redissonClient.getBucket(key).set(quantity - 1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            if (lock != null && lock.isLocked()) {
-                lock.unlock();
-            }
-        }
-    }
-
-    public void decreaseVolumeWithoutLock(final String key) {
-        final String threadName = Thread.currentThread().getName();
-        final int quantity = (int) redissonClient.getBucket(key).get();
-
-        if (quantity <= EMPTY) {
-            log.info("threadName : {} / 사용 가능 쿠폰 모두 소진", threadName);
-            return;
-        }
-
-        log.info("threadName : {} / 사용 가능 쿠폰 수량 : {}개", threadName, quantity);
-        redissonClient.getBucket(key).set(quantity - 1);
     }
 
     // 쿠폰 사용 메서드
