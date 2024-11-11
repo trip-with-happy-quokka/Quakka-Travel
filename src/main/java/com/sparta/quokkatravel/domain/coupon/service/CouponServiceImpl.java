@@ -1,6 +1,8 @@
 package com.sparta.quokkatravel.domain.coupon.service;
 
 import com.sparta.quokkatravel.domain.common.exception.BadRequestException;
+import com.sparta.quokkatravel.domain.common.exception.DuplicateRegistrationException;
+import com.sparta.quokkatravel.domain.common.exception.InvalidCouponStateException;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
 import com.sparta.quokkatravel.domain.coupon.dto.response.CouponCodeResponseDto;
@@ -42,13 +44,45 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     public CouponCodeResponseDto registerCoupon(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto) {
 
-
         // userId 로 User 조회
         User user = userRepository.findByEmailOrElseThrow(email);
 
         // 쿠폰 코드로 쿠폰 찾기
         Coupon coupon = couponRepository.findByCode(couponCodeRequestDto.getCouponCode())
                 .orElseThrow(() -> new NotFoundException("coupon is not found"));
+
+        // 중복 등록 방지: 이미 해당 유저가 쿠폰을 소유하고 있는지 확인
+        if (couponRepository.existsByUserAndCode(user, coupon.getCode())) {
+            throw new DuplicateRegistrationException("User already owns this coupon");
+        }
+
+        /**
+         *     CouponStatus // 설명
+         *     ACTIVATE     // 활성화             ==> ?
+         *     ISSUED       // 발행됨             ==> 사용 가능
+         *     REGISTERED   // 유저에게 할당됨     ==> 이미 등록됨
+         *     REDEEMED     // 사용됨             ==> 이미 사용됨
+         *     EXPIRED      // 만료됨             ==> 이미 만료됨
+         *     DELETED      // 삭제됨             ==> 이미 삭제됨
+         */
+        // 쿠폰의 상태에 대한 유효성 검사
+        // 쿠폰의 상태에 대한 유효성 검사
+        switch (coupon.getCouponStatus()) {
+            case ACTIVATE:
+            case ISSUED:
+                // 사용 가능 상태, 계속 진행
+                break;
+            case REGISTERED:
+                throw new InvalidCouponStateException("이미 등록된 쿠폰입니다.");
+            case REDEEMED:
+                throw new InvalidCouponStateException("이미 사용된 쿠폰입니다.");
+            case EXPIRED:
+                throw new InvalidCouponStateException("이미 만료된 쿠폰입니다.");
+            case DELETED:
+                throw new InvalidCouponStateException("이미 삭제된 쿠폰입니다.");
+            default:
+                throw new InvalidCouponStateException("Invalid Coupon State");
+        }
 
 
 //            // 동시성 제어
