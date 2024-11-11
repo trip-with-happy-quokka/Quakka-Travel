@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <!-- Console Appender 추가 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!-- Logstash 전송 -->
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>localhost:5001</destination> <!-- Logstash server IP 주소 -->
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"serviceName": "quokka-travel"}</customFields>
+        </encoder>
+        <layout class="net.logstash.logback.layout.LogstashLayout">
+            <timestampPattern>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampPattern>
+        </layout>
+    </appender>
+
+    <!-- ERROR와 WARN 레벨만을 위한 필터 설정 -->
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="LOGSTASH" />
+    </root>
+
+    <!-- 특정 패키지나 클래스에 대해 다른 로그 레벨을 설정하고 싶다면 아래와 같이 추가 -->
+    <!--
+    <logger name="your.package.name" level="ERROR"/>
+    -->
+</configuration>
