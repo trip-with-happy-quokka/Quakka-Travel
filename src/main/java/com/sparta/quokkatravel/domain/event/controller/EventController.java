@@ -26,7 +26,7 @@ public class EventController {
     private final EventServiceImpl eventService;
 
     @PostMapping("/events")
-    @Operation(summary = "행사 생성", description = "행사 생성하는 API")
+    @Operation(summary = "행사 생성", description = "ADMIN 유저가 행사 생성하는 API")
     public ResponseEntity<?> createEvent(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @Valid @RequestBody EventRequestDto eventRequestDto) {
@@ -36,7 +36,7 @@ public class EventController {
     }
 
     @GetMapping("/events")
-    @Operation(summary = "행사 전체 조회", description = "행사 조회하는 API")
+    @Operation(summary = "행사 전체 조회", description = "ADMIN 유저가 행사 조회하는 API")
     public ResponseEntity<?> getAllEvents(
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
@@ -46,7 +46,7 @@ public class EventController {
     }
 
     @PutMapping("/events/{eventId}")
-    @Operation(summary = "행사 정보 변경", description = "행사 정보 변경하는 API")
+    @Operation(summary = "행사 정보 변경", description = "ADMIN 유저가 행사 정보 변경하는 API")
     public ResponseEntity<?> updateEvent(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long eventId,
@@ -57,7 +57,7 @@ public class EventController {
     }
 
     @DeleteMapping("/events/{eventId}")
-    @Operation(summary = "행사 삭제", description = "행사 삭제하는 API")
+    @Operation(summary = "행사 삭제", description = "ADMIN 유저가 행사 삭제하는 API")
     public ResponseEntity<?> deleteEvent(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long eventId
