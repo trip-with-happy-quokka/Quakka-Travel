@@ -6,7 +6,7 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    <!-- Logstash 전송 -->
+    <!-- Logstash 전송 INFO 중 UserAction, WARN, ERROR -->
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <destination>localhost:5001</destination> <!-- Logstash server IP 주소 -->
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
@@ -15,6 +15,9 @@
         <layout class="net.logstash.logback.layout.LogstashLayout">
             <timestampPattern>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampPattern>
         </layout>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
     </appender>
 
     <!-- ERROR와 WARN 레벨만을 위한 필터 설정 -->
