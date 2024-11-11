@@ -38,8 +38,6 @@ public class CouponServiceImpl implements CouponService {
     private final RedissonClient redissonClient;
     private final CouponSearchRepository couponSearchRepository;
     private final CouponEmailService couponEmailService;
-    private final CouponLockUtil couponLockUtil;
-    private final int EMPTY = 0;
 
     // 쿠폰 등록 메서드 ( 분산락 사용 )
     @Override
