@@ -1,9 +1,6 @@
 package com.sparta.quokkatravel.domain.common.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -29,25 +26,52 @@ public class RabbitMqConfig {
     private int port;
 
 
+    /**
+     * [1] Standard
+     * QueueName : "queue1-name"
+     * exchangeName : "queue1-exchange-name"
+     * routingKey : "queue1.key"
+     */
     @Bean
-    public Queue Queue() {
-        return new Queue("coupon-issue-queue", true, false, false);
-        // QueueName : "coupon-issue-queue"
-    }
-
-    // 지정된 Exchange 이름으로 Direct Exchange Bean 생성
-    @Bean
-    public DirectExchange exchange() {
-        return new DirectExchange("coupon-issue-exchange");
-        // exchangeName : "coupon-issue-exchange"
+    public Queue queue1() {
+        return new Queue("queue1-name", true, false, false);
     }
 
     // Exchange 에 Queue 등록
     // == 주어진 Queue 와 Exchange 를 Binding + Routing Key 를 이용하여 Binding Bean 생성
     @Bean
-    public Binding binding(Queue queue, DirectExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with("coupon.key");
-        // routingKey : "hello.key"
+    public Binding binding(Queue queue1, DirectExchange exchange) {
+        return BindingBuilder.bind(queue1).to(exchange).with("queue1.key");
+    }
+
+    // 지정된 Exchange 이름으로 Direct Exchange Bean 생성
+    @Bean
+    public DirectExchange exchange() {
+        return new DirectExchange("queue1-exchange-name");
+    }
+
+    /**
+     * [2] Direct Exchange Binding
+     * QueueName : "coupon-issue-queue"
+     * exchangeName : "coupon-issue-exchange"
+     * routingKey : "coupon.key"
+     */
+
+    // [2-1] QueueName
+    @Bean
+    Queue queue2() {
+        return new Queue("coupon-issue-queue", true, false, false);
+    }
+
+    // [2-2] exchangeName
+    @Bean
+    DirectExchange directExchange() {
+        return new DirectExchange("coupon-issue-exchange");
+    }
+
+    // [2-3] binding
+    Binding directBinding() {
+        return BindingBuilder.bind(queue2()).to(directExchange()).with("coupon.key");
     }
 
     // RabbitMQ 연동을 위한 ConnectionFactory Bean 을 생성하여 반환

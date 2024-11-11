@@ -1,4 +1,4 @@
-package com.sparta.quokkatravel.domain.coupon.service;
+package com.sparta.quokkatravel.domain.rabbitmq.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CouponConsumerService {
+public class ConsumerService {
 
-    @RabbitListener(queues = "coupon-issue-queue")
+    @RabbitListener(queues = "queue1-name")
     public void receiveMessage(String message) {
         log.info("Consume result : {}", message);
     }
