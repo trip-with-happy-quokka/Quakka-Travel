@@ -23,10 +23,12 @@ public class SettlementService {
 
     private final SettlementRepository settlementRepository;
     private final AccommodationRepository accommodationRepository;
+    private final MonthlyStatisticsCacheService cacheService;
 
-    public SettlementService(SettlementRepository settlementRepository, AccommodationRepository accommodationRepository) {
+    public SettlementService(SettlementRepository settlementRepository, AccommodationRepository accommodationRepository, MonthlyStatisticsCacheService cacheService) {
        this.settlementRepository = settlementRepository;
        this.accommodationRepository = accommodationRepository;
+       this.cacheService = cacheService;
     }
 
     // 특정 정산 ID로 정산 정보 조회
@@ -99,9 +101,23 @@ public class SettlementService {
 
     // 월별 통계 조회 (연도-월 형식으로 입력)
     public List<SettlementResponseDto> getMonthlyStatistics(YearMonth yearMonth) {
+        String monthKey = "월별 통계:" + yearMonth.toString();
+
+        //캐시 확인
+        List<SettlementResponseDto> cacheData = cacheService.getCachedMonthlyStatistics(monthKey);
+        if (cacheData != null) {
+            return  cacheData; // 캐시된 데이터 변환
+        }
+
+        // 캐시된 데이터가 없으면 DB에서 조회 후 캐싱
         LocalDate startDate = yearMonth.atDay(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
-        return getSettlementsByDateRange(startDate, endDate);
+        List<SettlementResponseDto> statistics = getSettlementsByDateRange(startDate, endDate);
+
+        // 조회한 데이터를 캐시에 저장
+        cacheService.cacheMonthlyStatistics(monthKey, statistics);
+
+        return statistics;
     }
 
     // 정산 정보를 SettlementResponseDto로 변환
