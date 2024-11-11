@@ -176,8 +176,6 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     public CouponDeleteResponseDto deleteCoupon(String email, Long couponId) {
 
-        // 일단 내가 이 쿠폰 갖고 있는지 확인이 필요함
-
         // couponId 로 해당 쿠폰 조회
         Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new NotFoundException("해당 쿠폰 조회 불가"));
 
@@ -189,6 +187,11 @@ public class CouponServiceImpl implements CouponService {
         // 이메일 전송: 쿠폰 삭제 알림
         User user = coupon.getOwner();
         couponEmailService.sendCouponDeletionEmail(user, coupon);
+
+        // 유효성 검사: 해당 쿠폰의 소유자가 현재 사용자와 일치하는지 확인
+        if (!coupon.getOwner().equals(user)) {
+            throw new BadRequestException("해당 쿠폰의 소유자가 아닙니다.");
+        }
 
         // CouponDocument Create For ElasticSearch
         CouponDocument couponDocument = couponSearchRepository.findByCouponIdOrElseThrow(couponId);
