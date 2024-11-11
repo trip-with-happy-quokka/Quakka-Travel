@@ -172,4 +172,8 @@ public class Coupon extends Timestamped {
         this.event = event;
     }
 
+    public void updateCouponOwner(User Owner) {
+        this.owner = Owner;
+        this.registeredAt = LocalDateTime.now();
+    }
 }

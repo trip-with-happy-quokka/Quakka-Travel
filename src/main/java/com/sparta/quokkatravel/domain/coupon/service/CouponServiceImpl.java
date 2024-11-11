@@ -5,10 +5,8 @@ import com.sparta.quokkatravel.domain.common.exception.DuplicateRegistrationExce
 import com.sparta.quokkatravel.domain.common.exception.InvalidCouponStateException;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponCodeResponseDto;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponDeleteResponseDto;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponRedeemResponseDto;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
+import com.sparta.quokkatravel.domain.coupon.dto.request.CouponGiftRequestDto;
+import com.sparta.quokkatravel.domain.coupon.dto.response.*;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
 import com.sparta.quokkatravel.domain.coupon.util.CouponLockUtil;
@@ -66,7 +64,6 @@ public class CouponServiceImpl implements CouponService {
          *     DELETED      // 삭제됨             ==> 이미 삭제됨
          */
         // 쿠폰의 상태에 대한 유효성 검사
-        // 쿠폰의 상태에 대한 유효성 검사
         switch (coupon.getCouponStatus()) {
             case ACTIVATE:
             case ISSUED:
@@ -107,6 +104,45 @@ public class CouponServiceImpl implements CouponService {
                 coupon.getValidFrom(),
                 coupon.getValidUntil()
         );
+    }
+
+    // 쿠폰 선물하기 메서드
+    @Override
+    @Transactional
+    public CouponGiftResponseDto giveCouponToOther(String email, Long userId, Long couponId, CouponGiftRequestDto couponGiftRequestDto) {
+
+        // userId 로 User 조회
+        User user = userRepository.findByEmailOrElseThrow(email);
+        User newOwner = userRepository.findById(couponGiftRequestDto.getUserId())
+                .orElseThrow(()-> new NotFoundException("해당 유저는 조회가 불가능합니다."));
+
+        // couponId 로 Coupon 조회
+        Coupon coupon = couponRepository.findById(couponId).orElseThrow(()-> new NotFoundException("쿠폰 조회 불가"));
+
+        // 중복 등록 방지: 이미 해당 유저가 쿠폰을 소유하고 있는지 확인
+        if (couponRepository.existsByOwnerAndCode(user, coupon.getCode())) {
+            throw new DuplicateRegistrationException("해당 유저는 이미 해당 쿠폰을 사용하였으므로 쿠폰 선물이 불가능합니다.");
+        }
+
+        // 쿠폰의 상태에 대한 유효성 검사
+        switch (coupon.getCouponStatus()) {
+            case REGISTERED:
+                // 사용 가능 상태, 계속 진행
+                break;
+            case REDEEMED:
+                throw new InvalidCouponStateException("이미 사용된 쿠폰은 선물이 불가능합니다.");
+            case EXPIRED:
+                throw new InvalidCouponStateException("이미 만료된 쿠폰은 선물이 불가능합니다.");
+            case DELETED:
+                throw new InvalidCouponStateException("이미 삭제된 쿠폰은 선물이 불가능합니다.");
+            case ACTIVATE, ISSUED:
+                throw new InvalidCouponStateException("Invalid Coupon State");
+        }
+
+        coupon.updateCouponOwner(newOwner);
+        couponRepository.save(coupon);
+
+        return new CouponGiftResponseDto(coupon.getOwner().getId(), coupon.getRegisteredAt());
     }
 
     // 쿠폰 사용 메서드
