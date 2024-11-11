@@ -43,12 +43,20 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     // reactor-netty * 필수 외부 STOMP 사용*
     implementation "org.springframework.boot:spring-boot-starter-reactor-netty"
+
     // rabbit
     implementation "org.springframework.boot:spring-boot-starter-amqp"
+
     // rabbit jackson
     implementation "com.fasterxml.jackson.core:jackson-databind:2.15.1"
     // jackson2json LocalDateTime handling
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2"
+
+    // email authentication
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -95,6 +103,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator' // actuator 추가
     implementation 'io.micrometer:micrometer-registry-prometheus' // prometheus 추가
+
+    // SpringBatch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+
+    // jsoup
+    implementation 'org.jsoup:jsoup:1.18.1'
+
+    // logstash
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.0'
 
 }
 

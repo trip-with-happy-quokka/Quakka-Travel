@@ -4,7 +4,7 @@ import com.sparta.quokkatravel.domain.accommodation.dto.AccommodationRequestDto;
 import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationResponseDto;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
-import com.sparta.quokkatravel.domain.common.aop.InvalidateAccommodationCache;
+import com.sparta.quokkatravel.domain.common.cache.InvalidateAccommodationCache;
 import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.common.exception.UnAuthorizedException;
@@ -84,7 +84,6 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
     @InvalidateAccommodationCache
     public HostAccommodationResponseDto updateAccommodation(CustomUserDetails customUserDetails, Long accommodationId, AccommodationRequestDto accommodationRequestDto) {
 
-        User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
         Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow();
 
         if(!accommodation.getUser().getId().equals(customUserDetails.getUserId())) {

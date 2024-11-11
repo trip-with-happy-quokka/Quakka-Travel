@@ -1,47 +1,39 @@
 package com.sparta.quokkatravel.domain.chat.entity;
 
-import com.sparta.quokkatravel.domain.chat.dto.ChatMessageDto;
+import com.sparta.quokkatravel.domain.common.shared.Timestamped;
+import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
-
-@Data
 @Entity
-@Table(name = "ChatMessage")
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@EntityListeners(value = {AuditingEntityListener.class})
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatMessage {
+public class ChatMessage extends Timestamped {
 
-    @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @JoinColumn(name = "roomId", insertable = false, updatable = false)
-    private String roomId; //단순히 ID 값만 필요  (ChatRoom)
+    @Column
+    private String sender;
 
-    @JoinColumn(name = "authorId", insertable = false, updatable = false)
-    private String authorId; //단순히 ID 값만 필요 (User)
+    @Column
+    private String receiver;
 
-    @Column(name = "message")
-    private String message;
+    @Column
+    private String text;
 
-    @Column(name = "createdAt", updatable = false)
-    @CreatedDate
-    private LocalDateTime createdAt;
+    @Column
+    private String chatRoomId = sender + "-" + receiver;
 
-    public ChatMessage(ChatMessageDto chatMessageDto) {
-        this.roomId = chatMessageDto.getRoomId();
-        this.authorId = chatMessageDto.getAuthorId();
-        this.message = chatMessageDto.getMessage();
-    }
+    @ManyToOne
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
+
+    private Boolean isActive = true; // 메시지 기록 보관 여부
+
+
 }

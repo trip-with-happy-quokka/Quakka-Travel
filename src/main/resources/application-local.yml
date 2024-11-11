@@ -8,13 +8,43 @@ spring:
     # 1q2w3e4r5t
     password: ${DB_PASSWORD}
 
+  batch:
+    jdbc:
+      initialize-schema: always  # 배치 메타데이터 테이블 자동 생성
+      schema: classpath:org/springframework/batch/core/schema-mysql.sql
+    datasource:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/${BATCH_DB_NAME}  # 배치 메타데이터용 DB
+      username: ${BATCH_DB_USERNAME}
+      password: ${BATCH_DB_PASSWORD}
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME} # 이메일을 전송할 주체의 이메일 주소 (host mail)
+    password: ${APP_PASSWORD} # 해당 계정으로 발급받은 App password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+
   data:
     redis:
       host: localhost
-      port: ${AWS_REDIS_PORT}
+      port: 6379
 
   elasticsearch:
-    uris: localhost
+    uris: localhost:9200
+
+#  batch:
+#    job:
+#      name:
+#      enabled: false
+#    datasource:
+#      url:
+#      username:
+#      password:
+#      driver-class-name:
 
 jwt:
   secret:
@@ -29,6 +59,6 @@ cloud:
       access-key: ${AWS_ACCESS_KEY}  # 로컬 환경에서는 실제 키 대신 테스트 키를 넣거나 빈 값으로 두기
       secret-key: ${AWS_SECRET_KEY}
     region:
-      static: ${AWS_REGION}
+      static: ap-northeast-2
     s3:
       bucket: ${AWS_S3_BUCKET}

@@ -7,6 +7,8 @@ import com.sparta.quokkatravel.domain.reservation.dto.ReservationResponseDto;
 import com.sparta.quokkatravel.domain.reservation.service.ReservationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,11 +21,11 @@ import java.nio.file.AccessDeniedException;
 
 @RestController
 @RequestMapping("/api/v1/guest")
-@PreAuthorize("hasRole('GUEST') or hasRole('ADMIN')")
 @RequiredArgsConstructor
 @Tag(name = "Reservation", description = "예약 관련 컨트롤러")
 public class ReservationController {
 
+    private static final Logger log = LoggerFactory.getLogger(ReservationController.class);
     private final ReservationService reservationService;
 
     // 에약 작성
@@ -32,6 +34,7 @@ public class ReservationController {
                                                @PathVariable Long roomId,
                                                @RequestBody ReservationRequestDto reservationRequestDto) {
         ReservationResponseDto reservationResponseDto = reservationService.createReservation(userDetails.getEmail(), roomId, reservationRequestDto);
+        log.info("email:{}", userDetails.getEmail());
         return ResponseEntity.ok(ApiResponse.created("예약 생성 성공", reservationResponseDto));
     }
 

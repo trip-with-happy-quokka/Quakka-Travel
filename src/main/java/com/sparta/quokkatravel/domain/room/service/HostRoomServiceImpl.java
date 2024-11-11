@@ -2,7 +2,7 @@ package com.sparta.quokkatravel.domain.room.service;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
 import com.sparta.quokkatravel.domain.accommodation.repository.AccommodationRepository;
-import com.sparta.quokkatravel.domain.common.aop.InvalidateRoomCache;
+import com.sparta.quokkatravel.domain.common.cache.InvalidateRoomCache;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.room.dto.HostRoomResponseDto;
@@ -42,7 +42,7 @@ public class HostRoomServiceImpl implements HostRoomService {
     }
 
     @Override
-    public HostRoomResponseDto getRoom(CustomUserDetails userDetails, Long accommodationId, Long roomId) {
+    public HostRoomResponseDto getRoomByHost(CustomUserDetails userDetails, Long accommodationId, Long roomId) {
 
         // 유저가 해당 숙소를 소유하고 있는지 확인
         Accommodation accommodation = accommodationRepository.findById(accommodationId)
@@ -62,7 +62,7 @@ public class HostRoomServiceImpl implements HostRoomService {
     }
 
     @Override
-    public Page<HostRoomResponseDto> getAllRoom(CustomUserDetails userDetails, Long accommodationId, Pageable pageable) {
+    public Page<HostRoomResponseDto> getAllRoomByHost(CustomUserDetails userDetails, Long accommodationId, Pageable pageable) {
 
         // 유저가 해당 숙소를 소유하고 있는지 확인
         Accommodation accommodation = accommodationRepository.findById(accommodationId)
@@ -99,10 +99,13 @@ public class HostRoomServiceImpl implements HostRoomService {
     @InvalidateRoomCache
     public String deleteRoom(CustomUserDetails userDetails, Long accommodationId, Long roomId) {
 
+        Accommodation accommodation = accommodationRepository.findById(accommodationId)
+                .orElseThrow(() -> new NotFoundException("Accommodation Not Found"));
+
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new NotFoundException("Room Not Found"));
 
-        if (!room.getAccommodation().getUser().getId().equals(userDetails.getUserId())) {
+        if (!accommodation.getUser().getId().equals(userDetails.getUserId())) {
             throw new AccessDeniedException("You do not have permission to delete this accommodation");
         }
 

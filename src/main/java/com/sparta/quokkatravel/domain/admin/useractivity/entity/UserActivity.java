@@ -2,6 +2,8 @@ package com.sparta.quokkatravel.domain.admin.useractivity.entity;
 
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

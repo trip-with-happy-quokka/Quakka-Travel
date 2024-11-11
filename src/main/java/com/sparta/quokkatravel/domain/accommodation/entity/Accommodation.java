@@ -5,13 +5,17 @@ import com.sparta.quokkatravel.domain.review.entity.Review;
 import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
 public class Accommodation extends Timestamped {
 
@@ -60,10 +64,21 @@ public class Accommodation extends Timestamped {
 
     // 리뷰를 바탕으로 한 별점 평균 메서드 필요함
     public void updateRating() {
+        if(reviews ==null || reviews.isEmpty()) {
+            rating = 0L;
+            return;
+        }
         int ratingSum = 0;
         for(Review review: reviews) {
             ratingSum += review.getRating();
         }
         rating = (long) (ratingSum/=reviews.size());
+    }
+
+    // 테스트 코드를 위한 생성자 추가
+    public Accommodation(String name, String description, String address) {
+        this.name = name;
+        this.description = description;
+        this.address = address;
     }
 }

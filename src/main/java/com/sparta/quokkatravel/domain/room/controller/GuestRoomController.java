@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/guest")
-@PreAuthorize("hasRole('GUEST') or hasRole('ADMIN')")
 @RequiredArgsConstructor
 @Tag(name = "Room", description = "Guest 객실 관련 컨트롤러")
 public class GuestRoomController {
@@ -35,18 +34,18 @@ public class GuestRoomController {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
         Page<GuestRoomResponseDto> rooms = guestRoomService.getAllRoom(accomodationId, pageable);
-        return ResponseEntity.ok(ApiResponse.success("객실 조회 성공", rooms));
+        return ResponseEntity.ok(ApiResponse.success("객실 전체 조회 성공", rooms));
     }
 
     // 객실 단일 조회
     @GetMapping("/accommodations/{accommodationId}/rooms/{roomId}")
-    @Operation(summary = "객실 전체 조회", description = "특정 객실 하나만 조회하는 API")
+    @Operation(summary = "객실 단일 조회", description = "특정 객실 하나만 조회하는 API")
     public ResponseEntity<?> getAccommodation(@AuthenticationPrincipal CustomUserDetails userDetails,
                                               @PathVariable(name = "accommodationId") Long accommodationId,
                                               @PathVariable(name = "roomId") Long roomId) {
 
         GuestRoomResponseDto guestRoomResponseDto = guestRoomService.getRoom(userDetails.getUserId(), accommodationId, roomId);
-        return ResponseEntity.ok(ApiResponse.success("객실 조회 성공", guestRoomResponseDto));
+        return ResponseEntity.ok(ApiResponse.success("객실 단일 조회 성공", guestRoomResponseDto));
     }
 
 }

@@ -46,16 +46,16 @@ public class Coupon extends Timestamped {
 
     @Enumerated(EnumType.STRING)
     @Column
-    private CouponStatus couponStatus;
+    private CouponStatus couponStatus = CouponStatus.ISSUED;
 
     @Min(0)
     @Max(100)
     @Column(name = "discount_rate")
-    private Integer discountRate;
+    private Integer discountRate = 0;
 
     @Min(0)
     @Column(name = "discount_amount")
-    private Integer discountAmount;
+    private Integer discountAmount = 0;
 
     @Column(name = "valid_from", nullable = false)
     private LocalDate validFrom;
@@ -89,36 +89,17 @@ public class Coupon extends Timestamped {
     private LocalDateTime registeredAt;
 
     public Coupon(String couponName, String couponContent, String couponType, Integer volume,
-                  String couponCode, CouponStatus couponStatus, int discountRate, int discountAmount,
-                  LocalDate validFrom, LocalDate validUntil, Event event, User createdBy) {
+                  String couponCode, int discountRate, int discountAmount,
+                  LocalDate validFrom, LocalDate validUntil,User createdBy) {
         this.name = couponName;
         this.content = couponContent;
         this.couponType = CouponType.valueOf(couponType);
         this.volume = volume;
-        this.code = couponCode;
-        this.couponStatus = couponStatus;
+        if(couponCode==null) { this.code = createCouponCode();} else { this.code = couponCode; }
         this.discountRate = discountRate;
         this.discountAmount = discountAmount;
         this.validFrom = validFrom;
         this.validUntil = validUntil;
-        this.event = event;
-        this.createdBy = createdBy;
-    }
-
-    public Coupon(String couponName, String couponContent, String couponType, Integer volume,
-                  String couponCode, CouponStatus couponStatus, int discountRate, int discountAmount,
-                  LocalDate validFrom, LocalDate validUntil, Accommodation accommodation, User createdBy) {
-        this.name = couponName;
-        this.content = couponContent;
-        this.couponType = CouponType.valueOf(couponType);
-        this.volume = volume;
-        this.code = couponCode;
-        this.couponStatus = couponStatus;
-        this.discountRate = discountRate;
-        this.discountAmount = discountAmount;
-        this.validFrom = validFrom;
-        this.validUntil = validUntil;
-        this.accommodation = accommodation;
         this.createdBy = createdBy;
     }
 
@@ -164,4 +145,12 @@ public class Coupon extends Timestamped {
     public void redeemCoupon() {
         this.couponStatus= CouponStatus.REDEEMED;
     }
+
+    public void addAccommodation(Accommodation accommodation) {
+        this.accommodation = accommodation;
+    }
+    public void addEvent(Event event) {
+        this.event = event;
+    }
+
 }
