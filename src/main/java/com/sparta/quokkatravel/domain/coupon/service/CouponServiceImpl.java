@@ -49,11 +49,11 @@ public class CouponServiceImpl implements CouponService {
 
         // 쿠폰 코드로 쿠폰 찾기
         Coupon coupon = couponRepository.findByCode(couponCodeRequestDto.getCouponCode())
-                .orElseThrow(() -> new NotFoundException("coupon is not found"));
+                .orElseThrow(() -> new NotFoundException("쿠폰 조회 불가"));
 
         // 중복 등록 방지: 이미 해당 유저가 쿠폰을 소유하고 있는지 확인
-        if (couponRepository.existsByUserAndCode(user, coupon.getCode())) {
-            throw new DuplicateRegistrationException("User already owns this coupon");
+        if (couponRepository.existsByOwnerAndCode(user, coupon.getCode())) {
+            throw new DuplicateRegistrationException("해당 유저는 이미 해당 쿠폰을 사용하였으므로 중복 사용이 불가능합니다.");
         }
 
         /**
