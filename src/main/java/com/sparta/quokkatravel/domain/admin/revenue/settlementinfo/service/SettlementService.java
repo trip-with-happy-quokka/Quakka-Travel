@@ -13,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,7 +106,9 @@ public class SettlementService {
 
     // 정산 정보를 SettlementResponseDto로 변환
     private SettlementResponseDto convertToSettlementResponseDto(SettlementInfo settlementInfo) {
-        List<RevenueDetailResponseDto> revenueDetails = settlementInfo.getRevenueDetails().stream()
+        List<RevenueDetailResponseDto> revenueDetails = Optional.ofNullable(settlementInfo.getRevenueDetails())
+                .orElse(Collections.emptyList()) // null 체크 및 빈 리스트 반환
+                .stream()
                 .map(revenue -> new RevenueDetailResponseDto(
                         revenue.getProductName(),
                         revenue.getProductPrice(),

@@ -1,7 +1,8 @@
-package com.sparta.quokkatravel.domain.coupon.service;
+package com.sparta.quokkatravel.domain.coupon.service.guest;
 
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
+import com.sparta.quokkatravel.domain.coupon.service.CouponServiceImpl;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -16,11 +17,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.lang.System.currentTimeMillis;
-
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
-public class CouponRegisterTest {
+public class CouponDistributionLockTest {
 
     @Autowired
     private CouponServiceImpl couponService;
@@ -41,7 +40,7 @@ public class CouponRegisterTest {
         final int numberOfMember = 100;
         final CountDownLatch countDownLatch = new CountDownLatch(numberOfMember);
 
-        String couponkey = coupon.get().createCouponCode() + currentTimeMillis();
+        String couponkey = coupon.get().createCouponCode();
 
         // 100 개 카운트 넣어주기
         redissonClient.getBucket(couponkey).set(100);
@@ -66,7 +65,7 @@ public class CouponRegisterTest {
         final int numberOfMember = 100;
         final CountDownLatch countDownLatch = new CountDownLatch(numberOfMember);
 
-        String couponkey = coupon.get().createCouponCode() + currentTimeMillis();
+        String couponkey = coupon.get().createCouponCode();
 
         // 100 개 카운트 넣어주기
         redissonClient.getBucket(couponkey).set(100);

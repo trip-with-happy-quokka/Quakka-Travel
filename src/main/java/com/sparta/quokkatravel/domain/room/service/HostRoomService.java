@@ -12,8 +12,8 @@ public interface HostRoomService {
     HostRoomResponseDto createRoom(CustomUserDetails userDetails, Long accommodationId, RoomRequestDto roomRequestDto);
 
     // 조회
-    HostRoomResponseDto getRoom(CustomUserDetails userDetails, Long accommodationId, Long roomId);
-    Page<HostRoomResponseDto> getAllRoom(CustomUserDetails userDetails, Long accommodationId, Pageable pageable);
+    Page<HostRoomResponseDto> getAllRoomByHost(CustomUserDetails userDetails, Long accommodationId, Pageable pageable);
+    HostRoomResponseDto getRoomByHost(CustomUserDetails userDetails, Long accommodationId, Long roomId);
 
     // 수정
     HostRoomResponseDto updateRoom(CustomUserDetails userDetails, Long roomId, RoomRequestDto roomRequestDto);

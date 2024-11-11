@@ -6,6 +6,7 @@ import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponRequestDto;
 import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponResponseDto;
 import com.sparta.quokkatravel.domain.admin.coupon.repository.AdminCouponRepository;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
+import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponType;
 import com.sparta.quokkatravel.domain.event.entity.Event;
@@ -14,11 +15,13 @@ import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class AdminCouponService {
     private final AccommodationRepository accommodationRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final RedissonClient redissonClient;
 
     // 할인율과 할인 금액 중 하나는 반드시 0보다 커야 함을 검증하는 메서드(추가)
     private void validateDiscount(AdminCouponRequestDto couponRequestDto) {
@@ -55,6 +59,12 @@ public class AdminCouponService {
             } while (adminCouponRepository.existsByCode(couponCode));
         }
 
+        // 쿠폰 키 생성
+        String couponkey = couponCode;
+
+        // 쿠폰 발행 수량만큼 redis 서버에 쿠폰 수량 입력
+        redissonClient.getBucket(couponkey).set(couponRequestDto.getVolume());
+
         Coupon coupon = new Coupon(
                 couponRequestDto.getCouponName(),             // name 값
                 couponRequestDto.getCouponContent(),
@@ -68,7 +78,6 @@ public class AdminCouponService {
                 user
         );
 
-
         if (Objects.equals(CouponType.ACCOMMODATION, couponRequestDto.getCouponType())) {
             // 숙소 조회
             Accommodation accommodation = accommodationRepository.findById(couponRequestDto.getCouponTargetId())
@@ -81,7 +90,6 @@ public class AdminCouponService {
                     .orElseThrow(() -> new NotFoundException("Event is not found"));
             coupon.addEvent(event);
         }
-
 
         Coupon savedCoupon = adminCouponRepository.save(coupon);
 

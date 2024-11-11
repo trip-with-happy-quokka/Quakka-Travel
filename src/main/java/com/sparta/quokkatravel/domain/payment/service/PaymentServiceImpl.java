@@ -1,6 +1,5 @@
 package com.sparta.quokkatravel.domain.payment.service;
 
-import ch.qos.logback.core.spi.ErrorCodes;
 import com.sparta.quokkatravel.domain.common.config.TossPaymentConfig;
 import com.sparta.quokkatravel.domain.payment.dto.ChargingHistoryDto;
 import com.sparta.quokkatravel.domain.payment.dto.PaymentResponseDto;
@@ -12,7 +11,6 @@ import com.sparta.quokkatravel.domain.reservation.entity.ReservationStatus;
 import com.sparta.quokkatravel.domain.reservation.repository.ReservationRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
-import com.sparta.quokkatravel.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.springframework.data.domain.*;
@@ -24,7 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 

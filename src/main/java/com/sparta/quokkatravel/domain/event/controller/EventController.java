@@ -20,11 +20,11 @@ import java.util.List;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Tag(name = "Event", description = "행사 관련 컨트롤러")
-@PreAuthorize("hasRole('ADMIN')")
 public class EventController {
 
     private final EventServiceImpl eventService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/events")
     @Operation(summary = "행사 생성", description = "ADMIN 유저가 행사 생성하는 API")
     public ResponseEntity<?> createEvent(
@@ -45,6 +45,7 @@ public class EventController {
         return ResponseEntity.ok(ApiResponse.success("행사 전체 조회 성공", eventResponseDtoList));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/events/{eventId}")
     @Operation(summary = "행사 정보 변경", description = "ADMIN 유저가 행사 정보 변경하는 API")
     public ResponseEntity<?> updateEvent(
@@ -56,6 +57,7 @@ public class EventController {
         return ResponseEntity.ok(ApiResponse.success("행사 정보 변경 성공", eventResponseDto));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/events/{eventId}")
     @Operation(summary = "행사 삭제", description = "ADMIN 유저가 행사 삭제하는 API")
     public ResponseEntity<?> deleteEvent(
