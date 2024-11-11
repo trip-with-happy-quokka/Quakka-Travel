@@ -6,6 +6,7 @@ import com.sparta.quokkatravel.domain.common.monitoring.MetricService;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
 import com.sparta.quokkatravel.domain.notification.service.NotificationService;
+import com.sparta.quokkatravel.domain.notification.service.SlackNotificationService;
 import com.sparta.quokkatravel.domain.reservation.dto.ReservationRequestDto;
 import com.sparta.quokkatravel.domain.reservation.dto.ReservationResponseDto;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
@@ -57,7 +58,7 @@ public class ReservationServiceTest {
     @Mock
     private CouponRepository couponRepository;
     @Mock
-    private NotificationService notificationService;
+    private SlackNotificationService notificationService;
     @Mock
     private MetricService metricService;
 
