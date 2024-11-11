@@ -36,6 +36,12 @@ spring:
   elasticsearch:
     uris: localhost:9200
 
+  rabbitmq:
+    host: localhost           # RabbitMQ host ip
+    port: 5672                # RabbitMQ port
+    username: guest # RabbitMQ 웹 관리 콘솔 아이디
+    password: guest # RabbitMQ 웹 관리 콘솔 비밀번호
+
 #  batch:
 #    job:
 #      name:
