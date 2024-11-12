@@ -31,7 +31,7 @@ spring:
   data:
     redis:
       host: localhost
-      port: ${AWS_REDIS_PORT}
+      port: 6379
 
   elasticsearch:
     uris: localhost:9200
@@ -65,6 +65,6 @@ cloud:
       access-key: ${AWS_ACCESS_KEY}  # 로컬 환경에서는 실제 키 대신 테스트 키를 넣거나 빈 값으로 두기
       secret-key: ${AWS_SECRET_KEY}
     region:
-      static: ${AWS_REGION}
+      static: ap-northeast-2
     s3:
       bucket: ${AWS_S3_BUCKET}
