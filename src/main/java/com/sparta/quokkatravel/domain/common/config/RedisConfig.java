@@ -2,11 +2,9 @@ package com.sparta.quokkatravel.domain.common.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageDuplicator;
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageSubscriber;
-import lombok.extern.slf4j.Slf4j;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -17,7 +15,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -34,7 +31,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
-@Slf4j
 @Configuration
 @EnableCaching
 public class RedisConfig {
@@ -51,7 +47,6 @@ public class RedisConfig {
         redisStandaloneConfiguration.setHostName(redisHost);
         redisStandaloneConfiguration.setPort(redisPort);
 
-        log.info("Redis 서버에 성공적으로 연결되었습니다: {}:{}", redisHost, redisPort);
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
 
@@ -111,11 +106,6 @@ public class RedisConfig {
     @Bean(name = "cacheManager")
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
 
-        try {
-            redisConnectionFactory.getConnection().ping();
-        } catch (Exception e) {
-            throw new IllegalStateException("Redis 서버에 연결할 수 없습니다.", e);
-        }
         RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))

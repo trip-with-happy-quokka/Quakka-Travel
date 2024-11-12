@@ -3,10 +3,8 @@ package com.sparta.quokkatravel.domain.coupon.controller;
 import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponCodeResponseDto;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponDeleteResponseDto;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponRedeemResponseDto;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
+import com.sparta.quokkatravel.domain.coupon.dto.request.CouponGiftRequestDto;
+import com.sparta.quokkatravel.domain.coupon.dto.response.*;
 import com.sparta.quokkatravel.domain.coupon.service.CouponService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,6 +33,19 @@ public class GuestCouponController {
 
         CouponCodeResponseDto couponCodeResponseDto = couponService.registerCoupon(customUserDetails.getEmail(), userId, couponCodeRequestDto);
         return ResponseEntity.ok(ApiResponse.created("쿠폰 등록 성공", couponCodeResponseDto));
+    }
+
+    @PutMapping("/users/{userId}/coupons/{couponId}/gifts")
+    @Operation(summary = "쿠폰 선물하기", description = "다른 유저에게 쿠폰을 선물하는 API")
+    public ResponseEntity<?> giveCouponToOther(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long userId,
+            @PathVariable Long couponId,
+            @Valid @RequestBody CouponGiftRequestDto couponGiftRequestDto
+    ) {
+        CouponGiftResponseDto couponGiftResponseDto = couponService.giveCouponToOther(
+                customUserDetails.getEmail(), userId, couponId, couponGiftRequestDto);
+        return ResponseEntity.ok(ApiResponse.success("쿠폰 선물 성공", couponGiftResponseDto));
     }
 
     @PutMapping("/users/{userId}/coupons/{couponId}")

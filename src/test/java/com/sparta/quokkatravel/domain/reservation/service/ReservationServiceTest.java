@@ -1,11 +1,9 @@
 package com.sparta.quokkatravel.domain.reservation.service;
 
-import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
-import com.sparta.quokkatravel.domain.common.exception.InvalidRequestException;
 import com.sparta.quokkatravel.domain.common.monitoring.MetricService;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
-import com.sparta.quokkatravel.domain.notification.service.NotificationService;
+import com.sparta.quokkatravel.domain.notification.service.SlackNotificationService;
 import com.sparta.quokkatravel.domain.reservation.dto.ReservationRequestDto;
 import com.sparta.quokkatravel.domain.reservation.dto.ReservationResponseDto;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
@@ -14,14 +12,9 @@ import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.room.repository.RoomRepository;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -30,15 +23,14 @@ import org.mockito.quality.Strictness;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -57,7 +49,7 @@ public class ReservationServiceTest {
     @Mock
     private CouponRepository couponRepository;
     @Mock
-    private NotificationService notificationService;
+    private SlackNotificationService notificationService;
     @Mock
     private MetricService metricService;
 

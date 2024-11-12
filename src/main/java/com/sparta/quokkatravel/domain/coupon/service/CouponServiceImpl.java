@@ -1,14 +1,15 @@
 package com.sparta.quokkatravel.domain.coupon.service;
 
 import com.sparta.quokkatravel.domain.common.exception.BadRequestException;
+import com.sparta.quokkatravel.domain.common.exception.DuplicateRegistrationException;
+import com.sparta.quokkatravel.domain.common.exception.InvalidCouponStateException;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.coupon.dto.request.CouponCodeRequestDto;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponCodeResponseDto;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponDeleteResponseDto;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponRedeemResponseDto;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
+import com.sparta.quokkatravel.domain.coupon.dto.request.CouponGiftRequestDto;
+import com.sparta.quokkatravel.domain.coupon.dto.response.*;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
+import com.sparta.quokkatravel.domain.coupon.util.CouponLockUtil;
 import com.sparta.quokkatravel.domain.email.service.CouponEmailService;
 import com.sparta.quokkatravel.domain.search.document.CouponDocument;
 import com.sparta.quokkatravel.domain.search.repository.CouponSearchRepository;
@@ -35,20 +36,50 @@ public class CouponServiceImpl implements CouponService {
     private final RedissonClient redissonClient;
     private final CouponSearchRepository couponSearchRepository;
     private final CouponEmailService couponEmailService;
-    private final int EMPTY = 0;
 
     // 쿠폰 등록 메서드 ( 분산락 사용 )
     @Override
     @Transactional
     public CouponCodeResponseDto registerCoupon(String email, Long userId, CouponCodeRequestDto couponCodeRequestDto) {
 
-
         // userId 로 User 조회
         User user = userRepository.findByEmailOrElseThrow(email);
 
         // 쿠폰 코드로 쿠폰 찾기
         Coupon coupon = couponRepository.findByCode(couponCodeRequestDto.getCouponCode())
-                .orElseThrow(() -> new NotFoundException("coupon is not found"));
+                .orElseThrow(() -> new NotFoundException("쿠폰 조회 불가"));
+
+        // 중복 등록 방지: 이미 해당 유저가 쿠폰을 소유하고 있는지 확인
+        if (couponRepository.existsByOwnerAndCode(user, coupon.getCode())) {
+            throw new DuplicateRegistrationException("해당 유저는 이미 해당 쿠폰을 사용하였으므로 중복 사용이 불가능합니다.");
+        }
+
+        /**
+         *     CouponStatus // 설명
+         *     ACTIVATE     // 활성화             ==> ?
+         *     ISSUED       // 발행됨             ==> 사용 가능
+         *     REGISTERED   // 유저에게 할당됨     ==> 이미 등록됨
+         *     REDEEMED     // 사용됨             ==> 이미 사용됨
+         *     EXPIRED      // 만료됨             ==> 이미 만료됨
+         *     DELETED      // 삭제됨             ==> 이미 삭제됨
+         */
+        // 쿠폰의 상태에 대한 유효성 검사
+        switch (coupon.getCouponStatus()) {
+            case ACTIVATE:
+            case ISSUED:
+                // 사용 가능 상태, 계속 진행
+                break;
+            case REGISTERED:
+                throw new InvalidCouponStateException("이미 등록된 쿠폰입니다.");
+            case REDEEMED:
+                throw new InvalidCouponStateException("이미 사용된 쿠폰입니다.");
+            case EXPIRED:
+                throw new InvalidCouponStateException("이미 만료된 쿠폰입니다.");
+            case DELETED:
+                throw new InvalidCouponStateException("이미 삭제된 쿠폰입니다.");
+            default:
+                throw new InvalidCouponStateException("Invalid Coupon State");
+        }
 
 
 //            // 동시성 제어
@@ -56,7 +87,7 @@ public class CouponServiceImpl implements CouponService {
 //            coupon.decreaseVolume();
         String key = coupon.getCode();
 
-        decreaseVolumeWithLock(key);
+        CouponLockUtil.decreaseVolumeWithLock(redissonClient, key);
 
 
         // 쿠폰 소유자 및 등록일자 등록
@@ -75,45 +106,43 @@ public class CouponServiceImpl implements CouponService {
         );
     }
 
-    public void decreaseVolumeWithLock(final String key) {
-        final String lockName = key + ":lock";
-        final RLock lock = redissonClient.getLock(lockName);
-        final String threadName = Thread.currentThread().getName();
+    // 쿠폰 선물하기 메서드
+    @Override
+    @Transactional
+    public CouponGiftResponseDto giveCouponToOther(String email, Long userId, Long couponId, CouponGiftRequestDto couponGiftRequestDto) {
 
-        try {
-            if (!lock.tryLock(1, 3, TimeUnit.SECONDS)) {
-                return;
-            }
+        // userId 로 User 조회
+        User user = userRepository.findByEmailOrElseThrow(email);
+        User newOwner = userRepository.findById(couponGiftRequestDto.getUserId())
+                .orElseThrow(()-> new NotFoundException("해당 유저는 조회가 불가능합니다."));
 
-            final int quantity = (int) redissonClient.getBucket(key).get();
-            System.out.println("quantity : " + quantity);
-            if (quantity <= EMPTY) {
-                log.info("threadName : {} / 사용 가능 쿠폰 모두 소진", threadName);
-                return;
-            }
+        // couponId 로 Coupon 조회
+        Coupon coupon = couponRepository.findById(couponId).orElseThrow(()-> new NotFoundException("쿠폰 조회 불가"));
 
-            log.info("threadName : {} / 사용 가능 쿠폰 수량 : {}개", threadName, quantity);
-            redissonClient.getBucket(key).set(quantity - 1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            if (lock != null && lock.isLocked()) {
-                lock.unlock();
-            }
-        }
-    }
-
-    public void decreaseVolumeWithoutLock(final String key) {
-        final String threadName = Thread.currentThread().getName();
-        final int quantity = (int) redissonClient.getBucket(key).get();
-
-        if (quantity <= EMPTY) {
-            log.info("threadName : {} / 사용 가능 쿠폰 모두 소진", threadName);
-            return;
+        // 중복 등록 방지: 이미 해당 유저가 쿠폰을 소유하고 있는지 확인
+        if (couponRepository.existsByOwnerAndCode(user, coupon.getCode())) {
+            throw new DuplicateRegistrationException("해당 유저는 이미 해당 쿠폰을 사용하였으므로 쿠폰 선물이 불가능합니다.");
         }
 
-        log.info("threadName : {} / 사용 가능 쿠폰 수량 : {}개", threadName, quantity);
-        redissonClient.getBucket(key).set(quantity - 1);
+        // 쿠폰의 상태에 대한 유효성 검사
+        switch (coupon.getCouponStatus()) {
+            case REGISTERED:
+                // 사용 가능 상태, 계속 진행
+                break;
+            case REDEEMED:
+                throw new InvalidCouponStateException("이미 사용된 쿠폰은 선물이 불가능합니다.");
+            case EXPIRED:
+                throw new InvalidCouponStateException("이미 만료된 쿠폰은 선물이 불가능합니다.");
+            case DELETED:
+                throw new InvalidCouponStateException("이미 삭제된 쿠폰은 선물이 불가능합니다.");
+            case ACTIVATE, ISSUED:
+                throw new InvalidCouponStateException("Invalid Coupon State");
+        }
+
+        coupon.updateCouponOwner(newOwner);
+        couponRepository.save(coupon);
+
+        return new CouponGiftResponseDto(coupon.getOwner().getId(), coupon.getRegisteredAt());
     }
 
     // 쿠폰 사용 메서드
@@ -181,8 +210,6 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     public CouponDeleteResponseDto deleteCoupon(String email, Long couponId) {
 
-        // 일단 내가 이 쿠폰 갖고 있는지 확인이 필요함
-
         // couponId 로 해당 쿠폰 조회
         Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new NotFoundException("해당 쿠폰 조회 불가"));
 
@@ -194,6 +221,11 @@ public class CouponServiceImpl implements CouponService {
         // 이메일 전송: 쿠폰 삭제 알림
         User user = coupon.getOwner();
         couponEmailService.sendCouponDeletionEmail(user, coupon);
+
+        // 유효성 검사: 해당 쿠폰의 소유자가 현재 사용자와 일치하는지 확인
+        if (!coupon.getOwner().equals(user)) {
+            throw new BadRequestException("해당 쿠폰의 소유자가 아닙니다.");
+        }
 
         // CouponDocument Create For ElasticSearch
         CouponDocument couponDocument = couponSearchRepository.findByCouponIdOrElseThrow(couponId);

@@ -2,7 +2,10 @@ package com.sparta.quokkatravel.domain.admin.coupon.controller;
 
 import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponRequestDto;
 import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponResponseDto;
+import com.sparta.quokkatravel.domain.admin.coupon.dto.CouponToUserReq;
+import com.sparta.quokkatravel.domain.admin.coupon.dto.CouponToUserRes;
 import com.sparta.quokkatravel.domain.admin.coupon.service.AdminCouponService;
+import com.sparta.quokkatravel.domain.admin.coupon.service.CouponProducerService;
 import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +26,7 @@ import java.util.List;
 public class AdminCouponController {
 
     private final AdminCouponService adminCouponService;
+    private final CouponProducerService couponProducerService;
 
     // 모든 쿠폰 목록 조회 (관리자 전용)
     @GetMapping
@@ -41,6 +45,7 @@ public class AdminCouponController {
     }
 
     // 쿠폰 발급 (관리자 전용)
+    // 같은 UUID 번호로 일정 수량 만큼 발급
     @PostMapping
     @Operation(summary = "쿠폰 발급", description = "관리자가 쿠폰을 발급하는 API")
     public ResponseEntity<?> createCoupon(
@@ -48,6 +53,18 @@ public class AdminCouponController {
             @RequestBody AdminCouponRequestDto couponRequestDto) {
         AdminCouponResponseDto coupon = adminCouponService.createCoupon(customUserDetails.getEmail(), couponRequestDto);
         return ResponseEntity.ok(ApiResponse.created("쿠폰 발급 성공", coupon));
+    }
+
+    // 쿠폰 발급 2
+    // 특정 유저에게 쿠폰 발급
+    // RabbitMQ 사용
+    @PostMapping("/send")
+    @Operation(summary = "특정 유저에게 쿠폰 발급", description = "관리자가 특정 유저에게 쿠폰을 발급하는 API")
+    public ResponseEntity<?> createCouponToUser(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestBody CouponToUserReq couponMessageReq) {
+        CouponToUserRes couponMessageRes = couponProducerService.createCouponToUser(customUserDetails.getEmail(), couponMessageReq);
+        return ResponseEntity.ok(ApiResponse.success("유저에게 쿠폰 발급 성공", couponMessageRes));
     }
 
     // 쿠폰 수정 (관리자 전용)
