@@ -11,11 +11,11 @@ spring:
       username: ${AWS_DB_USERNAME}
       password: ${AWS_DB_PW}
 
-  data:
-    redis:
-      host: ${AWS_DB_IP}  # AWS ElastiCache Redis 엔드포인트
-      port: ${AWS_REDIS_PORT}
-  #      password: 1234
+#  data:
+#    redis:
+#      host: ${AWS_DB_IP}  # AWS ElastiCache Redis 엔드포인트
+#      port: ${AWS_REDIS_PORT}
+#  #      password: 1234
 
   elasticsearch:
     uris: ${AWS_ELASTIC_SEARCH_IP}:9200

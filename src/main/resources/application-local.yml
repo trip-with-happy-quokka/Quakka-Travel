@@ -27,11 +27,10 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
 
-
   data:
     redis:
       host: localhost
-      port: ${AWS_REDIS_PORT}
+      port: 6379
 
   elasticsearch:
     uris: localhost:9200
