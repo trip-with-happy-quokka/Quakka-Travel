@@ -2,6 +2,8 @@ FROM openjdk:17-oracle
 
 WORKDIR /app
 
+ENV SPRING_PROFILES_ACTIVE=aws
+
 COPY build/libs/Quokka-travel-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080

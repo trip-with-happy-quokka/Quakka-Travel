@@ -65,6 +65,14 @@ pipeline {
             }
         }
 
+         stages {
+             stage('Checkout') {
+                 steps {
+                     // Git 저장소를 체크아웃하는 단계
+                     checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://your.git.repo/url']]])
+                 }
+             }
+
         stage('Check Changes') {
             steps {
                 script {
