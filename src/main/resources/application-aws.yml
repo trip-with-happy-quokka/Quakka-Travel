@@ -9,7 +9,7 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: jdbc:mysql://${AWS_DB_URL}:3307/${AWS_DB_NAME}
       username: ${AWS_DB_USERNAME}
-      password: ${AWS_DB_PW}
+      password: ${AWS_DB_PW_S}
 
   mail:
     host: smtp.gmail.com
