@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 //@Table(indexes = {
 //        @Index(name = "idx_coupon_code_status_active_expired", columnList = "coupon_code, deletedAt, couponStatus")
@@ -103,6 +105,25 @@ public class Coupon extends Timestamped {
         this.createdBy = createdBy;
     }
 
+    // createCouponToUser
+    public Coupon(String couponName, String couponContent, String couponType,
+                  String couponCode, int discountRate, int discountAmount,
+                  LocalDate validFrom, LocalDate validUntil, User createdBy, User owner) {
+        this.name = couponName;
+        this.content = couponContent;
+        this.couponType = CouponType.valueOf(couponType);
+        this.volume = 1;
+        this.code = couponCode;
+        this.discountRate = discountRate;
+        this.discountAmount = discountAmount;
+        this.validFrom = validFrom;
+        this.validUntil = validUntil;
+        this.createdBy = createdBy;
+        this.owner = owner;
+        this.registeredAt = LocalDateTime.now();
+        this.couponStatus = CouponStatus.REGISTERED;
+    }
+
     // UUID 기반의 쿠폰 코드 생성 메서드
     public String createCouponCode() {
         return UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
@@ -153,4 +174,8 @@ public class Coupon extends Timestamped {
         this.event = event;
     }
 
+    public void updateCouponOwner(User Owner) {
+        this.owner = Owner;
+        this.registeredAt = LocalDateTime.now();
+    }
 }

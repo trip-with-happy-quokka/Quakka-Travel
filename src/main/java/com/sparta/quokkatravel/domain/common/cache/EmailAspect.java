@@ -1,4 +1,4 @@
-package com.sparta.quokkatravel.domain.common.aop;
+package com.sparta.quokkatravel.domain.common.cache;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;

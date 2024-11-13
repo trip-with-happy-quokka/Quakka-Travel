@@ -1,4 +1,8 @@
 spring:
+  batch:
+    jdbc:
+      initialize-schema: always  # 배치 메타데이터 테이블 자동 생성
+      schema: classpath:org/springframework/batch/core/schema-mysql.sql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     #quokka_travel
@@ -7,16 +11,6 @@ spring:
     username: ${DB_USERNAME}
     # 1q2w3e4r5t
     password: ${DB_PASSWORD}
-
-  batch:
-    jdbc:
-      initialize-schema: always  # 배치 메타데이터 테이블 자동 생성
-      schema: classpath:org/springframework/batch/core/schema-mysql.sql
-    datasource:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/${BATCH_DB_NAME}  # 배치 메타데이터용 DB
-      username: ${BATCH_DB_USERNAME}
-      password: ${BATCH_DB_PASSWORD}
 
   mail:
     host: smtp.gmail.com
@@ -27,7 +21,6 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
 
-
   data:
     redis:
       host: localhost
@@ -36,15 +29,12 @@ spring:
   elasticsearch:
     uris: localhost:9200
 
-#  batch:
-#    job:
-#      name:
-#      enabled: false
-#    datasource:
-#      url:
-#      username:
-#      password:
-#      driver-class-name:
+  rabbitmq:
+    host: localhost           # RabbitMQ host ip
+    port: 5672                # RabbitMQ port
+    username: guest # RabbitMQ 웹 관리 콘솔 아이디
+    password: guest # RabbitMQ 웹 관리 콘솔 비밀번호
+
 
 jwt:
   secret:
