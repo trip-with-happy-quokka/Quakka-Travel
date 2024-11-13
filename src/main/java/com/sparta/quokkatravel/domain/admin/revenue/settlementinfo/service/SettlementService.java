@@ -8,6 +8,7 @@ import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.dto.Settlemen
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.entity.SettlementInfo;
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.entity.SettlementStatus;
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.repository.SettlementRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,10 +95,11 @@ public class SettlementService {
     public List<SettlementResponseDto> getSettlementsByDateRange(LocalDate startDate, LocalDate endDate) {
         return settlementRepository.findBySettlementPeriodStartBetween(startDate, endDate).stream()
                 .map(this::convertToSettlementResponseDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // 월별 통계 조회 (연도-월 형식으로 입력)
+    @Cacheable(value = "SettlementResponseDto", key = "#yearMonth.toString() + '_' + #userID", cacheManager = "adminCacheManager")
     public List<SettlementResponseDto> getMonthlyStatistics(YearMonth yearMonth) {
         LocalDate startDate = yearMonth.atDay(1);
         LocalDate endDate = yearMonth.atEndOfMonth();

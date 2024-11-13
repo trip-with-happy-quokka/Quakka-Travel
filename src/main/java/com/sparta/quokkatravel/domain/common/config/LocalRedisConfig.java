@@ -1,6 +1,9 @@
 package com.sparta.quokkatravel.domain.common.config;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageDuplicator;
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageSubscriber;
 import org.redisson.Redisson;
@@ -12,6 +15,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
@@ -29,9 +33,10 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
+@Profile("local")
 @Configuration
 @EnableCaching
-public class RedisConfig {
+public class LocalRedisConfig {
     @Value("${spring.data.redis.host}")
     private String redisHost;
     @Value("${spring.data.redis.port}")
@@ -100,7 +105,8 @@ public class RedisConfig {
         return Redisson.create(config);
     }
 
-    @Bean
+    @Primary
+    @Bean(name = "cacheManager")
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
 
         RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
@@ -113,5 +119,23 @@ public class RedisConfig {
                 .cacheDefaults(redisCacheConfiguration)
                 .build();
 
+    }
+
+    @Bean(name = "adminCacheManager")
+    public CacheManager adminCacheManager(RedisConnectionFactory redisConnectionFactory) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // Java8 날짜/시간 모듈 추가
+        objectMapper.findAndRegisterModules(); // Jackson 모듈 등록
+
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+
+        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer))
+                .entryTtl(Duration.ofMinutes(30)); // 캐시 TTL 설정
+
+        return RedisCacheManager.builder(redisConnectionFactory)
+                .cacheDefaults(redisCacheConfiguration)
+                .build();
     }
 }

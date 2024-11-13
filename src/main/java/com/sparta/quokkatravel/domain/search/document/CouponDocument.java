@@ -18,7 +18,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Document(indexName = "coupon1")
+@Document(indexName = "coupon")
 public class CouponDocument {
 
     @Id
