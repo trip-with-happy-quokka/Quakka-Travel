@@ -27,13 +27,6 @@ public class LocalDataSourceConfig {
         return new DataSourceProperties();
     }
 
-    @Bean
-    @ConfigurationProperties(prefix = "spring.batch.datasource")
-    public DataSourceProperties batchDataSourceProperties() {
-        log.info("Configuring batch_metaDB datasource properties");
-        return new DataSourceProperties();
-    }
-
     @Primary
     @Bean(name = "dataSource")
     public DataSource quokkaDataSource() {
@@ -43,11 +36,4 @@ public class LocalDataSourceConfig {
         );
     }
 
-    @Bean(name = "batchDataSource")
-    public DataSource batchDataSource() {
-        return new LazyConnectionDataSourceProxy(
-                batchDataSourceProperties().initializeDataSourceBuilder()
-                        .type(HikariDataSource.class).build()
-        );
-    }
 }
