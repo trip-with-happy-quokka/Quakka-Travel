@@ -73,6 +73,11 @@ public class User extends Timestamped {
         this.status = status;
     }
 
+    // 역할 업데이트 메서드
+    public void updateRole(UserRole newRole) {
+        this.userRole = newRole;
+    }
+
 
     // Test Code 작성용 메서드
     public User(Long userId, String email, String password, String nickname, UserRole userRole) {
@@ -83,5 +88,3 @@ public class User extends Timestamped {
         this.userRole = userRole;
     }
 }
-
-
