@@ -22,11 +22,15 @@ spring:
 
   data:
     redis:
-      host: ${AWS_REDIS_URL}  # AWS ElastiCache Redis 엔드포인트
-      port: 6379
+      sentinel:
+        master: mymaster
+        nodes:
+          - ${AWS_REDIS_SENTINEL_IP}:26379
+          - ${AWS_REDIS_SENTINEL_IP}:26380
+          - ${AWS_REDIS_SENTINEL_IP}:26381
 
   elasticsearch:
-    uris: ${AWS_ELK_URL}:9200
+    uris: 52.79.171.129:9200
     password: ${AWS_ELASTIC_SEARCH_PW}
     username: ${AWS_ELASTIC_SEARCH_ID} # elastic
     connection-timeout: 1s

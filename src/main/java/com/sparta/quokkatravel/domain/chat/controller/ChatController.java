@@ -1,5 +1,6 @@
 package com.sparta.quokkatravel.domain.chat.controller;
 
+import com.sparta.quokkatravel.domain.chat.dto.ChatMessageDto;
 import com.sparta.quokkatravel.domain.chat.entity.ChatMessage;
 import com.sparta.quokkatravel.domain.chat.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +18,14 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/chat")
-    public void chat(ChatMessage chatMessage) {
-        // 대화방 ID가 존재하는지 확인하여 생성
-        String roomId = chatMessage.getChatRoomId();
+    public void chat(ChatMessageDto chatMessage) {
+
+        chatService.saveMessage(chatMessage);
 
         // 메시지 수신자에서 특정 방의 메시지 전송
+        String chatRoomId = chatMessage.getChatRoomId();
         messagingTemplate.convertAndSendToUser(
-                chatMessage.getReceiver(),"/queue/messages/" + roomId, chatMessage);
+                chatMessage.getReceiver(),"/queue/messages/" + chatRoomId, chatMessage);
     }
 
 }

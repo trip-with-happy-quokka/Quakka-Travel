@@ -9,9 +9,10 @@
 <body>
 <h2>1:1 채팅</h2>
 <label>보낸 사람: <input type="text" id="sender" /></label><br>
-<label>받는 사람: <input type="text" id="recipient" /></label><br>
+<label>받는 사람: <input type="text" id="receiver" /></label><br>
 <label>대화방 ID: <input type="text" id="roomId" /></label><br>
 <label>메시지 내용: <input type="text" id="messageContent" /></label><br>
+<button onclick="connect()">채팅 연결</button>
 <button onclick="sendMessage()">메시지 보내기</button>
 
 <h3>받은 메시지</h3>
@@ -28,7 +29,7 @@
             const roomId = document.getElementById("roomId").value;
 
             // 수신 경로를 대화방 ID를 사용하여 구독
-            stompClient.subscribe('/user/' + sender + '/queue/messages/' + roomId, function (message) {
+            stompClient.subscribe('/user/queue/messages/' + roomId, function (message) {
                 const messageContent = JSON.parse(message.body).content;
                 document.getElementById("messages").innerHTML += "<p>" + messageContent + "</p>";
             });
@@ -37,13 +38,13 @@
 
     function sendMessage() {
         const sender = document.getElementById("sender").value;
-        const recipient = document.getElementById("recipient").value;
+        const receiver = document.getElementById("receiver").value;
         const roomId = document.getElementById("roomId").value;
         const content = document.getElementById("messageContent").value;
 
         stompClient.send("/app/chat", {}, JSON.stringify({
             sender: sender,
-            recipient: recipient,
+            receiver: receiver,
             content: content,
             roomId: roomId
         }));

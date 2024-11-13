@@ -90,7 +90,7 @@ dependencies {
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     // redisson
-    implementation 'org.redisson:redisson-spring-boot-starter:3.16.3'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.29.0'
 
     // aws
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
