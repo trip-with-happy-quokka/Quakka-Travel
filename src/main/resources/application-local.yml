@@ -27,7 +27,6 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
 
-
   data:
     redis:
       host: localhost
