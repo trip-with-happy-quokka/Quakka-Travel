@@ -17,16 +17,16 @@ import java.util.Map;
 @Configuration
 public class AWSDatabaseConfig {
 
-    @Bean
     @Primary
+    @Bean
     @ConfigurationProperties(prefix = "spring.datasource")
     public DataSourceProperties dataSourceProperties() {
         log.info("Configuring primary (default) datasource properties");
         return new DataSourceProperties();
     }
 
-    @Bean
     @Primary
+    @Bean
     public DataSource defaultDataSource() {
         log.info("Configuring primary (default) datasource");
         return dataSourceProperties().initializeDataSourceBuilder()
@@ -79,6 +79,7 @@ public class AWSDatabaseConfig {
         return routingDataSource;
     }
 
+    @Primary
     @Bean
     public DataSource dataSource() {
         log.info("Configuring lazy connection data source proxy");
