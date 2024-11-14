@@ -1,4 +1,11 @@
 spring:
+  batch:
+    jdbc:
+      initialize-schema: always  # 배치 메타데이터 테이블 자동 생성
+      schema: classpath:org/springframework/batch/core/schema-mysql.sql
+    job:
+      enabled: false # JobLauncherApplicationRunner 비활성화
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     #quokka_travel

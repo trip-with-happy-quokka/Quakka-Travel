@@ -15,6 +15,7 @@ import java.util.Map;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+@Profile("aws")
 @Slf4j
 @Configuration
 public class AWSDatabaseConfig {
