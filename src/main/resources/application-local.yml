@@ -8,16 +8,6 @@ spring:
     # 1q2w3e4r5t
     password: ${DB_PASSWORD}
 
-  batch:
-    jdbc:
-      initialize-schema: always  # 배치 메타데이터 테이블 자동 생성
-      schema: classpath:org/springframework/batch/core/schema-mysql.sql
-    datasource:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/${BATCH_DB_NAME}  # 배치 메타데이터용 DB
-      username: ${BATCH_DB_USERNAME}
-      password: ${BATCH_DB_PASSWORD}
-
   mail:
     host: smtp.gmail.com
     port: 587

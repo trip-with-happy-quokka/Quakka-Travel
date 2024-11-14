@@ -21,8 +21,8 @@ public class SettlementResponseDto {
     private BigDecimal platformCommission;
     private BigDecimal partnerCommission;
     private BigDecimal taxAmount;
-    private LocalDate settlementPeriodStart;
-    private LocalDate settlementPeriodEnd;
+    private String settlementPeriodStart;
+    private String settlementPeriodEnd;
     private List<RevenueDetailResponseDto> revenueDetails;
 
     public SettlementResponseDto(Long settlementId, Long accommodationId, BigDecimal totalIncome,
@@ -39,8 +39,8 @@ public class SettlementResponseDto {
         this.platformCommission = platformCommission;
         this.partnerCommission = partnerCommission;
         this.taxAmount = taxAmount;
-        this.settlementPeriodStart = settlementPeriodStart;
-        this.settlementPeriodEnd = settlementPeriodEnd;
+        this.settlementPeriodStart = settlementPeriodStart.toString();
+        this.settlementPeriodEnd = settlementPeriodEnd.toString();
         this.revenueDetails = revenueDetails;
     }
 

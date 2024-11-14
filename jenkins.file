@@ -1,0 +1,204 @@
+pipeline {
+    agent any
+
+    triggers {
+        githubPush()
+    }
+
+    environment {
+        SERVICE_NAME = 'quokka-service' // 서비스 이름
+        IMAGE_TAG = "latest" // 최신 이미지 태그
+    }
+
+    stages {
+        stage('Prepare Config') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'AWS_ACCESS_KEY', variable: 'AWS_ACCESS_KEY'),
+                    string(credentialsId: 'AWS_SECRET_KEY', variable: 'AWS_SECRET_KEY'),
+                    string(credentialsId: 'ECR_REGISTRY', variable: 'ECR_REGISTRY'),
+                    string(credentialsId: 'AWS_REGION', variable: 'AWS_REGION'),
+                    string(credentialsId: 'AWS_DB_ID', variable: 'AWS_DB_ID'),
+                    string(credentialsId: 'AWS_DB_IP', variable: 'AWS_DB_IP'),
+                    string(credentialsId: 'AWS_DB_USERNAME', variable: 'AWS_DB_USERNAME'),
+                    string(credentialsId: 'AWS_DB_NAME', variable: 'AWS_DB_NAME'),
+                    string(credentialsId: 'AWS_DB_PW', variable: 'AWS_DB_PW'),
+                    string(credentialsId: 'AWS_ELASTIC_SEARCH_ID', variable: 'AWS_ELASTIC_SEARCH_ID'),
+                    string(credentialsId: 'AWS_ELASTIC_SEARCH_IP', variable: 'AWS_ELASTIC_SEARCH_IP'),
+                    string(credentialsId: 'AWS_ELASTIC_SEARCH_PW', variable: 'AWS_ELASTIC_SEARCH_PW'),
+                    string(credentialsId: 'AWS_REDIS_PORT', variable: 'AWS_REDIS_PORT'),
+                    string(credentialsId: 'AWS_S3_BUCKET', variable: 'AWS_S3_BUCKET'),
+                    string(credentialsId: 'BATCH_DB_NAME', variable: 'BATCH_DB_NAME'),
+                    string(credentialsId: 'BATCH_DB_PASSWORD', variable: 'BATCH_DB_PASSWORD'),
+                    string(credentialsId: 'BATCH_DB_USERNAME', variable: 'BATCH_DB_USERNAME'),
+                    string(credentialsId: 'APP_PASSWORD', variable: 'APP_PASSWORD'),
+                    string(credentialsId: 'DB_NAME', variable: 'DB_NAME'),
+                    string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
+                    string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
+                    string(credentialsId: 'JWT_SECRET_KEY', variable: 'JWT_SECRET_KEY'),
+                    string(credentialsId: 'MAIL_USERNAME', variable: 'MAIL_USERNAME'),
+                    string(credentialsId: 'SLACK_WEBHOOK_URL', variable: 'SLACK_WEBHOOK_URL'),
+                    string(credentialsId: 'TOSS_PAYMENT_CLIENT_KEY', variable: 'TOSS_PAYMENT_CLIENT_KEY'),
+                    string(credentialsId: 'TOSS_PAYMENT_FAIL_URL', variable: 'TOSS_PAYMENT_FAIL_URL'),
+                    string(credentialsId: 'TOSS_PAYMENT_SECRET_KEY', variable: 'TOSS_PAYMENT_SECRET_KEY'),
+                    string(credentialsId: 'TOSS_PAYMENT_SUCCESS_URL', variable: 'TOSS_PAYMENT_SUCCESS_URL')
+                ]) {
+                    script {
+                        echo "Preparing configuration values..."
+                        echo "AWS_REGION: ${AWS_REGION}"
+                        echo "ECR_REGISTRY: ${ECR_REGISTRY}"
+                        echo "AWS_DB_IP: ${AWS_DB_IP}"
+                        echo "AWS_REDIS_PORT: ${AWS_REDIS_PORT}"
+
+                        // 필수 변수 확인
+                        if (!AWS_ACCESS_KEY || !AWS_SECRET_KEY || !ECR_REGISTRY || !AWS_REGION) {
+                            error("필수 AWS 자격 증명 또는 레지스트리 정보가 없습니다.")
+                        }
+
+                        if (!AWS_DB_IP || !AWS_DB_USERNAME || !AWS_DB_PW || !AWS_REDIS_PORT) {
+                            error("데이터베이스 또는 Redis 설정이 없습니다.")
+                        }
+
+                        echo "환경 변수 로드 및 검증 완료"
+                    }
+                }
+            }
+        }
+
+        stage('Check Changes') {
+            steps {
+                script {
+                    def changes = sh(script: "git diff --name-only HEAD^", returnStdout: true).trim()
+                    def serviceChanged = changes.split('\n').any { it.startsWith('quokka-service/') }
+
+                    if (!serviceChanged) {
+                        currentBuild.result = 'NOT_BUILT'
+                        error('quokka-service 디렉토리에 변경 사항이 없어 빌드를 생략합니다.')
+                    }
+                    echo "quokka-service 디렉토리에서 변경 사항이 감지되었습니다. 빌드를 진행합니다."
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('quokka-service') { // 오타 수정
+                    sh '''
+                        chmod +x gradlew
+                        ./gradlew clean build -x test
+                    '''
+                }
+            }
+        }
+
+        stage('ECR Login & Docker Build') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'AWS_ACCESS_KEY', variable: 'AWS_ACCESS_KEY'),
+                    string(credentialsId: 'AWS_SECRET_KEY', variable: 'AWS_SECRET_KEY'),
+                    string(credentialsId: 'ECR_REGISTRY', variable: 'ECR_REGISTRY'),
+                    string(credentialsId: 'AWS_REGION', variable: 'AWS_REGION')
+                ]) {
+                    script {
+                        // AWS 환경 변수 설정 및 ECR 로그인
+                        sh '''
+                        export AWS_ACCESS_KEY=$AWS_ACCESS_KEY
+                        export AWS_SECRET_KEY=$AWS_SECRET_KEY
+                        export AWS_REGION=$AWS_REGION
+
+                        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+                        '''
+
+                        // Docker 이미지 빌드 및 latest 태그 설정
+                        sh '''
+                        docker build -t $ECR_REGISTRY:$IMAGE_TAG \
+                            --build-arg BATCH_DB_NAME=$BATCH_DB_NAME \
+                            --build-arg BATCH_DB_PASSWORD=$BATCH_DB_PASSWORD \
+                            --build-arg BATCH_DB_USERNAME=$BATCH_DB_USERNAME \
+                            --build-arg APP_PASSWORD=$APP_PASSWORD \
+                            --build-arg MAIL_USERNAME=$MAIL_USERNAME \
+                            --build-arg SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL \
+                            --build-arg TOSS_PAYMENT_CLIENT_KEY=$TOSS_PAYMENT_CLIENT_KEY \
+                            --build-arg TOSS_PAYMENT_FAIL_URL=$TOSS_PAYMENT_FAIL_URL \
+                            --build-arg TOSS_PAYMENT_SECRET_KEY=$TOSS_PAYMENT_SECRET_KEY \
+                            --build-arg TOSS_PAYMENT_SUCCESS_URL=$TOSS_PAYMENT_SUCCESS_URL \
+                            --build-arg DB_NAME=$DB_NAME \
+                            --build-arg DB_USERNAME=$DB_USERNAME \
+                            --build-arg DB_PASSWORD=$DB_PASSWORD \
+                            quokka-service/
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Push to ECR') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'AWS_ACCESS_KEY', variable: 'AWS_ACCESS_KEY'),
+                    string(credentialsId: 'AWS_SECRET_KEY', variable: 'AWS_SECRET_KEY'),
+                    string(credentialsId: 'ECR_REGISTRY', variable: 'ECR_REGISTRY'),
+                    string(credentialsId: 'AWS_REGION', variable: 'AWS_REGION')
+                ]) {
+                    script {
+                        sh '''
+                        export AWS_ACCESS_KEY=$AWS_ACCESS_KEY
+                        export AWS_SECRET_KEY=$AWS_SECRET_KEY
+                        export AWS_REGION=$AWS_REGION
+
+                        docker push $ECR_REGISTRY:$IMAGE_TAG
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to ECS') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'AWS_ACCESS_KEY', variable: 'AWS_ACCESS_KEY'),
+                    string(credentialsId: 'AWS_SECRET_KEY', variable: 'AWS_SECRET_KEY'),
+                    string(credentialsId: 'AWS_REGION', variable: 'AWS_REGION')
+                ]) {
+                    script {
+                        sh '''
+                        export AWS_ACCESS_KEY=$AWS_ACCESS_KEY
+                        export AWS_SECRET_KEY=$AWS_SECRET_KEY
+                        export AWS_REGION=$AWS_REGION
+
+                        aws ecs update-service \
+                            --cluster quokka-cluster \
+                            --service $SERVICE_NAME \
+                            --force-new-deployment \
+                            --region $AWS_REGION
+                        '''
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo """
+            ===========================================
+            Pipeline Successfully Completed
+            Service: ${SERVICE_NAME}
+            Image: ${ECR_REGISTRY}:${IMAGE_TAG}
+            ===========================================
+            """
+        }
+        failure {
+            echo """
+            ===========================================
+            Pipeline Failed
+            Service: ${SERVICE_NAME}
+            Stage: ${currentBuild.result}
+            ===========================================
+            """
+        }
+        always {
+            cleanWs()
+        }
+    }
+}
