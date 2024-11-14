@@ -1,7 +1,4 @@
 spring:
-  profiles:
-    active: local
-
   jpa:
     show-sql: true
     hibernate:
@@ -10,6 +7,39 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: false
+
+  datasource:
+    master:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://${AWS_DB_URL}:3306/${AWS_DB_NAME} # quokka_travel_m
+      username: ${AWS_DB_USERNAME}
+      password: ${AWS_DB_PW}
+    slave:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://${AWS_DB_URL}:3307/${AWS_DB_NAME}
+      username: ${AWS_DB_USERNAME}
+      password: ${AWS_DB_PW_S}
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME} # 이메일을 전송할 주체의 이메일 주소 (host mail)
+    password: ${APP_PASSWORD} # 해당 계정으로 발급받은 App password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+  data:
+    redis:
+      host: ${AWS_REDIS_URL}  # AWS ElastiCache Redis 엔드포인트
+      port: 6379
+
+  elasticsearch:
+    uris: ${AWS_ELK_URL}:9200
+    password: ${AWS_ELASTIC_SEARCH_PW}
+    username: ${AWS_ELASTIC_SEARCH_ID} # elastic
+    connection-timeout: 1s
+    socket-timeout: 30s
 
 server:
   tomcat:
@@ -30,17 +60,33 @@ springdoc:
 
 payment:
   toss:
-    test_client_api_key : ${TOSS_PAYMENT_CLIENT_KEY}
-    test_secret_api_key : ${TOSS_PAYMENT_SECRET_KEY}
-    success_url : ${TOSS_PAYMENT_SUCCESS_URL}
-    fail_url : ${TOSS_PAYMENT_FAIL_URL}
+    test_client_api_key: ${TOSS_PAYMENT_CLIENT_KEY}
+    test_secret_api_key: ${TOSS_PAYMENT_SECRET_KEY}
+    success_url: ${TOSS_PAYMENT_SUCCESS_URL}
+    fail_url: ${TOSS_PAYMENT_FAIL_URL}
 
 management:
   endpoint:
     health:
       show-components: always # health 컴포넌트의 상태 정보만 간략하게 노출
-      #show-details: always 세부사항 볼 때
   endpoints:
     web:
       exposure:
         include: "*"
+
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+
+slack:
+  webhook-url: ${SLACK_WEBHOOK_URL}
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}   # 실제 운영 환경의 AWS 액세스 키와 시크릿 키 사용
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: ${AWS_S3_BUCKET}
