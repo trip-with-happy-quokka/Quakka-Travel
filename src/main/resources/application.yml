@@ -8,6 +8,12 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: false
 
+  batch:
+    jdbc:
+      initialize-schema: never   # 수동으로 생성한 테이블과 충돌 방지
+    job:
+      enabled: false
+
   datasource:
     master:
       driver-class-name: com.mysql.cj.jdbc.Driver
