@@ -1,7 +1,7 @@
 package com.sparta.quokkatravel.domain.common.jwt;
 
-import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import com.sparta.quokkatravel.domain.user.entity.UserRole;
+import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
 
 import java.security.Key;
 import java.util.Base64;
@@ -25,16 +24,16 @@ public class JwtUtil {
     private static final long TOKEN_TIME = 60 * 60 * 1000L; // 60분
 
     @Value("${jwt.secret.key}")
-    private String secretKey;
+    private String secretKey; // Base64 encoded secret key
     private Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
     @PostConstruct
     public void init() {
-        byte[] bytes = Base64.getDecoder().decode(secretKey);
-        key = Keys.hmacShaKeyFor(bytes);
+        // Ensure the secretKey is decoded properly
+        byte[] keyBytes = Base64.getDecoder().decode(secretKey);
+        key = Keys.hmacShaKeyFor(keyBytes); // Set the key
     }
-
 
     public String createToken(Long id, String email, UserRole userRole) {
         Date date = new Date();
@@ -48,7 +47,6 @@ public class JwtUtil {
                         .setIssuedAt(date)
                         .signWith(key, signatureAlgorithm)
                         .compact();
-
     }
 
     public String substringToken(String tokenValue) {
