@@ -35,7 +35,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.time.Duration;
 import java.util.List;
 
-@Profile("aws")
 @Configuration
 @EnableCaching
 public class AWSRedisConfig {
