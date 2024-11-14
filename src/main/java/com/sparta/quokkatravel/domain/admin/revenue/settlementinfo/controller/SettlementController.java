@@ -3,11 +3,13 @@ package com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.controller;
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.dto.SettlementRequestDto;
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.dto.SettlementResponseDto;
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.service.SettlementService;
+import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
 import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -60,11 +62,10 @@ public class SettlementController {
 
     // 월별 통계 조회 (예시: 2023-10) - YearMonth
     @GetMapping("/monthly-statistics")
-    public ResponseEntity<?> getMonthlyStatistics(@RequestParam String yearMonth) {
-
+    public List<SettlementResponseDto> getMonthlyStatistics(@RequestParam String yearMonth,
+                                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
         YearMonth ym = YearMonth.parse(yearMonth);  // YearMonth 형식으로 변환
-        List<SettlementResponseDto> settlements = settlementService.getMonthlyStatistics(ym);
-
-        return ResponseEntity.ok(ApiResponse.success("월별통계 조회 성공", settlements));
+        Long userId = userDetails.getUserId();
+        return settlementService.getMonthlyStatistics(ym, userId);
     }
 }

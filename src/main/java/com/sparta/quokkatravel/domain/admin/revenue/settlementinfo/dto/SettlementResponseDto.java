@@ -22,10 +22,8 @@ public class SettlementResponseDto {
     private BigDecimal platformCommission;
     private BigDecimal partnerCommission;
     private BigDecimal taxAmount;
-
     private String settlementPeriodStart;
     private String settlementPeriodEnd;
-
     private List<RevenueDetailResponseDto> revenueDetails;
 
     public SettlementResponseDto(Long settlementId, Long accommodationId, BigDecimal totalIncome,

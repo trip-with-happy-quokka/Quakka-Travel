@@ -8,6 +8,8 @@ import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.dto.Settlemen
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.entity.SettlementInfo;
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.entity.SettlementStatus;
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.repository.SettlementRepository;
+import com.sparta.quokkatravel.domain.common.cache.InvalidateMonthlyStatisticsCache;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +28,8 @@ public class SettlementService {
     private final AccommodationRepository accommodationRepository;
 
     public SettlementService(SettlementRepository settlementRepository, AccommodationRepository accommodationRepository) {
-       this.settlementRepository = settlementRepository;
-       this.accommodationRepository = accommodationRepository;
+        this.settlementRepository = settlementRepository;
+        this.accommodationRepository = accommodationRepository;
     }
 
     // 특정 정산 ID로 정산 정보 조회
@@ -40,6 +42,7 @@ public class SettlementService {
 
     // 특정 정산 정보 삭제
     @Transactional
+    @InvalidateMonthlyStatisticsCache(cacheName = "SettlementResponseDto")
     public void deleteSettlement(Long id) {
         if (!settlementRepository.existsById(id)) {
             throw new RuntimeException("삭제할 정산 정보를 찾을 수 없습니다.");
@@ -49,6 +52,7 @@ public class SettlementService {
 
     // 새로운 정산 생성 및 저장
     @Transactional
+    @InvalidateMonthlyStatisticsCache(cacheName = "SettlementResponseDto")
     public SettlementInfo createSettlement(SettlementRequestDto requestDto) {
         Accommodation accommodation = accommodationRepository.findById(requestDto.getAccommodationId())
                 .orElseThrow(() -> new RuntimeException("숙소 정보를 찾을 수 없습니다."));
@@ -72,6 +76,7 @@ public class SettlementService {
 
     // 정산 정보 업데이트 (정산 ID 기준)
     @Transactional
+    @InvalidateMonthlyStatisticsCache(cacheName = "SettlementResponseDto")
     public void updateSettlement(Long id, SettlementRequestDto requestDto) {
         SettlementInfo settlementInfo = settlementRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("정산 정보를 찾을 수 없습니다."));
@@ -100,7 +105,7 @@ public class SettlementService {
 
     // 월별 통계 조회 (연도-월 형식으로 입력)
     @Cacheable(value = "SettlementResponseDto", key = "#yearMonth.toString() + '_' + #userID", cacheManager = "adminCacheManager")
-    public List<SettlementResponseDto> getMonthlyStatistics(YearMonth yearMonth) {
+    public List<SettlementResponseDto> getMonthlyStatistics(YearMonth yearMonth, Long userId) {
         LocalDate startDate = yearMonth.atDay(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
         return getSettlementsByDateRange(startDate, endDate);

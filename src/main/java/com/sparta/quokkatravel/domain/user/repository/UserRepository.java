@@ -16,4 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
         return findByEmail(email).orElseThrow(()-> new NotFoundException("유저를 찾을 수 없습니다"));
     }
 
+    Optional<User> findByKakaoId(Long kakaoId);
+
 }

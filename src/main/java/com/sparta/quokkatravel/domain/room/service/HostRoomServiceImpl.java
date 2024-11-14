@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class HostRoomServiceImpl implements HostRoomService {
+public class  HostRoomServiceImpl implements HostRoomService {
 
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
