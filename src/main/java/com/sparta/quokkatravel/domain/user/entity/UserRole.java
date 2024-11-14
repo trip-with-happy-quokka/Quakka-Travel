@@ -9,7 +9,8 @@ import java.util.Arrays;
 @Getter
 public enum UserRole {
     ADMIN, HOST, GUEST, // 회원가입 하면 default로 GUEST
-    OWNER, USER; // 채팅방을 관리할 수 있는 권한 , 일반 사용자의 역할
+    OWNER, USER, // 채팅방을 관리할 수 있는 권한 , 일반 사용자의 역할
+    INACTIVE; // 휴면계정
 
     public static UserRole of(String role) {
         // 문자열로 전달된 역할을 UserRole 열거형으로 변환

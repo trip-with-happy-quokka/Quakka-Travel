@@ -1,9 +1,9 @@
-package com.sparta.quokkatravel.domain.rabbitmq.controller;
+package com.sparta.quokkatravel.domain.common.rabbitmq.controller;
 
+import com.sparta.quokkatravel.domain.common.rabbitmq.dto.MessageRes;
 import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import com.sparta.quokkatravel.domain.coupon.dto.request.MessageRequestDto;
-import com.sparta.quokkatravel.domain.rabbitmq.dto.MessageRes;
-import com.sparta.quokkatravel.domain.rabbitmq.service.ProducerService;
+import com.sparta.quokkatravel.domain.common.rabbitmq.service.ProducerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
