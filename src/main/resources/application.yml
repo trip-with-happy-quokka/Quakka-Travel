@@ -7,6 +7,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: false
+  batch:
+    job:
+      enabled: false
 
   datasource:
     url: ${AWS_DB_MASTER}      # 기본 데이터 소스로 설정 (master DB)
