@@ -70,7 +70,7 @@ public class SearchServiceImpl implements SearchService {
                 .must(mustQuery).build();
 
         SearchRequest searchRequest = new SearchRequest.Builder()
-                .index("index005")
+                .index("accommodation")
                 .query(new Query.Builder().bool(boolQuery).build()).build();
 
         SearchResponse<AccommodationDocument> response = elasticsearchClient.search(searchRequest, AccommodationDocument.class);
@@ -122,7 +122,7 @@ public class SearchServiceImpl implements SearchService {
                 .must(mustQuery).build();
 
         SearchRequest searchRequest = new SearchRequest.Builder()
-                .index("coupon1")
+                .index("coupon")
                 .query(new Query.Builder().bool(boolQuery).build()).build();
 
         SearchResponse<CouponDocument> response = elasticsearchClient.search(searchRequest, CouponDocument.class);

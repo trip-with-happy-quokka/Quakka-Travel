@@ -1,11 +1,12 @@
 package com.sparta.quokkatravel.domain.common.config;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageDuplicator;
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageSubscriber;
+import io.lettuce.core.ReadFrom;
 import org.redisson.Redisson;
+import org.redisson.api.DefaultNatMapper;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,9 +16,11 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -30,24 +33,34 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.util.List;
 
+@Profile("aws")
 @Configuration
 @EnableCaching
-public class RedisConfig {
-    @Value("${spring.data.redis.host}")
-    private String redisHost;
-    @Value("${spring.data.redis.port}")
-    private int redisPort;
-    private static final String REDISSON_HOST_PREFIX = "redis://";
+public class AWSRedisConfig {
 
-    // 레디스 서버와의 연결을 관리하는 객체
+    @Value("${spring.data.redis.sentinel.master}")
+    private String REDIS_MASTER;
+
+    @Value("${spring.data.redis.sentinel.nodes[0]}")
+    private String SENTINEL_NODE_0;
+
+    @Value("${spring.data.redis.sentinel.nodes[1]}")
+    private String SENTINEL_NODE_1;
+
+    @Value("${spring.data.redis.sentinel.nodes[2]}")
+    private String SENTINEL_NODE_2;
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(redisHost);
-        redisStandaloneConfiguration.setPort(redisPort);
 
-        return new LettuceConnectionFactory(redisStandaloneConfiguration);
+        RedisSentinelConfiguration redisSentinelConfiguration = new RedisSentinelConfiguration()
+                .master(REDIS_MASTER)
+                .sentinel(SENTINEL_NODE_0.split(":")[0], Integer.parseInt(SENTINEL_NODE_0.split(":")[1]))
+                .sentinel(SENTINEL_NODE_1.split(":")[0], Integer.parseInt(SENTINEL_NODE_1.split(":")[1]))
+                .sentinel(SENTINEL_NODE_2.split(":")[0], Integer.parseInt(SENTINEL_NODE_2.split(":")[1]));
+        return new LettuceConnectionFactory(redisSentinelConfiguration);
     }
 
     // 메세지를 받을 때 지정된 메서드를 호출하여 메세지를 처리
@@ -97,8 +110,10 @@ public class RedisConfig {
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();
-        config.useSingleServer()
-                .setAddress(REDISSON_HOST_PREFIX + redisHost + ":" + redisPort);
+        config.useSentinelServers()
+                .setMasterName("mymaster")
+                .addSentinelAddress("redis://"+SENTINEL_NODE_0, "redis://"+SENTINEL_NODE_1, "redis://"+SENTINEL_NODE_2)
+                .setCheckSentinelsList(false);
         return Redisson.create(config);
     }
 
@@ -120,11 +135,6 @@ public class RedisConfig {
 
     @Bean(name = "adminCacheManager")
     public CacheManager adminCacheManager(RedisConnectionFactory redisConnectionFactory) {
-        try {
-            redisConnectionFactory.getConnection().ping();
-        } catch (Exception e) {
-            throw new IllegalStateException("admin Redis 서버에 연결할 수 없습니다.", e);
-        }
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule()); // Java8 날짜/시간 모듈 추가
         objectMapper.findAndRegisterModules(); // Jackson 모듈 등록

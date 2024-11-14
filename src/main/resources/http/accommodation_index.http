@@ -1,4 +1,4 @@
-PUT http://43.202.0.210:9200/accommodation1
+PUT http://52.79.171.129:9200/accommodation
 Content-Type: application/json
 Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
 

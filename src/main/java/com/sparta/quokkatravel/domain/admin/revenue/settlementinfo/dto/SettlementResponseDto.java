@@ -1,5 +1,6 @@
 package com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sparta.quokkatravel.domain.admin.revenue.revenuedetail.dto.RevenueDetailResponseDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

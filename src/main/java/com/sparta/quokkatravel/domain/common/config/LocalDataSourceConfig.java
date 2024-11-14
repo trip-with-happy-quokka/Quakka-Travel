@@ -11,8 +11,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
 
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
 
 @Profile("local")
 @Slf4j

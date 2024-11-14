@@ -4,6 +4,7 @@ import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.dto.Settlemen
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.dto.SettlementResponseDto;
 import com.sparta.quokkatravel.domain.admin.revenue.settlementinfo.service.SettlementService;
 import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

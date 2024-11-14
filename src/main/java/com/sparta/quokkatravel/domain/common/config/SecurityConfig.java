@@ -43,6 +43,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/notify/").hasRole("ADMIN")
                         .requestMatchers("/topic/notifications/").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/index.html/**").permitAll()
+                        .requestMatchers("/chat.html/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
                         .requestMatchers("/api/v1/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()

@@ -1,13 +1,21 @@
 package com.sparta.quokkatravel.domain.common.config;
 
+import com.sparta.quokkatravel.domain.common.interceptor.WebSocketAuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final WebSocketAuthInterceptor webSocketAuthInterceptor;
 
     // STOMP 엔드포인트 설정: 웹소켓 연결을 위한 엔드포인트로 /ws-chat을 정의, SockJS 사용을 허용
     @Override
@@ -28,6 +36,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.setApplicationDestinationPrefixes("/app");
         // 특정 사용자에게 메시지를 보낼 경로
         config.setUserDestinationPrefix("/user");
+    }
+
+    @Override
+    public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
+        messageConverters.add(new MappingJackson2MessageConverter());
+        return true;
     }
 
 }

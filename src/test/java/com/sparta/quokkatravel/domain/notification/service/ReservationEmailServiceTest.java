@@ -38,7 +38,7 @@ class ReservationEmailServiceTest {
         // 가상의 데이터 설정
         host = new User("host@example.com", "host123", "HostNickname", UserRole.HOST);
         guest = new User("guest@example.com", "guest123", "GuestNickname", UserRole.GUEST);
-        accommodation = new Accommodation("Sample Accommodation", "A nice place to stay", "123 Main St");
+        accommodation = new Accommodation("Sample Accommodation", "A nice place to stay", "123 Main St", host);
         room = new Room("Deluxe Room", "Comfortable room with amenities", 4L, 100000L, 20000L);
         reservation = new Reservation(LocalDate.of(2024, 11, 20), LocalDate.of(2024, 11, 25), 4L, guest, room);
     }

@@ -19,10 +19,9 @@ import java.time.temporal.ChronoUnit;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-//@Table(indexes = {
-//        @Index(name = "idx_reservation_user", columnList = "user_id"),
-//        @Index(name = "idx_reservation_room", columnList = "room_id")
-//})
+@Table(indexes = {
+        @Index(name = "idx_reservation_id", columnList = "id")
+})
 public class Reservation extends Timestamped {
 
     @Id
