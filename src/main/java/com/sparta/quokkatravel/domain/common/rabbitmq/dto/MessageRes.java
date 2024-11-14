@@ -1,4 +1,4 @@
-package com.sparta.quokkatravel.domain.rabbitmq.dto;
+package com.sparta.quokkatravel.domain.common.rabbitmq.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

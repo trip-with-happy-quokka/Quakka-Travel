@@ -1,10 +1,4 @@
 spring:
-  batch:
-    jdbc:
-      initialize-schema: always  # 배치 메타데이터 테이블 자동 생성
-      schema: classpath:org/springframework/batch/core/schema-mysql.sql
-    job:
-      enabled: false # JobLauncherApplicationRunner 비활성화
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     #quokka_travel
@@ -23,6 +17,7 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
 
+
   data:
     redis:
       host: localhost
@@ -37,6 +32,44 @@ spring:
     username: guest # RabbitMQ 웹 관리 콘솔 아이디
     password: guest # RabbitMQ 웹 관리 콘솔 비밀번호
 
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID} # 클라이언트 웹 어플리케이션 식별자 (노출O)
+            client-secret: ${KAKAO_CLIENT_SECRET} # 클라이언트 id 에 대한 비밀키 (절대 노출x)
+            redirect-uri: http://localhost:8080/users/login/kakao
+            client-authentication-method: client_secret_post
+            # kakao는 인증 토큰 발급 요청 메서드가 post 이다.
+            authorization-grant-type: authorization_code
+            scope: # kakao 개인 정보 동의 항목 설정의 ID 값
+              - profile_nickname
+              - account_email
+            client-name: kakao
+
+        #kakao provider 설정
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+            # 유저 정보 조회 시 반환된느 최상위 필드명으로 해야 한다.
+
+
+
+
+
+#  batch:
+#    job:
+#      name:
+#      enabled: false
+#    datasource:
+#      url:
+#      username:
+#      password:
+#      driver-class-name:
 
 jwt:
   secret:

@@ -1,4 +1,4 @@
-package com.sparta.quokkatravel.domain.rabbitmq.service;
+package com.sparta.quokkatravel.domain.common.rabbitmq.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

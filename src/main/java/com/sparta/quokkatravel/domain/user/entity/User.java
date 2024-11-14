@@ -43,6 +43,8 @@ public class User extends Timestamped {
     @Column(nullable = true)
     private String status; // 사용자 상태 필드
 
+    private Long kakaoId;
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Accommodation> accommodations = new ArrayList<>();
@@ -87,4 +89,12 @@ public class User extends Timestamped {
         this.nickname = nickname;
         this.userRole = userRole;
     }
+
+    // 기존 회원 정보에 kakaoId 추가
+    public User kakaoIdUpdate(Long kakaoId) {
+        this.kakaoId = kakaoId;
+        return this;
+    }
 }
+
+
