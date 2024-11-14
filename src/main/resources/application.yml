@@ -11,12 +11,12 @@ spring:
   datasource:
     master:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://${AWS_DB_URL}:3306/${AWS_DB_NAME} # quokka_travel_m
+      url: ${AWS_DB_MASTER}
       username: ${AWS_DB_USERNAME}
       password: ${AWS_DB_PW}
     slave:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://${AWS_DB_URL}:3307/${AWS_DB_NAME}
+      url: ${AWS_DB_SLAVE}
       username: ${AWS_DB_USERNAME}
       password: ${AWS_DB_PW_S}
 
