@@ -3,6 +3,7 @@ package com.sparta.quokkatravel.domain.coupon.service.guest;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.repository.CouponRepository;
 import com.sparta.quokkatravel.domain.coupon.service.CouponServiceImpl;
+import com.sparta.quokkatravel.domain.coupon.util.CouponLockUtil;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,9 @@ public class CouponDistributionLockTest {
 
     @Autowired
     private RedissonClient redissonClient;
+
+    @Autowired
+    private CouponLockUtil couponLockUtil;
 
     @Test
     @Order(1)
@@ -92,7 +96,7 @@ public class CouponDistributionLockTest {
 
         @Override
         public void run() {
-            couponService.decreaseVolumeWithLock(this.couponKey);
+            couponLockUtil.decreaseVolumeWithLock(redissonClient, this.couponKey);
             countDownLatch.countDown();
         }
     }
@@ -108,7 +112,7 @@ public class CouponDistributionLockTest {
 
         @Override
         public void run() {
-            couponService.decreaseVolumeWithoutLock(this.couponKey);
+            couponLockUtil.decreaseVolumeWithoutLock(redissonClient, this.couponKey);
             countDownLatch.countDown();
         }
     }
