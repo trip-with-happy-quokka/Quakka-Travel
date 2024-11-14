@@ -30,9 +30,13 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() {
-        // Ensure the secretKey is decoded properly
-        byte[] keyBytes = Base64.getDecoder().decode(secretKey);
-        key = Keys.hmacShaKeyFor(keyBytes); // Set the key
+        if (secretKey == null || secretKey.isEmpty()) {
+            // 키가 비어 있으면 안전한 키를 생성
+            key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        } else {
+            byte[] keyBytes = Base64.getDecoder().decode(secretKey);
+            key = Keys.hmacShaKeyFor(keyBytes);
+        }
     }
 
     public String createToken(Long id, String email, UserRole userRole) {
