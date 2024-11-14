@@ -14,7 +14,9 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "settlement_info")
+@Table(name = "settlement_info", indexes = {
+        @Index(name = "idx_settlement_id", columnList = "settlementId")
+})
 public class SettlementInfo {
 
     @Id

@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(indexes = {
+        @Index(name = "idx_room_id", columnList = "id")
+})
 public class Room extends Timestamped {
 
     @Id

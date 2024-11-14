@@ -48,7 +48,7 @@ public class HostRoomController {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
-        Page<HostRoomResponseDto> rooms = hostRoomService.getAllRoomByHost(customUserDetails, accommodationId, pageable);
+        Page<HostRoomResponseDto> rooms = hostRoomService.getAllRoom(customUserDetails, accommodationId, pageable);
         return ResponseEntity.ok(ApiResponse.success("객실 전체 조회 성공", rooms));
     }
 
@@ -59,7 +59,7 @@ public class HostRoomController {
                                               @PathVariable(name = "accommodationId") Long accommodationId,
                                               @PathVariable(name = "roomId") Long roomId) {
 
-        HostRoomResponseDto hostRoomResponseDto = hostRoomService.getRoomByHost(customUserDetails, accommodationId, roomId);
+        HostRoomResponseDto hostRoomResponseDto = hostRoomService.getRoom(customUserDetails, accommodationId, roomId);
         return ResponseEntity.ok(ApiResponse.success("객실 단일 조회 성공", hostRoomResponseDto));
     }
 

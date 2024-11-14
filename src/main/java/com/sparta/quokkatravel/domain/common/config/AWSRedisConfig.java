@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageDuplicator;
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageSubscriber;
+import io.lettuce.core.ReadFrom;
 import org.redisson.Redisson;
-import org.redisson.api.NatMapper;
+import org.redisson.api.DefaultNatMapper;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
-import org.redisson.misc.RedisURI;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
@@ -21,6 +21,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
@@ -32,7 +33,6 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 
 @Profile("aws")
@@ -41,32 +41,26 @@ import java.util.List;
 public class AWSRedisConfig {
 
     @Value("${spring.data.redis.sentinel.master}")
-    private String master;
+    private String REDIS_MASTER;
 
     @Value("${spring.data.redis.sentinel.nodes[0]}")
-    private String node0;
+    private String SENTINEL_NODE_0;
 
     @Value("${spring.data.redis.sentinel.nodes[1]}")
-    private String node1;
+    private String SENTINEL_NODE_1;
 
     @Value("${spring.data.redis.sentinel.nodes[2]}")
-    private String node2;
-
-    private static final String REDISSON_HOST_PREFIX = "redis://";
-
-    private List<String> getNodes() {
-        return Arrays.asList(node0, node1, node2);
-    }
+    private String SENTINEL_NODE_2;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
-                .master("mymaster")
-                .sentinel("13.124.1.237", 26379)
-                .sentinel("13.124.1.237", 26380)
-                .sentinel("13.124.1.237", 26381);
 
-        return new LettuceConnectionFactory(sentinelConfig);
+        RedisSentinelConfiguration redisSentinelConfiguration = new RedisSentinelConfiguration()
+                .master(REDIS_MASTER)
+                .sentinel(SENTINEL_NODE_0.split(":")[0], Integer.parseInt(SENTINEL_NODE_0.split(":")[1]))
+                .sentinel(SENTINEL_NODE_1.split(":")[0], Integer.parseInt(SENTINEL_NODE_1.split(":")[1]))
+                .sentinel(SENTINEL_NODE_2.split(":")[0], Integer.parseInt(SENTINEL_NODE_2.split(":")[1]));
+        return new LettuceConnectionFactory(redisSentinelConfiguration);
     }
 
     // 메세지를 받을 때 지정된 메서드를 호출하여 메세지를 처리
@@ -118,22 +112,8 @@ public class AWSRedisConfig {
         Config config = new Config();
         config.useSentinelServers()
                 .setMasterName("mymaster")
-                .addSentinelAddress("redis://13.124.1.237:26379", "redis://13.124.1.237:26380", "redis://13.124.1.237:26381")
-                .setNatMapper(new NatMapper() {
-                    @Override
-                    public RedisURI map(RedisURI redisURI) {
-                        if (redisURI.getHost().equals("172.18.0.4")) {
-                            return new RedisURI("redis", "13.124.1.237", 26379);
-                        } else if (redisURI.getHost().equals("172.18.0.5")) {
-                            return new RedisURI("redis://13.124.1.237:26380");
-                        } else if (redisURI.getHost().equals("172.18.0.6")) {
-                            return new RedisURI("redis://13.124.1.237:26381");
-                        }
-                        return redisURI;
-                    }
-                })
-                .setCheckSentinelsList(true)
-                .setTimeout(30000);
+                .addSentinelAddress("redis://"+SENTINEL_NODE_0, "redis://"+SENTINEL_NODE_1, "redis://"+SENTINEL_NODE_2)
+                .setCheckSentinelsList(false);
         return Redisson.create(config);
     }
 
