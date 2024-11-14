@@ -9,7 +9,7 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     #quokka_travel
-    url: jdbc:mysql://43.200.104.174/quokka_travel
+    url: jdbc:mysql://localhost:8080/quokka_travel
     # root
     username: root
     # 1q2w3e4r5t
