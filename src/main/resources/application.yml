@@ -15,22 +15,22 @@ spring:
       enabled: true              # Batch 기능 활성화
 
   datasource:
-    url: ${AWS_DB_MASTER}        # 기본 데이터 소스로 설정 (master DB)
+    url: ${AWS_DB_MASTER}
     username: ${AWS_DB_USERNAME}
     password: ${AWS_DB_PW}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-    master:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: ${AWS_DB_MASTER}
-      username: ${AWS_DB_USERNAME}
-      password: ${AWS_DB_PW}
+  datasource-master:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${AWS_DB_MASTER}
+    username: ${AWS_DB_USERNAME}
+    password: ${AWS_DB_PW}
 
-    slave:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: ${AWS_DB_SLAVE}
-      username: ${AWS_DB_USERNAME}
-      password: ${AWS_DB_PW_S}
+  datasource-slave:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${AWS_DB_SLAVE}
+    username: ${AWS_DB_USERNAME}
+    password: ${AWS_DB_PW_S}
 
   mail:
     host: smtp.gmail.com

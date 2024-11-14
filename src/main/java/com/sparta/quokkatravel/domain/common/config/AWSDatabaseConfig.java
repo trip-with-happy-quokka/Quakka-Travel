@@ -1,49 +1,74 @@
 package com.sparta.quokkatravel.domain.common.config;
 
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.zaxxer.hikari.HikariDataSource;
 
 @Slf4j
 @Configuration
 public class AWSDatabaseConfig {
 
     @Bean
-    @ConfigurationProperties(prefix = "spring.datasource.master")
-    public DataSourceProperties masterDataSourceProperties() {
-        log.info("master datasource properties");
-        return new DataSourceProperties();
-    }
-
-    @Bean
-    @ConfigurationProperties(prefix = "spring.datasource.slave")
-    public DataSourceProperties slaveDataSourceProperties() {
-        log.info("slave datasource properties");
-        return new DataSourceProperties();
-    }
-
     @Primary
+    @ConfigurationProperties(prefix = "spring.datasource")
+    public DataSourceProperties dataSourceProperties() {
+        log.info("Configuring primary (default) datasource properties");
+        return new DataSourceProperties();
+    }
+
     @Bean
-    public DataSource dataSource() {
-        return new LazyConnectionDataSourceProxy(routingDataSource());
+    @Primary
+    public DataSource defaultDataSource() {
+        log.info("Configuring primary (default) datasource");
+        return dataSourceProperties().initializeDataSourceBuilder()
+                .type(HikariDataSource.class)
+                .build();
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "spring.datasource-master")
+    public DataSourceProperties masterDataSourceProperties() {
+        log.info("Loading master datasource properties");
+        return new DataSourceProperties();
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "spring.datasource-slave")
+    public DataSourceProperties slaveDataSourceProperties() {
+        log.info("Loading slave datasource properties");
+        return new DataSourceProperties();
+    }
+
+    @Bean
+    public DataSource masterDataSource() {
+        log.info("Configuring master datasource");
+        return masterDataSourceProperties().initializeDataSourceBuilder()
+                .type(HikariDataSource.class)
+                .build();
+    }
+
+    @Bean
+    public DataSource slaveDataSource() {
+        log.info("Configuring slave datasource");
+        return slaveDataSourceProperties().initializeDataSourceBuilder()
+                .type(HikariDataSource.class)
+                .build();
     }
 
     @Bean
     public DataSource routingDataSource() {
+        log.info("Setting up routing datasource");
 
         ReplicationRoutingDataSource routingDataSource = new ReplicationRoutingDataSource();
-
         Map<Object, Object> dataSourceMap = new HashMap<>();
         dataSourceMap.put("master", masterDataSource());
         dataSourceMap.put("slave", slaveDataSource());
@@ -55,22 +80,8 @@ public class AWSDatabaseConfig {
     }
 
     @Bean
-    public DataSource masterDataSource() {
-        HikariDataSource dataSource = new HikariDataSource();
-        dataSource.setJdbcUrl(masterDataSourceProperties().getUrl());
-        dataSource.setUsername(masterDataSourceProperties().getUsername());
-        dataSource.setPassword(masterDataSourceProperties().getPassword());
-        dataSource.setDriverClassName(masterDataSourceProperties().getDriverClassName());
-        return dataSource;
-    }
-
-    @Bean
-    public DataSource slaveDataSource() {
-        HikariDataSource dataSource = new HikariDataSource();
-        dataSource.setJdbcUrl(slaveDataSourceProperties().getUrl());
-        dataSource.setUsername(slaveDataSourceProperties().getUsername());
-        dataSource.setPassword(slaveDataSourceProperties().getPassword());
-        dataSource.setDriverClassName(slaveDataSourceProperties().getDriverClassName());
-        return dataSource;
+    public DataSource dataSource() {
+        log.info("Configuring lazy connection data source proxy");
+        return new LazyConnectionDataSourceProxy(routingDataSource());
     }
 }
