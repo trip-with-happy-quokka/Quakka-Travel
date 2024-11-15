@@ -21,7 +21,7 @@
     </appender>
 
     <!-- ERROR와 WARN 레벨만을 위한 필터 설정 -->
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="LOGSTASH" />
     </root>

@@ -17,9 +17,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(indexes = {
-        @Index(name = "idx_accommodation_id", columnList = "id")
-})
 public class Accommodation extends Timestamped {
 
     @Id

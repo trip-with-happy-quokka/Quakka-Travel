@@ -18,9 +18,6 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(indexes = {
-        @Index(name = "idx_user_id", columnList = "id"),
-        @Index(name = "idx_user_email", columnList = "email")})
 public class User extends Timestamped {
 
     @Id

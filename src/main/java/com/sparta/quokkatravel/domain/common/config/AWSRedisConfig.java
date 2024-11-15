@@ -5,10 +5,20 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageDuplicator;
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageSubscriber;
 import io.lettuce.core.ReadFrom;
+import io.netty.channel.socket.DatagramChannel;
+import io.netty.resolver.AddressResolverGroup;
+import io.netty.resolver.InetNameResolver;
+import io.netty.resolver.dns.DnsAddressResolverGroup;
+import io.netty.resolver.dns.DnsNameResolverBuilder;
+import io.netty.resolver.dns.DnsServerAddressStreamProvider;
 import org.redisson.Redisson;
 import org.redisson.api.DefaultNatMapper;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.redisson.config.ReadMode;
+import org.redisson.config.SubscriptionMode;
+import org.redisson.connection.AddressResolverGroupFactory;
+import org.redisson.misc.RedisURI;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
@@ -32,6 +42,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.net.InetSocketAddress;
 import java.time.Duration;
 import java.util.List;
 
@@ -112,8 +123,15 @@ public class AWSRedisConfig {
         Config config = new Config();
         config.useSentinelServers()
                 .setMasterName("mymaster")
-                .addSentinelAddress("redis://"+SENTINEL_NODE_0, "redis://"+SENTINEL_NODE_1, "redis://"+SENTINEL_NODE_2)
-                .setCheckSentinelsList(false);
+                .addSentinelAddress(
+                        "redis://172.17.0.1:26379",
+                        "redis://172.17.0.1:26380",
+                        "redis://172.17.0.1:26381")
+                .setCheckSentinelsList(false)
+                .setConnectTimeout(10000)
+                .setTimeout(30000)
+                .setRetryAttempts(3)
+                .setRetryInterval(3000);
         return Redisson.create(config);
     }
 
