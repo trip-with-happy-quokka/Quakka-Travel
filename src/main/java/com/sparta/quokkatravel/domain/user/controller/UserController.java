@@ -1,16 +1,15 @@
 package com.sparta.quokkatravel.domain.user.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
+import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import com.sparta.quokkatravel.domain.user.dto.UserLoginRequestDto;
-import com.sparta.quokkatravel.domain.user.dto.UserSignupRequestDto;
 import com.sparta.quokkatravel.domain.user.dto.UserResponseDto;
+import com.sparta.quokkatravel.domain.user.dto.UserSignupRequestDto;
 import com.sparta.quokkatravel.domain.user.service.KakaoService;
 import com.sparta.quokkatravel.domain.user.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

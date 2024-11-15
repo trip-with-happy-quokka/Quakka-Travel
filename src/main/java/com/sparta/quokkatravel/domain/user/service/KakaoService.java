@@ -5,7 +5,6 @@ import com.sparta.quokkatravel.domain.common.jwt.JwtUtil;
 import com.sparta.quokkatravel.domain.user.dto.KakaoUserInfoDto;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.util.KakaoApiUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

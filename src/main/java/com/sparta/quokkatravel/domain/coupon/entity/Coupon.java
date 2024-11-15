@@ -21,7 +21,8 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Table(indexes = {
-        @Index(name = "idx_coupon_id", columnList = "id"),
+        @Index(name = "idx_coupon_status", columnList = "coupon_status"),
+        @Index(name = "idx_coupon_type", columnList = "coupon_type"),
         @Index(name = "idx_coupon_code", columnList = "coupon_code")
 })
 public class Coupon extends Timestamped {
@@ -37,7 +38,7 @@ public class Coupon extends Timestamped {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "coupon_type", nullable = false)
     private CouponType couponType;
 
     @Min(0)
@@ -48,7 +49,7 @@ public class Coupon extends Timestamped {
     private String code;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(name = "coupon_status")
     private CouponStatus couponStatus = CouponStatus.ISSUED;
 
     @Min(0)
