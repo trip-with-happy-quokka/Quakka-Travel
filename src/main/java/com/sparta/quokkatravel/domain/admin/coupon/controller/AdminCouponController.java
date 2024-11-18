@@ -1,6 +1,5 @@
 package com.sparta.quokkatravel.domain.admin.coupon.controller;
 
-import com.sparta.quokkatravel.domain.accommodation.dto.HostAccommodationResponseDto;
 import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponRequestDto;
 import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponResponseDto;
 import com.sparta.quokkatravel.domain.admin.coupon.dto.CouponToUserReq;
@@ -12,9 +11,6 @@ import com.sparta.quokkatravel.domain.common.shared.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,20 +27,6 @@ public class AdminCouponController {
 
     private final AdminCouponService adminCouponService;
     private final CouponProducerService couponProducerService;
-
-//    // 내 숙소 전체 조회
-//    @GetMapping("/accommodations")
-//    @Operation(summary = "숙소 전체 조회", description = "HOST 유저의 숙소들을 조회하는 API")
-//    public ResponseEntity<?> getCouponbyPaging(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-//                                                 @RequestParam(required = false, defaultValue = "0") int pageNo,
-//                                                 @RequestParam(required = false, defaultValue = "10") int pageSize,
-//                                                 @RequestParam(required = false) String searchType,
-//                                                 @RequestParam(required = false) String searchValue) {
-//
-//        Pageable pageable = PageRequest.of(pageNo, pageSize);
-//        Page<AdminCouponResponseDto> coupons = adminCouponService.getCouponbyPaging(customUserDetails, pageable);
-//        return ResponseEntity.ok(ApiResponse.success("쿠폰 페이지 조회 성공", coupons));
-//    }
 
     // 모든 쿠폰 목록 조회 (관리자 전용)
     @GetMapping

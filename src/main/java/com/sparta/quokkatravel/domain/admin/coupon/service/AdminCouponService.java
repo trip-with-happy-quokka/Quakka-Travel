@@ -6,8 +6,6 @@ import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponRequestDto;
 import com.sparta.quokkatravel.domain.admin.coupon.dto.AdminCouponResponseDto;
 import com.sparta.quokkatravel.domain.admin.coupon.repository.AdminCouponRepository;
 import com.sparta.quokkatravel.domain.common.exception.NotFoundException;
-import com.sparta.quokkatravel.domain.common.jwt.CustomUserDetails;
-import com.sparta.quokkatravel.domain.coupon.dto.response.CouponResponseDto;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponType;
 import com.sparta.quokkatravel.domain.event.entity.Event;
@@ -17,14 +15,11 @@ import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RedissonClient;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,10 +41,6 @@ public class AdminCouponService {
             throw new IllegalArgumentException("할인율과 할인 금액 중 하나는 반드시 0보다 커야 합니다.");
         }
     }
-
-    public Page<AdminCouponResponseDto> getCouponbyPaging(CustomUserDetails customUserDetails, Pageable pageable) {
-    }
-
 
     // 쿠폰 발급
     public AdminCouponResponseDto createCoupon(String email, AdminCouponRequestDto couponRequestDto) {
