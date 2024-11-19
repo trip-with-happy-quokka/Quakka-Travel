@@ -52,7 +52,6 @@ public class SettlementService {
 
     // 새로운 정산 생성 및 저장
     @Transactional
-    @InvalidateMonthlyStatisticsCache(cacheName = "SettlementResponseDto")
     public SettlementInfo createSettlement(SettlementRequestDto requestDto) {
         Accommodation accommodation = accommodationRepository.findById(requestDto.getAccommodationId())
                 .orElseThrow(() -> new RuntimeException("숙소 정보를 찾을 수 없습니다."));

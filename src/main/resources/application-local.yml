@@ -9,11 +9,11 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     #quokka_travel
-    url: jdbc:mysql://localhost:3306/quokka_travel
+    url: jdbc:mysql://localhost:3306/${DB_NAME}
     # root
-    username: root
+    username: ${DB_USERNAME}
     # 1q2w3e4r5t
-    password: 1q2w3e4r5t
+    password: ${DB_PASSWORD}
 
   mail:
     host: smtp.gmail.com

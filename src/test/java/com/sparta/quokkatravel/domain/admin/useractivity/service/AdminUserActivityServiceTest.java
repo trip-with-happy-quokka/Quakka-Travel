@@ -41,13 +41,15 @@ class AdminUserActivityServiceTest {
     @Test
     void 특정_사용자_활동_조회_테스트() {
         // given
-        Long userId = 1L;
+        String email = "dummy@example.com"; // email을 String으로 선언
+        UserRole userRole = UserRole.ADMIN; // UserRole을 ADMIN으로 설정
+
         User user = new User();
-        ReflectionTestUtils.setField(user, "id", userId);
-        ReflectionTestUtils.setField(user, "email", "dummy@example.com");
+        ReflectionTestUtils.setField(user, "email", email);
+        ReflectionTestUtils.setField(user, "id", 1L); // userId 설정
         ReflectionTestUtils.setField(user, "password", "password");
         ReflectionTestUtils.setField(user, "nickname", "TestUser");
-        ReflectionTestUtils.setField(user, "userRole", UserRole.USER);
+        ReflectionTestUtils.setField(user, "userRole", userRole);
 
         UserActivity userActivity = new UserActivity();
         ReflectionTestUtils.setField(userActivity, "user", user);
@@ -58,38 +60,42 @@ class AdminUserActivityServiceTest {
         List<UserActivity> userActivities = List.of(userActivity);
 
         // adminUserActivityRepository.findByUserId() 호출 시 userActivities 반환
-        given(adminUserActivityRepository.findByUserId(userId)).willReturn(userActivities);
+        given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
+        given(adminUserActivityRepository.findByUserId(user.getId())).willReturn(userActivities);
 
         // when
-        List<AdminUserActivityResponseDto> result = adminUserActivityService.getUserActivities(userId);
+        List<AdminUserActivityResponseDto> result = adminUserActivityService.getUserActivities(email, userRole);
 
         // then
         assertEquals(1, result.size()); // 반환된 활동 내역의 개수가 1인지 검증
         assertEquals("LOGIN", result.get(0).getActivityType()); // 활동 타입이 "LOGIN"인지 검증
-        verify(adminUserActivityRepository, times(1)).findByUserId(userId); // 호출 횟수 검증
+        verify(userRepository, times(1)).findByEmail(email); // 이메일로 사용자 조회 호출 검증
+        verify(adminUserActivityRepository, times(1)).findByUserId(user.getId()); // 활동 조회 호출 검증
     }
 
     @Test
     void 사용자_상태_업데이트_테스트() {
         // given
-        Long userId = 1L;
+        String email = "dummy@example.com"; // email을 String으로 설정
+        UserRole userRole = UserRole.ADMIN; // UserRole을 ADMIN으로 설정
         AdminUserStatusUpdateRequestDto statusUpdateDto = new AdminUserStatusUpdateRequestDto("ACTIVE");
+
         User user = new User();
-        ReflectionTestUtils.setField(user, "id", userId);
-        ReflectionTestUtils.setField(user, "email", "dummy@example.com");
+        ReflectionTestUtils.setField(user, "email", email);
+        ReflectionTestUtils.setField(user, "id", 1L); // userId 설정
         ReflectionTestUtils.setField(user, "password", "password");
         ReflectionTestUtils.setField(user, "nickname", "TestUser");
-        ReflectionTestUtils.setField(user, "userRole", UserRole.USER);
+        ReflectionTestUtils.setField(user, "userRole", userRole);
         ReflectionTestUtils.setField(user, "status", "INACTIVE");
 
-        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(userRepository.findByEmail(email)).willReturn(Optional.of(user));
 
         // when
-        adminUserActivityService.updateUserStatus(userId, statusUpdateDto);
+        adminUserActivityService.updateUserStatus(email, statusUpdateDto, userRole);
 
         // then
         assertEquals("ACTIVE", user.getStatus()); // 상태가 "ACTIVE"로 업데이트되었는지 검증
-        verify(userRepository, times(1)).findById(userId); // 사용자 조회 호출 검증
+        verify(userRepository, times(1)).findByEmail(email); // 사용자 조회 호출 검증
         verify(userRepository, times(1)).save(user); // 사용자 저장 호출 검증
 
         ArgumentCaptor<UserActivity> captor = ArgumentCaptor.forClass(UserActivity.class);
@@ -103,14 +109,17 @@ class AdminUserActivityServiceTest {
     @Test
     void 사용자_상태_업데이트_실패_테스트_사용자_없음() {
         // given
-        Long userId = 1L;
+        String email = "dummy@example.com"; // email을 String으로 설정
+        UserRole userRole = UserRole.ADMIN; // UserRole을 ADMIN으로 설정
         AdminUserStatusUpdateRequestDto statusUpdateDto = new AdminUserStatusUpdateRequestDto("INACTIVE");
-        given(userRepository.findById(userId)).willReturn(Optional.empty()); // 존재하지 않는 사용자 반환
+
+        // userRepository가 존재하지 않는 사용자에 대해 Optional.empty() 반환하도록 설정
+        given(userRepository.findByEmail(email)).willReturn(Optional.empty());
 
         // when & then
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
-                adminUserActivityService.updateUserStatus(userId, statusUpdateDto));
+                adminUserActivityService.updateUserStatus(email, statusUpdateDto, userRole));
         assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage()); // 예외 메시지가 예상대로인지 검증
-        verify(userRepository, times(1)).findById(userId); // 호출 검증
+        verify(userRepository, times(1)).findByEmail(email); // 호출 검증
     }
 }

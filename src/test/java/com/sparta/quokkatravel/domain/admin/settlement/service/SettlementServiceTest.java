@@ -209,6 +209,8 @@ class SettlementServiceTest {
     @Test
     void getMonthlyStatistics_정상적으로_조회() {
         // given
+        Long userid = 1L;
+
         YearMonth yearMonth = YearMonth.now();
         LocalDate startDate = yearMonth.atDay(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
@@ -224,7 +226,7 @@ class SettlementServiceTest {
                 .willReturn(List.of(settlementInfo));
 
         // when
-        List<SettlementResponseDto> responseList = settlementService.getMonthlyStatistics(yearMonth);
+        List<SettlementResponseDto> responseList = settlementService.getMonthlyStatistics(yearMonth,userid);
 
         // then
         assertEquals(1, responseList.size()); // 월별 통계 조회 결과 검증
