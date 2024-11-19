@@ -14,7 +14,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Document(indexName = "accommodation")
+@Document(indexName = "accommodations")
 public class AccommodationDocument {
 
     @Id
@@ -25,12 +25,6 @@ public class AccommodationDocument {
 
     @Field(type = FieldType.Text)
     private String name;
-
-    @Field(type = FieldType.Text)
-    private String koreanPartOfName;
-    @Field(type = FieldType.Text)
-    private String englishPartOfName;
-
     @Field(type = FieldType.Text)
     private String address;
 
@@ -47,7 +41,6 @@ public class AccommodationDocument {
         this.address = accommodation.getAddress();
         this.rating = accommodation.getRating();
         this.imageurl = accommodation.getImageurl();
-        setPartOfName(accommodation.getName());
     }
 
     public void update(Accommodation accommodation) {
@@ -55,13 +48,6 @@ public class AccommodationDocument {
         this.address = accommodation.getAddress();
         this.rating = accommodation.getRating();
         this.imageurl = accommodation.getImageurl();
-        setPartOfName(accommodation.getName());
-    }
-
-    public void setPartOfName(String name) {
-        LanguageSeparator ls = new LanguageSeparator(name);
-        this.koreanPartOfName = ls.getKoreanPart();
-        this.englishPartOfName = ls.getEnglishPart();
     }
 
 }

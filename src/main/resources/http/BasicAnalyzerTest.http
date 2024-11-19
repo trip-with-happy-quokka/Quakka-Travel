@@ -4,5 +4,4 @@ Content-Type: application/json
 {
   "tokenizer" : "edge_ngram",
   "text" : "Visit http://example.com or contact user@example.com for details. 서울"
-  // 한국어로 된 글 제목, 영어로만 구성된 글 제목, 영어 및 한국어 혼합 제목
 }
