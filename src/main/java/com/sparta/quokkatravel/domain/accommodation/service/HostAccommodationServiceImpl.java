@@ -15,6 +15,7 @@ import com.sparta.quokkatravel.domain.user.entity.User;
 import com.sparta.quokkatravel.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -34,6 +35,7 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
     private final UserRepository userRepository;
     private final S3Uploader s3Uploader;
     private final AccommodationSearchRepository accommodationSearchRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -48,6 +50,7 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
         Accommodation accommodation = new Accommodation(accommodationRequestDto.getName(), accommodationRequestDto.getDescription(), accommodationRequestDto.getAddress(), url, user);
         log.info("Accommodation created: {}", accommodation);
         Accommodation saved = accommodationRepository.save(accommodation);
+
 
         // Accommodation Document Create For ElasticSearch
         AccommodationDocument accommodationDocument = new AccommodationDocument(accommodation);
@@ -107,7 +110,6 @@ public class HostAccommodationServiceImpl implements HostAccommodationService {
     @InvalidateAccommodationCache
     public String deleteAccommodation(CustomUserDetails customUserDetails, Long accommodationId) {
 
-        User user = userRepository.findByEmailOrElseThrow(customUserDetails.getEmail());
         Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow();
 
         if(!accommodation.getUser().getId().equals(customUserDetails.getUserId())) {

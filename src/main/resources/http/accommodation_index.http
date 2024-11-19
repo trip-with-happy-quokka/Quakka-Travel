@@ -1,96 +1,65 @@
-PUT http://52.79.171.129:9200/accommodation
+PUT http://52.79.171.129:9200/accommodations
 Content-Type: application/json
 Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
 
 {
   "settings": {
+    "index": {
+      "requests.cache.enable": true
+    },
     "analysis": {
       "analyzer": {
-        "my_analyzer": {
-          "type": "custom",
-          "tokenizer": "my_nori_tokenizer",
-          "filter": ["nori_posfilter"]
-        },
-        "mixed_korean_english_analyzer": {
-          "type": "custom",
-          "tokenizer": "standard",
-          "filter": ["lowercase"]
-        },
-        "nori_analyzer": {
+        "korean_analyzer": {
           "type": "custom",
           "tokenizer": "nori_tokenizer",
-          "filter": ["lowercase"]
+          "filter": ["lowercase", "nori_posfilter"]
         },
-        "english_ngram_analyzer": {
+        "english_analyzer": {
           "type": "custom",
           "tokenizer": "standard",
           "filter": ["lowercase", "edge_ngram_filter"]
-        }
-      },
-      "tokenizer": {
-        "my_nori_tokenizer": {
-          "type": "nori_tokenizer",
-          "decompound_mode": "mixed"
         }
       },
       "filter": {
         "edge_ngram_filter": {
           "type": "edge_ngram",
           "min_gram": 2,
-          "max_gram": 10
+          "max_gram": 7
         },
         "nori_posfilter": {
           "type": "nori_part_of_speech",
-          "stoptags": [
-            "E", "IC", "J", "MAG", "MAJ", "MM", "NA", "NR",
-            "SC", "SE", "SF", "SH", "SL", "SN", "SP",
-            "SSC", "SSO", "SY", "UNA", "UNKNOWN",
-            "VA", "VCN", "VCP", "VSV", "VV", "VX",
-            "XPN", "XR", "XSA", "XSN", "XSV"
-          ]
+          "stoptags": ["E", "IC", "J", "MAG", "MM", "UNA"]
         }
       }
     }
   },
   "mappings": {
     "properties": {
-      "id": {
-        "type": "text"
-      },
       "accommodationId": {
         "type": "long"
       },
       "name": {
         "type": "text",
-        "analyzer": "mixed_korean_english_analyzer",
         "fields": {
-          "english_field": {
+          "korean": {
             "type": "text",
-            "analyzer": "english_ngram_analyzer"
+            "analyzer": "korean_analyzer"
           },
-          "korean_field": {
+          "english": {
             "type": "text",
-            "analyzer": "my_analyzer"
+            "analyzer": "english_analyzer"
           }
         }
       },
-      "koreanPartOfName": {
-        "type": "text",
-        "analyzer": "my_analyzer"
-      },
-      "englishPartOfName": {
-        "type": "text",
-        "analyzer": "english_ngram_analyzer"
-      },
       "address": {
-        "type": "text",
-        "analyzer": "nori_analyzer"
+        "type": "keyword"
       },
       "rating": {
         "type": "long"
       },
       "imageurl": {
-        "type": "text"
+        "type": "keyword",
+        "ignore_above": 256
       }
     }
   }

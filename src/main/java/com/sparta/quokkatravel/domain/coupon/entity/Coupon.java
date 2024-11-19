@@ -15,15 +15,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(indexes = {
-        @Index(name = "idx_coupon_id", columnList = "id"),
-        @Index(name = "idx_coupon_code", columnList = "coupon_code")
-})
 public class Coupon extends Timestamped {
 
     @Id

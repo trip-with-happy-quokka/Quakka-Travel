@@ -6,20 +6,15 @@ import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(indexes = {
-        @Index(name = "idx_accommodation_id", columnList = "id")
-})
 public class Accommodation extends Timestamped {
 
     @Id
@@ -78,11 +73,4 @@ public class Accommodation extends Timestamped {
         rating = (long) (ratingSum/=reviews.size());
     }
 
-    // 테스트 코드를 위한 생성자 추가
-    public Accommodation(String name, String description, String address, User user) {
-        this.name = name;
-        this.description = description;
-        this.address = address;
-        this.user = user;
-    }
 }

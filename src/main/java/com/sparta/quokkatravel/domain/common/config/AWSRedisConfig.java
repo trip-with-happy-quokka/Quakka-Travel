@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageDuplicator;
 import com.sparta.quokkatravel.domain.common.redis.RedisMessageSubscriber;
-import io.lettuce.core.ReadFrom;
 import org.redisson.Redisson;
-import org.redisson.api.DefaultNatMapper;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,7 +19,6 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
@@ -33,7 +30,6 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
-import java.util.List;
 
 @Profile("aws")
 @Configuration
@@ -60,7 +56,13 @@ public class AWSRedisConfig {
                 .sentinel(SENTINEL_NODE_0.split(":")[0], Integer.parseInt(SENTINEL_NODE_0.split(":")[1]))
                 .sentinel(SENTINEL_NODE_1.split(":")[0], Integer.parseInt(SENTINEL_NODE_1.split(":")[1]))
                 .sentinel(SENTINEL_NODE_2.split(":")[0], Integer.parseInt(SENTINEL_NODE_2.split(":")[1]));
-        return new LettuceConnectionFactory(redisSentinelConfiguration);
+//        return new LettuceConnectionFactory(redisSentinelConfiguration);
+        // LettuceConnectionFactory를 사용해 Redis 연결 설정
+        LettuceConnectionFactory factory = new LettuceConnectionFactory(redisSentinelConfiguration);
+        // 설정 적용 후 자동 장애 조치(failover) 및 마스터 서버로의 연결이 자동으로 이루어짐
+        factory.setValidateConnection(true); // 연결 유효성 검사 활성
+
+        return factory;
     }
 
     // 메세지를 받을 때 지정된 메서드를 호출하여 메세지를 처리
@@ -111,9 +113,15 @@ public class AWSRedisConfig {
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSentinelServers()
-                .setMasterName("mymaster")
-                .addSentinelAddress("redis://"+SENTINEL_NODE_0, "redis://"+SENTINEL_NODE_1, "redis://"+SENTINEL_NODE_2)
-                .setCheckSentinelsList(false);
+                .setMasterName(REDIS_MASTER)
+                .addSentinelAddress(
+                        "redis://"+SENTINEL_NODE_0,
+                        "redis://"+SENTINEL_NODE_1,
+                        "redis://"+SENTINEL_NODE_2)
+                .setConnectTimeout(10000)
+                .setTimeout(10000)
+                .setRetryAttempts(3)
+                .setRetryInterval(3000);
         return Redisson.create(config);
     }
 

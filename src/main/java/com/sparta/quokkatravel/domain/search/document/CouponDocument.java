@@ -16,9 +16,8 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import java.util.UUID;
 
 @Getter
-@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Document(indexName = "coupon")
+@Document(indexName = "coupons")
 public class CouponDocument {
 
     @Id
@@ -29,11 +28,6 @@ public class CouponDocument {
 
     @Field(type = FieldType.Text)
     private String name;
-
-    @Field(type = FieldType.Text)
-    private String koreanPartOfName;
-    @Field(type = FieldType.Text)
-    private String englishPartOfName;
 
     @Field(type = FieldType.Text)
     private String content;
@@ -78,7 +72,6 @@ public class CouponDocument {
         this.accommodation = (coupon.getAccommodation() != null) ? new AccommodationDto(coupon.getAccommodation()).getName() : null;
         this.event = (coupon.getEvent() != null) ? new EventDto(coupon.getEvent()).getName() : null;
         this.createdBy = coupon.getCreatedBy().getEmail();
-        setPartOfName(coupon.getName());
     }
 
     public void update(Coupon coupon) {
@@ -93,13 +86,5 @@ public class CouponDocument {
         this.accommodation =(coupon.getAccommodation() != null) ? new AccommodationDto(coupon.getAccommodation()).getName() : null;
         this.event = (coupon.getEvent() != null) ? new EventDto(coupon.getEvent()).getName() : null;
         this.createdBy = coupon.getCreatedBy().getEmail();
-        setPartOfName(coupon.getName());
     }
-
-    public void setPartOfName(String name) {
-        LanguageSeparator ls = new LanguageSeparator(name);
-        this.koreanPartOfName = ls.getKoreanPart();
-        this.englishPartOfName = ls.getEnglishPart();
-    }
-
 }

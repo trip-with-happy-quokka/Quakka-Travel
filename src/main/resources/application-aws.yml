@@ -1,4 +1,11 @@
 spring:
+  batch:
+    jdbc:
+      initialize-schema: always  # 배치 메타데이터 테이블 자동 생성
+      schema: classpath:org/springframework/batch/core/schema-mysql.sql
+    job:
+      enabled: false # JobLauncherApplicationRunner 비활성화
+
   datasource:
     master:
       driver-class-name: com.mysql.cj.jdbc.Driver
@@ -25,9 +32,9 @@ spring:
       sentinel:
         master: mymaster
         nodes:
-          - ${AWS_REDIS_SENTINEL_IP}:26379
-          - ${AWS_REDIS_SENTINEL_IP}:26380
-          - ${AWS_REDIS_SENTINEL_IP}:26381
+          - ${AWS_REDIS_SENTINEL_URL}:26379
+          - ${AWS_REDIS_SENTINEL_URL}:26380
+          - ${AWS_REDIS_SENTINEL_URL}:26381
       timeout: 10000
 
   elasticsearch:
@@ -37,6 +44,11 @@ spring:
     connection-timeout: 1s
     socket-timeout: 30s
 
+  rabbitmq:
+    host: ${AWS_RABBITMQ_URL}           # RabbitMQ host ip
+    port: 5672                # RabbitMQ port
+    username: guest # RabbitMQ 웹 관리 콘솔 아이디
+    password: guest # RabbitMQ 웹 관리 콘솔 비밀번호
 
 jwt:
   secret:
