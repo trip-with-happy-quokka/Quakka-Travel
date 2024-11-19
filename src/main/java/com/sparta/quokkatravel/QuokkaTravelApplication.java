@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaAuditing
 @EnableCaching
 @EnableScheduling
-@SpringBootApplication(exclude = {BatchAutoConfiguration.class})
+@SpringBootApplication
 @ComponentScan(basePackages = "com.sparta.quokkatravel.domain")
 
 public class QuokkaTravelApplication {
