@@ -18,5 +18,4 @@ public interface SearchService {
     // 쿠폰
     List<CouponDocument> searchCoupons(String name, CouponType couponType, CouponStatus couponStatus) throws IOException;
 
-    void deleteDocuments();
 }

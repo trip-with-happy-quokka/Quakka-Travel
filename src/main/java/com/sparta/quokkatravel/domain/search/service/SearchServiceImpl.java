@@ -1,10 +1,7 @@
 package com.sparta.quokkatravel.domain.search.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
@@ -39,38 +36,32 @@ public class SearchServiceImpl implements SearchService {
         List<Query> mustQuery = new ArrayList<>();
 
         if (name != null && !name.isEmpty()) {
-            MultiMatchQuery multiMatchQuery = new MultiMatchQuery.Builder()
-                    .query(name)
-                    .fields("name", "koreanPartOfName", "englishPartOfName")
-                    .build();
-            mustQuery.add(new Query.Builder()
-                    .multiMatch(multiMatchQuery)
-                    .build());
+            Query multiMatchQuery = new Query.Builder()
+                    .multiMatch(m -> m
+                            .query(name)
+                            .fields(List.of("name.korean", "name.english"))
+                            .minimumShouldMatch("75%")
+                    ).build();
+            mustQuery.add(multiMatchQuery);
         }
         if (address != null && !address.isEmpty()) {
-            MatchQuery matchQuery = new MatchQuery.Builder()
-                    .field("address")
-                    .query(address)
+            Query termQuery = new Query.Builder()
+                    .term(t -> t.field("address").value(address))
                     .build();
-            mustQuery.add(new Query.Builder()
-                    .match(matchQuery)
-                    .build());
+            mustQuery.add(termQuery);
         }
         if (rating != null) {
-            MatchQuery matchQuery = new MatchQuery.Builder()
-                    .field("rating")
-                    .query(rating)
+            Query termQuery = new Query.Builder()
+                    .term(t -> t.field("rating").value(rating))
                     .build();
-            mustQuery.add(new Query.Builder()
-                    .match(matchQuery)
-                    .build());
+            mustQuery.add(termQuery);
         }
 
         BoolQuery boolQuery = new BoolQuery.Builder()
                 .must(mustQuery).build();
 
         SearchRequest searchRequest = new SearchRequest.Builder()
-                .index("accommodation")
+                .index("accommodations")
                 .query(new Query.Builder().bool(boolQuery).build()).build();
 
         SearchResponse<AccommodationDocument> response = elasticsearchClient.search(searchRequest, AccommodationDocument.class);
@@ -91,38 +82,32 @@ public class SearchServiceImpl implements SearchService {
         List<Query> mustQuery = new ArrayList<>();
 
         if (name != null && !name.isEmpty()) {
-            MultiMatchQuery multiMatchQuery = new MultiMatchQuery.Builder()
-                    .query(name)
-                    .fields("name", "koreanPartOfName", "englishPartOfName")
-                    .build();
-            mustQuery.add(new Query.Builder()
-                    .multiMatch(multiMatchQuery)
-                    .build());
+            Query multiMatchQuery = new Query.Builder()
+                    .multiMatch(m -> m
+                            .query(name)
+                            .fields(List.of("name.korean", "name.english"))
+                            .minimumShouldMatch("75%")
+                    ).build();
+            mustQuery.add(multiMatchQuery);
         }
         if (couponType != null) {
-            MatchQuery matchQuery = new MatchQuery.Builder()
-                    .field("couponType")
-                    .query(couponType.toString())
+            Query termQuery = new Query.Builder()
+                    .term(t -> t.field("couponType").value(couponType.toString()))
                     .build();
-            mustQuery.add(new Query.Builder()
-                    .match(matchQuery)
-                    .build());
+            mustQuery.add(termQuery);
         }
         if (couponStatus != null) {
-            MatchQuery matchQuery = new MatchQuery.Builder()
-                    .field("couponStatus")
-                    .query(couponStatus.toString())
+            Query termQuery = new Query.Builder()
+                    .term(t -> t.field("couponStatus").value(couponStatus.toString()))
                     .build();
-            mustQuery.add(new Query.Builder()
-                    .match(matchQuery)
-                    .build());
+            mustQuery.add(termQuery);
         }
 
         BoolQuery boolQuery = new BoolQuery.Builder()
                 .must(mustQuery).build();
 
         SearchRequest searchRequest = new SearchRequest.Builder()
-                .index("coupon")
+                .index("coupons")
                 .query(new Query.Builder().bool(boolQuery).build()).build();
 
         SearchResponse<CouponDocument> response = elasticsearchClient.search(searchRequest, CouponDocument.class);
@@ -134,12 +119,6 @@ public class SearchServiceImpl implements SearchService {
         }
 
         return documentList;
-    }
-
-    @Override
-    public void deleteDocuments() {
-        accommodationSearchRepository.deleteAll();
-        couponSearchRepository.deleteAll();
     }
 
 }
