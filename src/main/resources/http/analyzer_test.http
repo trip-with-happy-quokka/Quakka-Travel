@@ -1,10 +1,10 @@
-POST http://43.202.0.210:9200/index005/_analyze
+POST http://localhost:9200/test_index06_for_accommodations/_analyze
 Content-Type: application/json
 Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
 
 {
-  "analyzer": "my_analyzer",
-  "text": "안기모씨의 은하수 별나라 펜션이 달린다"
+  "analyzer": "english_analyzer",
+  "text": "Canada 출신 집사 카페"
 }
 
 
