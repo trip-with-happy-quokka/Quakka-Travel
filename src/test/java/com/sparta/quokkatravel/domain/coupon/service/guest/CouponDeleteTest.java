@@ -51,7 +51,7 @@ public class CouponDeleteTest {
         String email = "test@example.com";
 
         when(couponRepository.findById(couponId)).thenReturn(Optional.of(coupon));
-        when(couponSearchRepository.findByCouponIdOrElseThrow(couponId)).thenReturn(new CouponDocument());
+        when(couponSearchRepository.findByCouponIdOrElseThrow(couponId)).thenReturn(new CouponDocument(coupon));
 
         // when
         CouponDeleteResponseDto responseDto = couponService.deleteCoupon(email, couponId);
