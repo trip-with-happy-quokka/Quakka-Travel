@@ -5,7 +5,6 @@ import com.sparta.quokkatravel.domain.review.entity.Review;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
-import org.springframework.web.bind.annotation.PostMapping;
 
 public class AccommodationListener {
 

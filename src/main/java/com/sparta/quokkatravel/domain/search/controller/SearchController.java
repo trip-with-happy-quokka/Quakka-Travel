@@ -45,9 +45,4 @@ public class SearchController {
 
     // 이벤트 검색
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteAccommodation() {
-        searchService.deleteDocuments();
-        return ResponseEntity.ok().body("delete");
-    }
 }

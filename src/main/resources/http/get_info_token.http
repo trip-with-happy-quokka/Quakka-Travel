@@ -1,0 +1,9 @@
+GET http://localhost:9200/test_index04_for_accommodations/_termvectors/fa283aa9-1003-4fcf-a3aa-4d2fc5182ee3
+Content-Type: application/json
+Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
+
+{
+  "fields": ["name", "name.korean"],
+  "term_statistics": true,
+  "field_statistics": false
+}
