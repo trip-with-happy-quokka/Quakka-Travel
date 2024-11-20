@@ -9,11 +9,18 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     #quokka_travel
-    url: jdbc:mysql://localhost:8080/quokka_travel
+    url: jdbc:mysql://localhost:3306/${DB_NAME}
     # root
-    username: root
+    username: ${DB_USERNAME}
     # 1q2w3e4r5t
-    password: 1234
+    password: ${DB_PASSWORD}
+
+#  hikari:
+#    maximumPoolSize: 5  # 커넥션 풀의 최대 커넥션 개수 설정
+#    minimumIdle: 10    # 최소 유휴 커넥션 개수 설정
+#    idleTimeout: 30000  # 유휴 커넥션의 유지 시간 (밀리초)
+#    maxLifetime: 1800000 # 커넥션의 최대 생명 시간 (밀리초)
+#    connectionTimeout: 50000 # 커넥션 풀에서 커넥션을 가져오기 위한 최대 대기 시간 (밀리초)
 
   mail:
     host: smtp.gmail.com
