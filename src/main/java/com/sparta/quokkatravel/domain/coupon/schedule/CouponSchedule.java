@@ -22,9 +22,9 @@ public class CouponSchedule {
         this.jobRegistry = jobRegistry;
     }
 
-    @Scheduled(cron = "20 * * * * *", zone = "Asia/Seoul")
+//    @Scheduled(cron = "20 * * * * *", zone = "Asia/Seoul")
     // 매일 오전 12시에 스케줄링
-    //@Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     public void runBatchJob() throws Exception{
 
         System.out.println("coupon schedule start");

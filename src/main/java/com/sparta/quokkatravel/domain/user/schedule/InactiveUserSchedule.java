@@ -21,8 +21,8 @@ public class InactiveUserSchedule {
         this.jobRegistry = jobRegistry;
     }
 
-    @Scheduled(cron = "10 * * * * *", zone = "Asia/Seoul")
-    //@Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+//    @Scheduled(cron = "10 * * * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     public void runInactiveUserJob() throws Exception {
         System.out.println("Starting inactive user job");
 
