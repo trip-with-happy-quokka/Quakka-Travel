@@ -804,7 +804,70 @@ Elasticsearch를 활용하여 숙소 및 쿠폰 검색 기능 구현
 2. 쿠폰 검색(ADMIN 전용)
 
    쿠폰의 경우, 이름과 쿠폰 타입(숙소에 적용되는 쿠폰인지, 이벤트에 적용되는 쿠폰인지), 그리고 쿠폰의 상태를 가지고 검색이 가능하도록 구현
-
+```
+{
+  "settings": {
+    "index": {
+      "requests.cache.enable": true
+    },
+    "analysis": {
+      "analyzer": {
+        "korean_analyzer": {
+          "type": "custom",
+          "tokenizer": "nori_tokenizer",
+          "filter": ["lowercase", "nori_posfilter"]
+        },
+        "english_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "edge_ngram_filter"]
+        }
+      },
+      "filter": {
+        "edge_ngram_filter": {
+          "type": "edge_ngram",
+          "min_gram": 2,
+          "max_gram": 7
+        },
+        "nori_posfilter": {
+          "type": "nori_part_of_speech",
+          "stoptags": ["E", "IC", "J", "MAG", "MM", "UNA"]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "accommodationId": {
+        "type": "long"
+      },
+      "name": {
+        "type": "text",
+        "fields": {
+          "korean": {
+            "type": "text",
+            "analyzer": "korean_analyzer"
+          },
+          "english": {
+            "type": "text",
+            "analyzer": "english_analyzer"
+          }
+        }
+      },
+      "address": {
+        "type": "keyword"
+      },
+      "rating": {
+        "type": "long"
+      },
+      "imageurl": {
+        "type": "keyword",
+        "ignore_above": 256
+      }
+    }
+  }
+}
+```
 
 </details>
 
@@ -918,6 +981,10 @@ Elasticsearch를 활용하여 숙소 및 쿠폰 검색 기능 구현
 어플리케이션에서 기존에는 Master 하나에 직접 연결하던 것을 변경하여, Sentinel 3대에 연결하도록 진행
 
 Sentinel들이 Master의 상태를 추적하다가 문제가 발생하면 Slave로 변경하도록 구현
+
+![img_16.png](img_16.png)
+![img_15.png](img_15.png)
+
 
 </details>
 
