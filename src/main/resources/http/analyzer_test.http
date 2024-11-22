@@ -1,0 +1,10 @@
+POST http://localhost:9200/test_index06_for_accommodations/_analyze
+Content-Type: application/json
+Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
+
+{
+  "analyzer": "english_analyzer",
+  "text": "Canada 출신 집사 카페"
+}
+
+

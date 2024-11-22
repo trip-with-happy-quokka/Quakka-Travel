@@ -1,0 +1,2 @@
+DELETE http://52.79.171.129:9200/accommodations
+Authorization: Basic ZWxhc3RpYzoxMjM0NTY=

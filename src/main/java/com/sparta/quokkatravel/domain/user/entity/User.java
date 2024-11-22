@@ -1,16 +1,13 @@
 package com.sparta.quokkatravel.domain.user.entity;
 
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
-import com.sparta.quokkatravel.domain.admin.loginhistory.entity.LoginHistory;
-import com.sparta.quokkatravel.domain.chat.entity.ChatParticipant;
-import com.sparta.quokkatravel.domain.chat.entity.Chatting;
-import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
+import com.sparta.quokkatravel.domain.common.shared.Timestamped;
 import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
-import com.sparta.quokkatravel.domain.coupon.entity.CouponUser;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
 import com.sparta.quokkatravel.domain.review.entity.Review;
-import com.sparta.quokkatravel.domain.user.UserRole;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,7 +18,6 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "user")
 public class User extends Timestamped {
 
     @Id
@@ -35,10 +31,7 @@ public class User extends Timestamped {
     private String password;
 
     @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private String phoneNumber;
+    private String nickname;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -46,6 +39,12 @@ public class User extends Timestamped {
 
     @Column(nullable = false)
     private Boolean isDelete = false;
+
+    @Column(nullable = true)
+    private String status; // 사용자 상태 필드
+
+    private Long kakaoId;
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Accommodation> accommodations = new ArrayList<>();
@@ -56,26 +55,46 @@ public class User extends Timestamped {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Chatting> chattings = new ArrayList<>();
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Coupon> coupons = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChatParticipant> chatParticipants = new ArrayList<>();
+    public User(String email, String password, String nickname, UserRole userRole) {
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CouponUser> couponUsers = new ArrayList<>();
-    
-
-    public User(String email, String password, String name, String phoneNumber, UserRole userRole) {
         this.email = email;
         this.password = password;
-        this.name = name;
-        this.phoneNumber = phoneNumber;
+        this.nickname = nickname;
         this.userRole = userRole;
     }
 
-
-    public void deleteAccount(){
+    public void deleteAccount() {
         this.isDelete = true;
     }
+
+    // 상태 업데이트 메서드
+    public void updateStatus(String status) {
+        this.status = status;
+    }
+
+    // 역할 업데이트 메서드
+    public void updateRole(UserRole newRole) {
+        this.userRole = newRole;
+    }
+
+
+    // Test Code 작성용 메서드
+    public User(Long userId, String email, String password, String nickname, UserRole userRole) {
+        this.id = userId;
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.userRole = userRole;
+    }
+
+    // 기존 회원 정보에 kakaoId 추가
+    public User kakaoIdUpdate(Long kakaoId) {
+        this.kakaoId = kakaoId;
+        return this;
+    }
 }
+
+

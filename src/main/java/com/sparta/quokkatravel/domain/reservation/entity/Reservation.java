@@ -1,20 +1,24 @@
 package com.sparta.quokkatravel.domain.reservation.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sparta.quokkatravel.domain.accommodation.entity.Accommodation;
-import com.sparta.quokkatravel.domain.accommodation.entity.Room;
-import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
-import com.sparta.quokkatravel.domain.payment.entity.Payment;
+import com.sparta.quokkatravel.domain.coupon.entity.Coupon;
+import com.sparta.quokkatravel.domain.room.entity.Room;
+import com.sparta.quokkatravel.domain.common.shared.Timestamped;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 @Entity
 @Getter
-@Table(name = "reservation")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Reservation extends Timestamped {
 
     @Id
@@ -27,52 +31,78 @@ public class Reservation extends Timestamped {
     @Column(nullable = false)
     private LocalDate endDate;
 
-    @Column
-    private int numberOfGuests;
+    @Column(nullable = false)
+    private Long numberOfGuests;
 
-    @Column
-    private int totalPrice;
+    @Column(nullable = false)
+    private Long totalPrice;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReservationStatus status = ReservationStatus.PENDING;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
+    @JsonBackReference
     private Room room;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "payment_id", referencedColumnName = "id")
-    private Payment payment;
 
-
-    public Reservation() {}
-
-    public Reservation(LocalDate startDate, LocalDate endDate, int numberOfGuests, User user, Room room) {
+    public Reservation(LocalDate startDate, LocalDate endDate, Long numberOfGuests, User user, Room room, Coupon coupon) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.numberOfGuests = numberOfGuests;
-        this.totalPrice = calculateTotalPrice(startDate, endDate, room);
+        this.totalPrice = calculateTotalPrice(startDate, endDate, room, coupon);
         this.user = user;
         this.room = room;
     }
 
-    public void update(LocalDate startDate, LocalDate endDate, int numberOfGuests) {
+    public void update(LocalDate startDate, LocalDate endDate, Long numberOfGuests, Room room, Coupon coupon) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.numberOfGuests = numberOfGuests;
+        this.room = room;
+        this.totalPrice = calculateTotalPrice(startDate, endDate, room, coupon);
     }
 
-    public int calculateTotalPrice(LocalDate startDate, LocalDate endDate, Room room) {
+    public void updateStatus(ReservationStatus status) {
+        this.status = status;
+    }
 
-        int pricePerNight = room.getPricePerNight();
+    public Long calculateTotalPrice(LocalDate startDate, LocalDate endDate, Room room, Coupon coupon) {
 
-        if(numberOfGuests < room.getCapacity()) {
-            pricePerNight += (room.getCapacity() - numberOfGuests) * room.getAdditionalPricePerOverCapacity();
+        Long pricePerNight = room.getPricePerNight();
+
+        if(room.getCapacity() < numberOfGuests) {
+            pricePerNight += (numberOfGuests - room.getCapacity()) * room.getPricePerOverCapacity();
         }
 
-        int totalDays = (int) (ChronoUnit.DAYS.between(startDate, endDate) + 1);
+        Long totalDays =  ChronoUnit.DAYS.between(startDate, endDate) + 1;
 
-        return pricePerNight * totalDays;
+        long totalprice = pricePerNight * totalDays;
+
+        if(coupon != null) {
+            if(coupon.getDiscountRate() != null) {
+                totalprice = totalprice * (100 - coupon.getDiscountRate()) / 100;
+            } else if(coupon.getDiscountAmount() != null) {
+                totalprice = totalprice - coupon.getDiscountAmount();
+            }
+        }
+
+        return totalprice;
+    }
+
+    // 테스트 코드를 위한 생성자 추가
+    public Reservation(LocalDate startDate, LocalDate endDate, Long numberOfGuests, User user, Room room) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.numberOfGuests = numberOfGuests;
+        this.totalPrice = calculateTotalPrice(startDate, endDate, room, null); // 쿠폰이 없는 경우
+        this.user = user;
+        this.room = room;
     }
 }

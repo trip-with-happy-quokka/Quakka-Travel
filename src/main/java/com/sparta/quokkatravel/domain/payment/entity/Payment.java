@@ -1,52 +1,81 @@
 package com.sparta.quokkatravel.domain.payment.entity;
 
-import com.sparta.quokkatravel.domain.accommodation.entity.Room;
-import com.sparta.quokkatravel.domain.common.timestamped.Timestamped;
+import com.sparta.quokkatravel.domain.common.shared.Timestamped;
+import com.sparta.quokkatravel.domain.payment.dto.PaymentResponseDto;
 import com.sparta.quokkatravel.domain.reservation.entity.Reservation;
+import com.sparta.quokkatravel.domain.room.entity.Room;
 import com.sparta.quokkatravel.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import org.hibernate.annotations.Fetch;
+import lombok.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
-@Table(name = "payment")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Table(indexes = {
+        @Index(name = "idx_payment_user", columnList = "user_id"),
+        @Index(name = "idx_payment_paymentKey", columnList = "paymentKey" ),
+})
 public class Payment extends Timestamped {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "payment_id", nullable = false, unique = true)
+    private Long paymentId;
 
-    @Column(nullable = false)
-    private int amount;
+    @Column(nullable = false , name = "pay_amount")
+    private Long amount;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PayMethod paymentMethod;
+    @Column(nullable = false , name = "pay_name")
+    private String orderName;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PayStatus paymentStatus;
+    @Column(nullable = false , name = "order_id")
+    private String orderId;
 
-    private LocalDateTime paymentDate;
+    private boolean paySuccessYN;
 
-    @OneToOne(mappedBy = "payment")
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
-    public Payment() {}
+    @Column
+    private String paymentKey;
+    @Column
+    private String failReason;
 
-    public Payment(int amount, PayMethod paymentMethod, PayStatus paymentStatus) {
-        this.amount = amount;
-        this.paymentMethod = paymentMethod;
-        this.paymentStatus = paymentStatus;
+    @Column
+    private boolean cancelYN;
+
+    @Column
+    private String cancelReason;
+
+    public PaymentResponseDto toPaymentResponseDto() { // DB에 저장하게 될 결제 관련 정보들
+        return PaymentResponseDto.builder()
+                .amount(amount)
+                .orderName(orderName)
+                .orderId(orderId)
+                .customerEmail(user.getEmail())
+                .customerName(user.getNickname())
+                .createdAt(String.valueOf(getCreatedAt()))
+                .cancelYN(cancelYN)
+                .failReason(failReason)
+                .build();
     }
 
-    public void update(int amount, PayMethod paymentMethod, PayStatus paymentStatus) {
-        this.amount = amount;
-        this.paymentMethod = paymentMethod;
-        this.paymentStatus = paymentStatus;
+    public Payment(User user, Reservation reservation) {
+        this.amount = reservation.getTotalPrice();
+        this.orderName = reservation.getId().toString();
+        this.orderId = UUID.randomUUID().toString();
+        this.user = user;
+        this.reservation = reservation;
+        this.paySuccessYN = false;
+
     }
 }

@@ -1,0 +1,66 @@
+PUT http://52.79.171.129:9200/accommodations
+Content-Type: application/json
+Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
+
+{
+  "settings": {
+    "index": {
+      "requests.cache.enable": true
+    },
+    "analysis": {
+      "analyzer": {
+        "korean_analyzer": {
+          "type": "custom",
+          "tokenizer": "nori_tokenizer",
+          "filter": ["lowercase", "nori_posfilter"]
+        },
+        "english_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "edge_ngram_filter"]
+        }
+      },
+      "filter": {
+        "edge_ngram_filter": {
+          "type": "edge_ngram",
+          "min_gram": 2,
+          "max_gram": 7
+        },
+        "nori_posfilter": {
+          "type": "nori_part_of_speech",
+          "stoptags": ["E", "IC", "J", "MAG", "MM", "UNA"]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "accommodationId": {
+        "type": "long"
+      },
+      "name": {
+        "type": "text",
+        "fields": {
+          "korean": {
+            "type": "text",
+            "analyzer": "korean_analyzer"
+          },
+          "english": {
+            "type": "text",
+            "analyzer": "english_analyzer"
+          }
+        }
+      },
+      "address": {
+        "type": "keyword"
+      },
+      "rating": {
+        "type": "long"
+      },
+      "imageurl": {
+        "type": "keyword",
+        "ignore_above": 256
+      }
+    }
+  }
+}

@@ -1,21 +1,20 @@
 spring:
+  profiles:
+    active: aws
 
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/quokka_travel
-    username: root
-    password: 1q2w3e4r5t
-
-    jpa:
-      show-sql: true
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
       hibernate:
-        ddl-auto: update
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.MySQLDialect
-          format_sql: false
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: false
 
 server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
   servlet:
     encoding:
       charset: UTF-8
@@ -23,31 +22,25 @@ server:
       force: true
   port: 8080
 
-jwt:
-  secret:
-    key: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==
-
-log:
-  export:
-    path: src/main/log
-
-logging:
-  level:
-    root: info
-
 springdoc:
   api-docs:
     path: /api-docs
-    groups:
-      enabled: true
   swagger-ui:
     path: /swagger-ui.html
-    enabled: true
-    groups-order: ASC
-    tags-sorter: alpha
-    operations-sorter: alpha
-    display-request-duration: true
-    doc-expansion: none
-    cache:
-      disabled: true
-    model-and-view-allowed: true
+
+payment:
+  toss:
+    test_client_api_key : ${TOSS_PAYMENT_CLIENT_KEY}
+    test_secret_api_key : ${TOSS_PAYMENT_SECRET_KEY}
+    success_url : ${TOSS_PAYMENT_SUCCESS_URL}
+    fail_url : ${TOSS_PAYMENT_FAIL_URL}
+
+management:
+  endpoint:
+    health:
+      show-components: always # health 컴포넌트의 상태 정보만 간략하게 노출
+      #show-details: always 세부사항 볼 때
+  endpoints:
+    web:
+      exposure:
+        include: "*"

@@ -1,0 +1,11 @@
+POST http://localhost:9200/test_index06_for_accommodations/_doc/2
+Content-Type: application/json
+Authorization: Basic ZWxhc3RpYzoxMjM0NTY=
+
+{
+  "accommodationId": 1,
+  "name": "배주희의 하남 스타필드",
+  "address": "서울 강남구",
+  "rating": 5,
+  "imageurl": "http://example.com/image1.jpg"
+}

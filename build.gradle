@@ -30,17 +30,40 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     // swagger
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+    // mapper
+    implementation 'org.mapstruct:mapstruct:1.5.1.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.1.Final'
+
+    // json
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 
     // WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    // reactor-netty * 필수 외부 STOMP 사용*
+    implementation "org.springframework.boot:spring-boot-starter-reactor-netty"
+
+    // rabbit
+    implementation "org.springframework.boot:spring-boot-starter-amqp"
+
+    // rabbit jackson
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.15.1"
+    // jackson2json LocalDateTime handling
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2"
+
+    // email authentication
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
     // MySQL
-    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.mysql:mysql-connector-j:8.2.0'
 
     // Test dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -56,6 +79,58 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // QueryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    implementation 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // redisson
+    implementation 'org.redisson:redisson-spring-boot-starter:3.38.0'
+
+    // aws
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    // elasticsearch
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'co.elastic.clients:elasticsearch-java:8.10.2'
+
+    // Monitoring
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator' // actuator 추가
+    implementation 'io.micrometer:micrometer-registry-prometheus' // prometheus 추가
+
+    // SpringBatch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+
+    // jsoup
+    implementation 'org.jsoup:jsoup:1.18.1'
+
+    // logstash
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.0'
+
+    // oauth2.0
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+
+}
+
+// QueryDSL 관련 설정
+def querydslDir = "src/main/generated"
+
+sourceSets {
+    main.java.srcDirs += [ querydslDir ]
+}
+tasks.withType(JavaCompile) {
+    options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
+}
+
+clean.doLast {
+    file(querydslDir).deleteDir()
 }
 
 tasks.named('test') {
