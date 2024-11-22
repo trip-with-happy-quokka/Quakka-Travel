@@ -1,7 +1,0 @@
-POST http://localhost:9200/_analyze
-Content-Type: application/json
-
-{
-  "tokenizer" : "edge_ngram",
-  "text" : "Visit http://example.com or contact user@example.com for details. 서울"
-}

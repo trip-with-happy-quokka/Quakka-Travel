@@ -33,8 +33,18 @@ public class LocalElasticSearchConfig extends ElasticsearchConfiguration {
     @Bean
     public ElasticsearchClient elasticsearchClient() {
 
+        // Create credentials provider
+        BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(
+                AuthScope.ANY,
+                new UsernamePasswordCredentials("elastic", "123456")
+        );
+
         // Configure RestClient with credentials
-        RestClientBuilder restClientBuilder = RestClient.builder(HttpHost.create(elasticsearchUri));
+        RestClientBuilder restClientBuilder = RestClient.builder(HttpHost.create(elasticsearchUri))
+                .setHttpClientConfigCallback(httpAsyncClientBuilder ->
+                        httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
+                );
 
         // Create transport and ElasticsearchClient
         ElasticsearchTransport transport = new RestClientTransport(
