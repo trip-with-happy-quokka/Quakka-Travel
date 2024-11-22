@@ -9,13 +9,9 @@ import com.sparta.quokkatravel.domain.coupon.entity.CouponStatus;
 import com.sparta.quokkatravel.domain.coupon.entity.CouponType;
 import com.sparta.quokkatravel.domain.search.document.AccommodationDocument;
 import com.sparta.quokkatravel.domain.search.document.CouponDocument;
-import com.sparta.quokkatravel.domain.search.dto.SearchAccommodationRes;
-import com.sparta.quokkatravel.domain.search.dto.SearchCouponRes;
 import com.sparta.quokkatravel.domain.search.repository.AccommodationSearchRepository;
 import com.sparta.quokkatravel.domain.search.repository.CouponSearchRepository;
 import lombok.RequiredArgsConstructor;
-import org.json.simple.JSONObject;
-import org.springframework.data.elasticsearch.repository.query.parser.ElasticsearchQueryCreator;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -39,7 +35,7 @@ public class SearchServiceImpl implements SearchService {
             Query multiMatchQuery = new Query.Builder()
                     .multiMatch(m -> m
                             .query(name)
-                            .fields(List.of("name.korean", "name.english"))
+                            .fields(List.of("name", "name.korean", "name.english"))
                             .minimumShouldMatch("75%")
                     ).build();
             mustQuery.add(multiMatchQuery);

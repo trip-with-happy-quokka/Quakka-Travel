@@ -38,7 +38,7 @@ spring:
       timeout: 10000
 
   elasticsearch:
-    uris: 52.79.171.129:9200
+    uris: ${AWS_ELK_URL}:9200
     password: ${AWS_ELASTIC_SEARCH_PW}
     username: ${AWS_ELASTIC_SEARCH_ID} # elastic
     connection-timeout: 1s
