@@ -1,2 +1,2 @@
-GET http://localhost:9200/test_index06_for_accommodations/_search?pretty
+GET http://52.79.171.129:9200/accommodations/_search?pretty
 Authorization: Basic ZWxhc3RpYzoxMjM0NTY=

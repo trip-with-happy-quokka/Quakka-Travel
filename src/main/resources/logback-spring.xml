@@ -8,7 +8,7 @@
     </appender>
     <!-- Logstash 전송 INFO 중 UserAction, WARN, ERROR -->
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>52.79.171.129:5001</destination> <!-- Logstash server IP 주소 -->
+        <destination>${AWS_ELK_URL}:5001</destination> <!-- Logstash server IP 주소 -->
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <customFields>{"serviceName": "quokka-travel"}</customFields>
         </encoder>
